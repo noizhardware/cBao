@@ -1,0 +1,5 @@
+$ cat .gitattributes
+freeglut-3.0.0/* linguist-vendored
+GLFW/* linguist-vendored
+i686-w64-mingw32/* linguist-vendored
+libraries/* linguist-vendored
