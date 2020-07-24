@@ -1,0 +1,1 @@
+  -LC:/MinGW/lib/gcc/mingw32/8.2.0  -LC:/MinGW/lib/gcc  -LC:/MinGW/mingw32/lib  -LC:/MinGW/lib  -lglu32 -lopengl32 -lwinmm lib/libfreeglut_static.a -lopengl32 -lwinmm -lmingw32 -lgcc -lmoldname -lmingwex -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc -lmoldname -lmingwex -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

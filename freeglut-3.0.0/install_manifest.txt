@@ -1,0 +1,8 @@
+C:/mingw64/x86_64-w64-mingw32/lib/libfreeglut.dll.a
+C:/mingw64/x86_64-w64-mingw32/bin/libfreeglut.dll
+C:/mingw64/x86_64-w64-mingw32/lib/libfreeglut_static.a
+C:/mingw64/x86_64-w64-mingw32/include/GL/freeglut.h
+C:/mingw64/x86_64-w64-mingw32/include/GL/freeglut_ext.h
+C:/mingw64/x86_64-w64-mingw32/include/GL/freeglut_std.h
+C:/mingw64/x86_64-w64-mingw32/include/GL/glut.h
+C:/mingw64/x86_64-w64-mingw32/lib/pkgconfig/freeglut.pc
