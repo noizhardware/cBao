@@ -8,7 +8,9 @@
  * need to use -Wno-long-long
  */
 
-#include <windows.h>
+#ifndef _POSIX_C_SOURCE
+     #include <windows.h>
+#endif
 
 #ifdef WIN32
 #elif _POSIX_C_SOURCE >= 199309L
