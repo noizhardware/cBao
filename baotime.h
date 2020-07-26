@@ -8,9 +8,11 @@
  * need to use -Wno-long-long
  */
 
-#ifndef _POSIX_C_SOURCE
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
      #include <windows.h>
-#else
+#endif
+
+#ifdef __linux__
      #include <sys/time.h>
 #endif
 
@@ -43,7 +45,7 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unuse
     /* Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
      * This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
      * until 00:00:00 January 1, 1970 */
-
+    
     static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL); /* this is C99 -- cacca -- need to use -Wno-long-long to compile C90 */
 
     SYSTEMTIME  system_time; /* for .wMilliseconds >> 16bits */
@@ -52,10 +54,10 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unuse
 
     GetSystemTime( &system_time ); /* system time can be retrieved only in SYSTEMTIME format (year,month,day....) */
     SystemTimeToFileTime( &system_time, &file_time ); /* here is converted in FILETIME format (number of 100-nanosecond intervals since January 1, 1601 (UTC)) */
-
+    
     time =  ((uint64_t)file_time.dwLowDateTime )      ;
     time += ((uint64_t)file_time.dwHighDateTime) << 32;
-
+    
     tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
     tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
     return 0;
@@ -110,14 +112,14 @@ static __inline__ void stopTimer(){
      if(__BAOTIME_H__running){
           gettimeofday(&__BAOTIME_H__stopTime, NULL);
           __BAOTIME_H__running = false;}}
-
+          
 static __inline__ void resetTimer(){
   __BAOTIME_H__savedTime.tv_sec = 0; __BAOTIME_H__savedTime.tv_usec = 0;
   __BAOTIME_H__difference.tv_sec = 0; __BAOTIME_H__difference.tv_usec = 0;
   __BAOTIME_H__startTime.tv_sec = 0; __BAOTIME_H__startTime.tv_usec = 0;
   __BAOTIME_H__stopTime.tv_sec = 0; __BAOTIME_H__stopTime.tv_usec = 0;
-  __BAOTIME_H__running = false;}
-
+  __BAOTIME_H__running = FALSE;}
+          
 static __inline__ struct timeval elapsed(){
      return timevalDiff(__BAOTIME_H__stopTime, __BAOTIME_H__startTime);}
 
@@ -130,7 +132,7 @@ static __inline__ void pauseTimer(){
           __BAOTIME_H__running = false;}
      else {
           startTimer();}} /* if the timer was already paused, when they click pause again, start the timer again */
-
+          
 
 
 static __inline__ void timertoggle(){
@@ -161,8 +163,8 @@ static __inline__ void getTime(){
           __BAOTIME_H__difference = timevalSum(timevalDiff(__BAOTIME_H__updatedTime, __BAOTIME_H__startTime), __BAOTIME_H__savedTime);}
      else {
           __BAOTIME_H__difference =  timevalDiff(__BAOTIME_H__updatedTime, __BAOTIME_H__startTime);}}
-
+          
 static __inline__ float sec_to_hm(unsigned long int sec){
      return floor(((float)sec / 3600)) + ((((float)sec / 3600) - floor(((float)sec / 3600))) * 0.6);}
-
+     
 #endif /* __BAOTIME_H__ */
