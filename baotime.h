@@ -10,6 +10,8 @@
 
 #ifndef _POSIX_C_SOURCE
      #include <windows.h>
+#else
+     #include <sys/time.h>
 #endif
 
 #ifdef WIN32
