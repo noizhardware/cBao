@@ -9,8 +9,8 @@ extern "C" {
 #endif
 
 /* for 2D arrays*/
-#define ARRAYELEMS(arr) sizeof(*arr)-1 /* how many elements in the array */
-/* #define ARRAYELEMSIZE(arr) sizeof(arr[0]) -- size of the single elements */
+/*#define ARRAYELEMS(arr) sizeof arr / sizeof arr[0]*/ /* how many elements in the array */
+#define ARRAYELEMS(arr) (&arr)[1] - arr /* how many elements in the array */
 
 #define foreach(item, array) \
     for(int keep = 1, \
