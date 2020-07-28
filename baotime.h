@@ -66,7 +66,7 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unuse
 /**********************************/
 
 /* globals: */
-struct timeval __BAOTIME_H__stop, __BAOTIME_H__startTime, __BAOTIME_H__stopTime, __BAOTIME_H__difference, __BAOTIME_H__savedTime, __BAOTIME_H__updatedTime;
+struct timeval __BAOTIME_H__stop, __BAOTIME_H__startTime, __BAOTIME_H__stopTime, __BAOTIME_H__difference, __BAOTIME_H__savedTime, __BAOTIME_H__updatedTime, __BAOTIME_H__splitTime;
 bool __BAOTIME_H__running = false;
 /**********************************/
 
@@ -77,12 +77,15 @@ bool __BAOTIME_H__running = false;
 static __inline__ float sec_to_hm(unsigned long int sec);
 static __inline__ void pauseTimer();
 static __inline__ void startTimer();
+static __inline__ void splitTimer();
 static __inline__ void timertoggle();
 static __inline__ void resetTimer();
 static __inline__ struct timeval timevalDiff(struct timeval a, struct timeval b);
 static __inline__ struct timeval timevalSum(struct timeval a, struct timeval b);
 static __inline__ void getTime();
 static __inline__ void sleep_ms(int milliseconds);
+static __inline__ struct timeval elapsed();
+static __inline__ struct timeval getSplit();
 
 /**********************************/
 
@@ -101,11 +104,10 @@ static __inline__ void sleep_ms(int milliseconds){ /* cross-platform sleep funct
 
 /* SW StopWatch functions: */
 
-/* writes current time in __BAOTIME_H__startTime, if timer already running, do nothing */
+/* writes current time in __BAOTIME_H__startTime, if timer already running, it gets reset and started */
 static __inline__ void startTimer(){
-     if(!__BAOTIME_H__running){
           gettimeofday(&__BAOTIME_H__startTime, NULL);
-          __BAOTIME_H__running = true;}}
+          __BAOTIME_H__running = true;}
 
 /* writes current time in stopTime, if timer is not running, do nothing */
 static __inline__ void stopTimer(){
@@ -113,6 +115,11 @@ static __inline__ void stopTimer(){
           gettimeofday(&__BAOTIME_H__stopTime, NULL);
           __BAOTIME_H__running = false;}}
 
+/* writes current time in splitTime, doesn't stop the timer, if timer is not running, do nothing */
+static __inline__ void splitTimer(){
+     if(__BAOTIME_H__running){
+          gettimeofday(&__BAOTIME_H__splitTime, NULL);}}
+          
 static __inline__ void resetTimer(){
   __BAOTIME_H__savedTime.tv_sec = 0; __BAOTIME_H__savedTime.tv_usec = 0;
   __BAOTIME_H__difference.tv_sec = 0; __BAOTIME_H__difference.tv_usec = 0;
@@ -122,7 +129,9 @@ static __inline__ void resetTimer(){
 
 static __inline__ struct timeval elapsed(){
      return timevalDiff(__BAOTIME_H__stopTime, __BAOTIME_H__startTime);}
-
+     
+static __inline__ struct timeval getSplit(){
+     return timevalDiff(__BAOTIME_H__splitTime, __BAOTIME_H__startTime);}
 
 static __inline__ void pauseTimer(){
      if ((__BAOTIME_H__difference.tv_sec == 0) && (__BAOTIME_H__difference.tv_usec == 0)){
