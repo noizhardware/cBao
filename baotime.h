@@ -52,14 +52,14 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unuse
     FILETIME    file_time/*, EPOCHdiff*/; /* for dwLowDateTime and dwHighDateTime >> unsigned 32bits */
     uint64_t    time;
 
-    GetSystemTime( &system_time ); /* system time can be retrieved only in SYSTEMTIME format (year,month,day....) */
+    GetSystemTime( &system_time ); /* system time can be retrieved only in SYSTEMTIME format (year,month,day....) mSec precision*/
     SystemTimeToFileTime( &system_time, &file_time ); /* here is converted in FILETIME format (number of 100-nanosecond intervals since January 1, 1601 (UTC)) */
 
     time =  ((uint64_t)file_time.dwLowDateTime )      ;
     time += ((uint64_t)file_time.dwHighDateTime) << 32;
 
     tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
-    tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
+    tp->tv_usec = (long) (system_time.wMilliseconds * 1000); /* will ALWAYS have 3 non-information-carrying trailing zeroes */
     return 0;
 }
 #endif
