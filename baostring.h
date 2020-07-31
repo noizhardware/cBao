@@ -1,7 +1,7 @@
 #ifndef __BAOSTRING_H__
 #define __BAOSTRING_H__
 
-/* 202007241411 */
+/* 202007311331 */
 
 /* C90 compliant <3 */
 
@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+
+#include "baomath.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +26,12 @@ static __inline__ char digitToChar(unsigned char digit);
 static __inline__ char* boolToStr(bool in);
 static __inline__ bool strEqual(char* st1, char* st2);
 static __inline__ char* removeSubstr(char* str, char* toRemove);
+
+static __inline__ void* reallok(void* source, size_t size);
+static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker);
+static __inline__ char* clearStringUntilChar(char* inputString, char marker, bool deleteMarker);
+
+static __inline__ bool startsWith(char* str, char* with);
 /* prototypes END */
 
 static __inline__ char* toUpper(char* str){
@@ -98,6 +106,77 @@ static __inline__ char* removeSubstr(char* str, char* toRemove){
           out=calloc(1, lenStr+1);
           strcpy(out, str);}
      return out;}
+     
+static __inline__ void* reallok(void* source, size_t size){ /* basically alloc with automatic check for success/fail*/
+  void* tempPtr = realloc(source, size);
+  if(tempPtr != NULL){
+       return tempPtr;}
+  else{
+       return source;}}
+     
+/*
+// takes string and removes everything after the first occurrence of the "marker" char. marker must be a single char
+// the bool deleteMarker determines whether the marker is deleted as well or not
+// deleteMarker TRUE >> marker gets deleted
+// terminateStringOnChar(str, ':', FALSE) deletes everything after the first ':'
+//if freeTheSource is TRUE, the original inputString will be freed from memory. destructive*/
+static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker){
+     char* ptr;
+     char* outputString; /* new internal char* */
+     outputString = malloc(strlen(inputString)+1); 
+     strcpy(outputString, inputString); /* copies inputString into outputString, now they're identical*/
+     ptr = strchr(outputString, marker);
+     if (ptr != NULL){
+          ptr += !deleteMarker;
+          *ptr = '\0';
+          reallok(outputString, strlen(inputString)+1-(ptr-(outputString+1))); /* resize allocated memory*/
+          /*if(freeTheSource){
+               free(inputString);}*/ /* frees the old allocation*/
+          return outputString;}
+     else{ /* not found*/
+          free(outputString); /* freeing the allocation, it was all useless :(*/
+          return inputString;}}
+          
+/*
+// takes string and removes everything before the first occurrence of the "marker" char. marker must be a single char
+// the bool deleteMarker determines whether the marker is deleted as well or not
+// deleteMarker TRUE >> marker gets deleted
+// clearStringUntilChar(str, ':', FALSE) deletes everything before the first ':',
+////////// THIS FUNCTION SHOULD BE OK, BUT IT HAS NEVER BEEN TESTED!!!!! /////////////////////////
+///////////////DO NOT FREETHESOURCE, for now///////////////////////////////*/
+static __inline__ char* clearStringUntilChar(char* inputString, char marker, bool deleteMarker){
+     char* ptr;
+     char* outputString; /*new internal char* */
+     ptr = strchr(inputString, marker);
+     if (ptr != NULL){ /* we've got a match!*/
+          ptr += deleteMarker;
+          outputString = malloc(strlen(inputString)+1-(ptr-inputString)); /* allocate memory, smaller than inputString*/
+          outputString = ptr;
+          /*if(freeTheSource){
+               //free(inputString);} // frees the old allocation*/
+          return outputString;}
+     else{ /* not found*/
+          return inputString;}}
+          
+#ifndef BRANCH     
+     static __inline__ bool startsWith(char* str, char* with){
+          int i;
+          size_t c = 0;
+          for(i=0; i<(minn(strlen(with),strlen(str))); i++){
+               c += str[i]==with[i];}
+          return (c==strlen(with))&&(strlen(with)<strlen(str));}
+#endif
+
+/* branching version: */
+#ifdef BRANCH
+     static __inline__ bool startsWith(char* str, char* with){
+          size_t i;
+          size_t c = 0;
+          if(strlen(with)<strlen(str)){
+          for(i=0; i<(strlen(with)); i++){
+               c += str[i]==with[i];}}
+          return (c==strlen(with));}
+#endif
 
 #ifdef __cplusplus
 }
