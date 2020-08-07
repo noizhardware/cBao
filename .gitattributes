@@ -1,4 +1,7 @@
 $ cat .gitattributes
+*.c linguist-detectable=true
+*.h linguist-language=C
+_OLD/* linguist-vendored
 freeglut-3.0.0/* linguist-vendored
 glew-2.1.0-win32/* linguist-vendored
 GLFW/* linguist-vendored
