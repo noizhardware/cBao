@@ -1,6 +1,9 @@
 $ cat .gitattributes
 freeglut-3.0.0/* linguist-vendored
+glew-2.1.0-win32/* linguist-vendored
 GLFW/* linguist-vendored
 i686-w64-mingw32/* linguist-vendored
 libraries/* linguist-vendored
-glew-2.1.0-win32/* linguist-vendored
+SDL2-2.0.12/* linguist-vendored
+SDL2-2.0.12-win32-x64/* linguist-vendored
+sdl2-mingw/* linguist-vendored
