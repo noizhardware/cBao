@@ -42,7 +42,7 @@ static __inline__ char* toUpper(char* str){
      for(i=0; i<len; i++){
           out[i] -= 32*(out[i] >= 'a' && out[i] <= 'z');} /* branchless!! */
      return out;}
-     
+
 static __inline__ char* appendChar(char* str, char c){
          size_t len = strlen(str);
          char *out = calloc(1, len + 2); /* one for the extra char, one for trailing zero */
@@ -51,7 +51,7 @@ static __inline__ char* appendChar(char* str, char c){
          out[len + 1] = '\0';
          free(str);
          return out;}
-         
+
 /* str1 must be previously malloc'd, and will be free'd here. str2 will not be free'd here */
 static __inline__ char* appendString(char* str1, char* str2){
      size_t len1 = strlen(str1);
@@ -68,8 +68,8 @@ static __inline__ char* appendString(char* str1, char* str2){
           exit(-1);}}
 
 
-         
-/* gives true even if it's an int */         
+
+/* gives true even if it's an int */
 static __inline__ bool isFloat(char *str){
   char *ptr = NULL;
   strtod(str, &ptr);
@@ -82,7 +82,7 @@ static __inline__ bool isInt(char *str){
 
 static __inline__ char digitToChar(unsigned char digit){
      return digit +'0';}
-     
+
 static __inline__ char* boolToStr(bool in){
      if(in){
           return "true";}
@@ -106,14 +106,14 @@ static __inline__ char* removeSubstr(char* str, char* toRemove){
           out=calloc(1, lenStr+1);
           strcpy(out, str);}
      return out;}
-     
+
 static __inline__ void* reallok(void* source, size_t size){ /* basically alloc with automatic check for success/fail*/
   void* tempPtr = realloc(source, size);
   if(tempPtr != NULL){
        return tempPtr;}
   else{
        return source;}}
-     
+
 /*
 // takes string and removes everything after the first occurrence of the "marker" char. marker must be a single char
 // the bool deleteMarker determines whether the marker is deleted as well or not
@@ -123,7 +123,7 @@ static __inline__ void* reallok(void* source, size_t size){ /* basically alloc w
 static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker){
      char* ptr;
      char* outputString; /* new internal char* */
-     outputString = malloc(strlen(inputString)+1); 
+     outputString = malloc(strlen(inputString)+1);
      strcpy(outputString, inputString); /* copies inputString into outputString, now they're identical*/
      ptr = strchr(outputString, marker);
      if (ptr != NULL){
@@ -136,7 +136,7 @@ static __inline__ char* terminateStringOnChar(char* inputString, char marker, bo
      else{ /* not found*/
           free(outputString); /* freeing the allocation, it was all useless :(*/
           return inputString;}}
-          
+
 /*
 // takes string and removes everything before the first occurrence of the "marker" char. marker must be a single char
 // the bool deleteMarker determines whether the marker is deleted as well or not
@@ -158,8 +158,8 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
      else{ /* not found*/
           return inputString;}}
 
-/* startsWith */          
-#ifndef BRANCH     
+/* startsWith */
+#ifndef BRANCH
      static __inline__ bool startsWith(char* str, char* with){
           int i;
           size_t c = 0;
@@ -184,18 +184,13 @@ char** makeStringTable(int dimensionA, int dimensionB)
      int i;
     char* values = calloc(dimensionA*dimensionB, sizeof(char));
     char** rows = malloc(dimensionB*sizeof(char*));
-    for (i=0; i<dimensionB; i++)
-    {
-        rows[i] = values + i*dimensionA;
-    }
-    return rows;
-}
+    for (i=0; i<dimensionB; i++){
+        rows[i] = values + i*dimensionA;}
+    return rows;}
 
-void freeStringTable(char** arr)
-{
+void freeStringTable(char** arr){
     free(*arr);
-    free(arr);
-}
+    free(arr);}
 
 #ifdef __cplusplus
 }
