@@ -32,6 +32,9 @@ static __inline__ char* terminateStringOnChar(char* inputString, char marker, bo
 static __inline__ char* clearStringUntilChar(char* inputString, char marker, bool deleteMarker);
 
 static __inline__ bool startsWith(char* str, char* with);
+
+static __inline__ char** makeStringTable(int dimensionA, int dimensionB);
+static __inline__ void freeStringTable(char** arr);
 /* prototypes END */
 
 static __inline__ char* toUpper(char* str){
@@ -179,18 +182,17 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
 #endif
 /* startsWith END */
 
-char** makeStringTable(int dimensionA, int dimensionB)
-{
+static __inline__ char** makeStringTable(int dimensionA, int dimensionB){
      int i;
-    char* values = calloc(dimensionA*dimensionB, sizeof(char));
-    char** rows = malloc(dimensionB*sizeof(char*));
-    for (i=0; i<dimensionB; i++){
-        rows[i] = values + i*dimensionA;}
-    return rows;}
+     char* values = calloc(dimensionA*dimensionB, sizeof(char));
+     char** rows = malloc(dimensionB*sizeof(char*));
+     for (i=0; i<dimensionB; i++){
+          rows[i] = values + i*dimensionA;}
+     return rows;}
 
-void freeStringTable(char** arr){
-    free(*arr);
-    free(arr);}
+static __inline__ void freeStringTable(char** arr){
+     free(*arr);
+     free(arr);}
 
 #ifdef __cplusplus
 }
