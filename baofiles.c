@@ -11,8 +11,8 @@ int main(){
      printf("==fileToLines:\n");
 
      while(lines[loopTable][0]!='\0'){
-     printf("%s\n", lines[loopTable]);
-     loopTable++;}
+          printf("%s\n", lines[loopTable]);
+          loopTable++;}
 
      freeStringTable(lines);
 

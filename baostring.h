@@ -194,6 +194,20 @@ static __inline__ void freeStringTable(char** arr){
      free(*arr);
      free(arr);}
 
+/* terminates the string on a match, if there is one, otherwise returns the same string */
+static __inline__ char* terminateStringOnString(char* in, char* marker, bool deleteMarker){
+     size_t lenMark = strlen(marker);
+     size_t lenStr = strlen(in);
+     char* out;
+     char* match = strstr(in, marker);
+     if(match != NULL){
+          out=calloc(1, match-in+1 + ((!deleteMarker)*lenMark));
+          memcpy(out, in, match-in + ((!deleteMarker)*lenMark));}
+     else{
+          out=calloc(1, lenStr+1);
+          strcpy(out, in);}
+     return out;}
+
 #ifdef __cplusplus
 }
 #endif

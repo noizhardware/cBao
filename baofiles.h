@@ -25,7 +25,7 @@ extern "C" {
 static __inline__ char* fileRead(char* fileName);
 static __inline__ long int fileSize(char* filename);
 static __inline__ bool fileWrite(char* fileName, char* stuffToWrite);
-static __inline__ char** fileToLines(char* in);
+static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile);
 /* prototypes END */
 
 static __inline__ char* fileRead(char* file){
@@ -83,18 +83,16 @@ static __inline__ long int fileSize(char* filename){ /*returns size in bytes, NO
      fclose(in);
      return size;}
      
-/* (file)>>(array of lines) */
-static __inline__ char** fileToLines(char* fileName){
-     #define MAX_LINE_SIZE 128 
-     #define MAX_LINES_IN_FILE 256    
-     /*static char line[MAX_LINES_IN_FILE][MAX_LINE_SIZE];*/
-     char** line = makeStringTable(MAX_LINES_IN_FILE, MAX_LINE_SIZE);
+/* (file)>>(array of lines) terminated by an EOF*/
+static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile){
+     char** line = makeStringTable(maxLinesInFile, maxLineSize);
      FILE *fptr = NULL; 
      int i = 0;
      fptr = fopen(fileName, "r");
-     while(fgets(line[i], MAX_LINE_SIZE, fptr)){
+     while(fgets(line[i], maxLineSize, fptr)){
           line[i][strlen(line[i]) - 1] = '\0';
           i++;}
+     line[i][0]=(char)EOF;
      return line;}
      
      
