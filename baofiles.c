@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "baofiles.h"
 
-/* gcc -ansi -g0 -Wall -Wextra -Wshadow -Wvla -pedantic-errors -o baofiles.exe baofiles.c */
+/* 202008081633 */
 
 int main(){
      int loopTable = 0;
