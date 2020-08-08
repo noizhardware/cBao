@@ -25,9 +25,40 @@ extern "C" {
 static __inline__ char* fileRead(char* fileName);
 static __inline__ long int fileSize(char* filename);
 static __inline__ bool fileWrite(char* fileName, char* stuffToWrite);
-static __inline__ char** fileToLines(char* in);
+static __inline__ char** fileToLines(char* in){
 /* prototypes END */
 
+/* you need to free() the string when you're done using it */
+static __inline__ char* fileRead_OLD(char* fileName){
+     FILE* in = fopen(fileName, "r");
+     int c;
+     char* fileContents = malloc(fileSize(fileName)+1); /* to include the '\0' terminator */
+     
+     *fileContents = '\0';
+     
+     if(in == NULL){
+          printf("read error\n");
+          exit(-1);}
+          /********************************
+          il problema è quando entro in questo while loop, per qualche motivo, riscrivendo fileContents
+          ripetutamente, si perde la possibilità di fare "free" fuori dal while loop
+          ********************************/
+     while ((c = fgetc(in)) != EOF) {
+          fileContents = appendChar(fileContents, c);
+          fileContents = realloc(fileContents, strlen(fileContents)+1);
+     }
+     /*free(fileContents);*/
+          
+     /*fileContents = realloc(fileContents, fileSize(fileName)+1);*/ /* to include the '\0' terminator */
+     /*fileContents[fileSize(fileName)] = '\0';*/ /* terminate the string */
+
+     if (fclose(in)){
+          printf("error closing file.\n");
+          exit(-1);}
+     /*else{
+          printf("fclose success!\n");}*/
+     return fileContents;}
+     
 static __inline__ char* fileRead(char* file){
      FILE* fp;
      long fileSize;
@@ -83,14 +114,14 @@ static __inline__ long int fileSize(char* filename){ /*returns size in bytes, NO
      fclose(in);
      return size;}
      
-/* (file)>>(array of lines) */
+/* (file)>>(array of lines */)
 static __inline__ char** fileToLines(char* fileName){
      #define MAX_LINE_SIZE 128 
      #define MAX_LINES_IN_FILE 256    
-     /*static char line[MAX_LINES_IN_FILE][MAX_LINE_SIZE];*/
-     char** line = makeStringTable(MAX_LINES_IN_FILE, MAX_LINE_SIZE);
+     static char line[MAX_LINES_IN_FILE][MAX_LINE_SIZE];
      FILE *fptr = NULL; 
      int i = 0;
+     int tot = 0;
      fptr = fopen(fileName, "r");
      while(fgets(line[i], MAX_LINE_SIZE, fptr)){
           line[i][strlen(line[i]) - 1] = '\0';

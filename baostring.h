@@ -157,7 +157,8 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
           return outputString;}
      else{ /* not found*/
           return inputString;}}
-          
+
+/* startsWith */          
 #ifndef BRANCH     
      static __inline__ bool startsWith(char* str, char* with){
           int i;
@@ -166,7 +167,6 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
                c += str[i]==with[i];}
           return (c==strlen(with))&&(strlen(with)<strlen(str));}
 #endif
-
 /* branching version: */
 #ifdef BRANCH
      static __inline__ bool startsWith(char* str, char* with){
@@ -177,6 +177,25 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
                c += str[i]==with[i];}}
           return (c==strlen(with));}
 #endif
+/* startsWith END */
+
+char** makeStringTable(int dimensionA, int dimensionB)
+{
+     int i;
+    char* values = calloc(dimensionA*dimensionB, sizeof(char));
+    char** rows = malloc(dimensionB*sizeof(char*));
+    for (i=0; i<dimensionB; i++)
+    {
+        rows[i] = values + i*dimensionA;
+    }
+    return rows;
+}
+
+void freeStringTable(char** arr)
+{
+    free(*arr);
+    free(arr);
+}
 
 #ifdef __cplusplus
 }
