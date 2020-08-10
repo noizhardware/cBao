@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define NIL ((void*)0)
+
 /* for 2D arrays*/
 /*#define ARRAYELEMS(arr) sizeof arr / sizeof arr[0]*/ /* how many elements in the array */
 #define ARRAYELEMS(arr) (&arr)[1] - arr /* how many elements in the array */

@@ -56,12 +56,12 @@ static __inline__ char* fileRead(char* file){
           free(fileContents);
           fputs("entire read fails",stderr);
           exit(1);}
-          
+
      /* close the file */
      fclose(fp);
      return fileContents;}
-     
-static __inline__ bool fileWrite(char* fileName, char* stuffToWrite){     
+
+static __inline__ bool fileWrite(char* fileName, char* stuffToWrite){
      FILE* out = fopen(fileName, "w"); /* open file for writing */
      char* ORIGINALstuffToWrite;
      if (!out) {
@@ -74,7 +74,7 @@ static __inline__ bool fileWrite(char* fileName, char* stuffToWrite){
      stuffToWrite = ORIGINALstuffToWrite;
      fclose(out);
      return true;}
-     
+
 static __inline__ long int fileSize(char* filename){ /*returns size in bytes, NOT counting the EOF byte  */
      FILE* in = fopen(filename, "r");
      long int size;
@@ -82,11 +82,11 @@ static __inline__ long int fileSize(char* filename){ /*returns size in bytes, NO
      size = ftell(in);
      fclose(in);
      return size;}
-     
+
 /* (file)>>(array of lines) terminated by an EOF*/
 static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile){
      char** line = makeStringTable(maxLinesInFile, maxLineSize);
-     FILE *fptr = NULL; 
+     FILE *fptr = NULL;
      int i = 0;
      fptr = fopen(fileName, "r");
      while(fgets(line[i], maxLineSize, fptr)){
@@ -94,8 +94,8 @@ static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, u
           i++;}
      line[i][0]=(char)EOF;
      return line;}
-     
-     
+
+
 #ifdef __cplusplus
 }
 #endif
