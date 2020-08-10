@@ -30,10 +30,10 @@ static __inline__ char digitToChar(unsigned char digit);
 static __inline__ char* boolToStr(bool in);
 static __inline__ bool strEqual(char* st1, char* st2);
 static __inline__ char* removeSubstr(char* str, char* toRemove);
-
 static __inline__ void* reallok(void* source, size_t size);
 static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker);
 static __inline__ char* clearStringUntilChar(char* inputString, char marker, bool deleteMarker);
+static __inline__ char* terminateStringOnString(char* in, char* marker, bool deleteMarker);
 
 static __inline__ bool startsWith(char* str, char* with);
 

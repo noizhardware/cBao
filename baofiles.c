@@ -6,11 +6,11 @@
 int main(){
      int loopTable = 0;
      char** lines;
-     lines = fileToLines("test.txt");
+     lines = fileToLines("test.txt", 256, 256);
 
      printf("==fileToLines:\n");
 
-     while(lines[loopTable][0]!='\0'){
+     while(lines[loopTable][0]!=EOF){
           printf("%s\n", lines[loopTable]);
           loopTable++;}
 
