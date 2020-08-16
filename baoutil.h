@@ -1,14 +1,19 @@
 #ifndef __BAOUTIL_H__
 #define __BAOUTIL_H__
-/* 202007241413 */
+/* 202008152305 */
 
 /* C90 compliant <3 */
+
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define NIL ((void*)0)
+
+static __inline__ char* boolToString(bool in){
+  return in ? "true" : "false";}
 
 /* for 2D arrays*/
 /*#define ARRAYELEMS(arr) sizeof arr / sizeof arr[0]*/ /* how many elements in the array */
