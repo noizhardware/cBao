@@ -10,3 +10,5 @@ libraries/* linguist-vendored
 SDL2-2.0.12/* linguist-vendored
 SDL2-2.0.12-win32-x64/* linguist-vendored
 sdl2-mingw/* linguist-vendored
+glut.h linguist-vendored
+direntWin.h linguist-vendored
