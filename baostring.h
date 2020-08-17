@@ -37,7 +37,7 @@ static __inline__ char* terminateStringOnString(char* in, char* marker, bool del
 
 static __inline__ bool startsWith(char* str, char* with);
 
-static __inline__ char** makeStringTable(int dimensionA, int dimensionB);
+static __inline__ char** makeStringTable(unsigned int dimensionA, unsigned int dimensionB);
 static __inline__ void freeStringTable(char** arr);
 /* prototypes END */
 
@@ -100,6 +100,7 @@ static __inline__ bool strEqual(char* st1, char* st2){
      return (strcmp(st1, st2)==0);}
 
 /* removes the first occurrence of sub from the input string, if there is one */
+/* you must free the output element of this function */
 static __inline__ char* removeSubstr(char* str, char* toRemove){
      size_t lenRem = strlen(toRemove);
      size_t lenStr = strlen(str);
@@ -186,8 +187,8 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
 #endif
 /* startsWith END */
 
-static __inline__ char** makeStringTable(int dimensionA, int dimensionB){
-     int i;
+static __inline__ char** makeStringTable(unsigned int dimensionA, unsigned int dimensionB){
+     unsigned int i;
      char* values = calloc(dimensionA*dimensionB, sizeof(char));
      char** rows = malloc(dimensionB*sizeof(char*));
      for (i=0; i<dimensionB; i++){
