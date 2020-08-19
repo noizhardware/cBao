@@ -190,7 +190,7 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
 static __inline__ char** makeStringTable(unsigned int dimensionA, unsigned int dimensionB){
      unsigned int i;
      char* values = calloc(dimensionA*dimensionB, sizeof(char));
-     char** rows = malloc(dimensionB*sizeof(char*));
+     char** rows = calloc(dimensionB, sizeof(char*));
      for (i=0; i<dimensionB; i++){
           rows[i] = values + i*dimensionA;}
      return rows;}

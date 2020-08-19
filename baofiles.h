@@ -1,7 +1,7 @@
 #ifndef __BAOFILES_H__
 #define __BAOFILES_H__
 
-/* 202008172159 */
+/* 2020h18-1600 */
 
 /* C90 compliant <3 */
 
@@ -15,6 +15,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+     #include "direntWin.h"
+#endif
+
+#ifdef __linux__
+  #include <dirent.h>
+#endif
+
 #include "baostring.h"
 
 #ifdef __cplusplus
@@ -86,15 +95,38 @@ static __inline__ long int fileSize(char* filename){ /*returns size in bytes, NO
 /* (file)>>(array of lines) terminated by an EOF*/
 static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile){
      char** line = makeStringTable(maxLinesInFile, maxLineSize);
-     FILE *fptr = NULL;
+     FILE* fptr = NULL;
      int i = 0;
      fptr = fopen(fileName, "r");
      while(fgets(line[i], maxLineSize, fptr)){
           line[i][strlen(line[i]) - 1] = '\0';
           i++;}
      line[i][0]=(char)EOF;
+     fclose(fptr);
      return line;}
 
+     /* dirlist */
+
+static __inline__ char** dirList(char* directory, unsigned int maxFilesInDir, unsigned int maxFilenameLen){
+    char** dirList = makeStringTable(maxFilesInDir, maxFilenameLen);
+
+     DIR *d;
+     struct dirent *dir;
+     unsigned int arrIndex = 0;
+
+     d = opendir(directory);
+         if(d){
+             while (((dir = readdir(d)) != NULL)&&(arrIndex<(maxFilenameLen-1))){ /* the -1 is to leave space for the EOF terminator */
+               /*printf("arrIndex: %d\n", arrIndex);*/
+                 sprintf(dirList[arrIndex], "%s", dir->d_name);
+                 /*dirList[arrIndex][0] = 0;*/
+                 arrIndex++;}
+             closedir(d);
+             sprintf(dirList[arrIndex], "%c", EOF);}
+        else{
+          fprintf(stderr, "Cannot find specified directory.\n");}
+    return dirList;
+}
 
 #ifdef __cplusplus
 }
