@@ -12,6 +12,14 @@ extern "C" {
 
 #define NIL ((void*)0)
 
+static __inline__ void porcodio(){
+printf("______ ___________ _____ ___________ _____ _____\n");
+printf("| ___ |  _  | ___ /  __ |  _  |  _  |_   _|  _  |\n");
+printf("| |_/ | | | | |_/ | /  \\| | | | | | | | | | | | |\n");
+printf("|  __/| | | |    /| |   | | | | | | | | | | | | |\n");
+printf("| |   \\ \\_/ | |\\ \\| \\__/\\ \\_/ | |/ / _| |_\\ \\_/ /\n");
+printf("\\_|    \\___/\\_| \\_|\\____/\\___/|___/  \\___/ \\___/\n");}
+
 static __inline__ char* boolToString(bool in){
   return in ? "true" : "false";}
 

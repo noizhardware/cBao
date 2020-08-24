@@ -13,3 +13,4 @@ sdl2-mingw/* linguist-vendored
 glut.h linguist-vendored
 direntWin.h linguist-vendored
 sdl-nix/* linguist-vendored
+miniaudio.h linguist-vendored
