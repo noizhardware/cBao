@@ -1,6 +1,6 @@
 /*
 Audio playback and capture library. Choice of public domain or MIT-0. See license statements at the end of this file.
-miniaudio - v0.10.16 - 2020-08-14
+miniaudio - v0.10.17 - 2020-08-28
 
 David Reid - davidreidsoftware@gmail.com
 
@@ -606,9 +606,6 @@ To perform the conversion simply call `ma_channel_converter_process_pcm_frames()
     ```
 
 It is up to the caller to ensure the output buffer is large enough to accomodate the new PCM frames.
-
-The only formats supported are `ma_format_s16` and `ma_format_f32`. If you need another format you need to convert your data manually which you can do with
-`ma_pcm_convert()`, etc.
 
 Input and output PCM frames are always interleaved. Deinterleaved layouts are not supported.
 
@@ -1423,7 +1420,7 @@ extern "C" {
 
 #define MA_VERSION_MAJOR    0
 #define MA_VERSION_MINOR    10
-#define MA_VERSION_REVISION 16
+#define MA_VERSION_REVISION 17
 #define MA_VERSION_STRING   MA_XSTRINGIFY(MA_VERSION_MAJOR) "." MA_XSTRINGIFY(MA_VERSION_MINOR) "." MA_XSTRINGIFY(MA_VERSION_REVISION)
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -5485,6 +5482,11 @@ MA_API ma_result ma_decoder_init_file_mp3_w(const wchar_t* pFilePath, const ma_d
 MA_API ma_result ma_decoder_init_file_vorbis_w(const wchar_t* pFilePath, const ma_decoder_config* pConfig, ma_decoder* pDecoder);
 
 MA_API ma_result ma_decoder_uninit(ma_decoder* pDecoder);
+
+/*
+Retrieves the current position of the read cursor in PCM frames.
+*/
+MA_API ma_result ma_decoder_get_cursor_in_pcm_frames(ma_decoder* pDecoder, ma_uint64* pCursor);
 
 /*
 Retrieves the length of the decoder in PCM frames.
@@ -10178,7 +10180,7 @@ static ma_result ma_device__handle_duplex_callback_capture(ma_device* pDevice, m
             break;
         }
 
-        result = ma_pcm_rb_commit_write(pRB, (ma_uint32)framesProcessedInDeviceFormat, pFramesInClientFormat);  /* Safe cast. */
+        result = ma_pcm_rb_commit_write(pRB, (ma_uint32)framesProcessedInClientFormat, pFramesInClientFormat);  /* Safe cast. */
         if (result != MA_SUCCESS) {
             ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "Failed to commit capture PCM frames to ring buffer.", result);
             break;
@@ -41622,7 +41624,7 @@ MA_API ma_uint64 ma_audio_buffer_read_pcm_frames(ma_audio_buffer* pAudioBuffer, 
         MA_ASSERT(pAudioBuffer->cursor < pAudioBuffer->sizeInFrames);
     }
 
-    return frameCount;
+    return totalFramesRead;
 }
 
 MA_API ma_result ma_audio_buffer_seek_to_pcm_frame(ma_audio_buffer* pAudioBuffer, ma_uint64 frameIndex)
@@ -42531,7 +42533,7 @@ MA_API ma_result ma_default_vfs_init(ma_default_vfs* pVFS, const ma_allocation_c
 Decoding and Encoding Headers. These are auto-generated from a tool.
 
 **************************************************************************************************************************************************************/
-#if !defined(MA_NO_WAV) && !defined(MA_NO_DECODING) && !defined(MA_NO_ENCODING)
+#if !defined(MA_NO_WAV) && (!defined(MA_NO_DECODING) || !defined(MA_NO_ENCODING))
 /* dr_wav_h begin */
 #ifndef dr_wav_h
 #define dr_wav_h
@@ -42542,7 +42544,7 @@ extern "C" {
 #define DRWAV_XSTRINGIFY(x)     DRWAV_STRINGIFY(x)
 #define DRWAV_VERSION_MAJOR     0
 #define DRWAV_VERSION_MINOR     12
-#define DRWAV_VERSION_REVISION  9
+#define DRWAV_VERSION_REVISION  10
 #define DRWAV_VERSION_STRING    DRWAV_XSTRINGIFY(DRWAV_VERSION_MAJOR) "." DRWAV_XSTRINGIFY(DRWAV_VERSION_MINOR) "." DRWAV_XSTRINGIFY(DRWAV_VERSION_REVISION)
 #include <stddef.h>
 typedef   signed char           drwav_int8;
@@ -44499,13 +44501,11 @@ static ma_result ma_decoder__data_source_on_get_data_format(ma_data_source* pDat
     return MA_SUCCESS;
 }
 
-static ma_result ma_decoder__data_source_on_get_cursor(ma_data_source* pDataSource, ma_uint64* pCursor)
+static ma_result ma_decoder__data_source_on_get_cursor(ma_data_source* pDataSource, ma_uint64* pLength)
 {
     ma_decoder* pDecoder = (ma_decoder*)pDataSource;
 
-    *pCursor = pDecoder->readPointerInPCMFrames;
-
-    return MA_SUCCESS;
+    return ma_decoder_get_cursor_in_pcm_frames(pDecoder, pLength);
 }
 
 static ma_result ma_decoder__data_source_on_get_length(ma_data_source* pDataSource, ma_uint64* pLength)
@@ -45699,6 +45699,23 @@ MA_API ma_result ma_decoder_uninit(ma_decoder* pDecoder)
     }
 
     ma_data_converter_uninit(&pDecoder->converter);
+
+    return MA_SUCCESS;
+}
+
+MA_API ma_result ma_decoder_get_cursor_in_pcm_frames(ma_decoder* pDecoder, ma_uint64* pCursor)
+{
+    if (pCursor == NULL) {
+        return MA_INVALID_ARGS;
+    }
+
+    *pCursor = 0;
+
+    if (pDecoder == NULL) {
+        return MA_INVALID_ARGS;
+    }
+
+    *pCursor = pDecoder->readPointerInPCMFrames;
 
     return MA_SUCCESS;
 }
@@ -47051,7 +47068,7 @@ code below please report the bug to the respective repository for the relevant p
 
 ***************************************************************************************************************************************************************
 **************************************************************************************************************************************************************/
-#if !defined(MA_NO_WAV) && !defined(MA_NO_DECODING) && !defined(MA_NO_ENCODING)
+#if !defined(MA_NO_WAV) && (!defined(MA_NO_DECODING) || !defined(MA_NO_ENCODING))
 #if !defined(DR_WAV_IMPLEMENTATION) && !defined(DRWAV_IMPLEMENTATION) /* For backwards compatibility. Will be removed in version 0.11 for cleanliness. */
 /* dr_wav_c begin */
 #ifndef dr_wav_c
@@ -49087,6 +49104,13 @@ DRWAV_API drwav_bool32 drwav_seek_to_first_pcm_frame(drwav* pWav)
     }
     if (drwav__is_compressed_format_tag(pWav->translatedFormatTag)) {
         pWav->compressed.iCurrentPCMFrame = 0;
+        if (pWav->translatedFormatTag == DR_WAVE_FORMAT_ADPCM) {
+            DRWAV_ZERO_OBJECT(&pWav->msadpcm);
+        } else if (pWav->translatedFormatTag == DR_WAVE_FORMAT_DVI_ADPCM) {
+            DRWAV_ZERO_OBJECT(&pWav->ima);
+        } else {
+            DRWAV_ASSERT(DRWAV_FALSE);
+        }
     }
     pWav->bytesRemaining = pWav->dataChunkDataSize;
     return DRWAV_TRUE;
@@ -62461,6 +62485,14 @@ The following miscellaneous changes have also been made.
 /*
 REVISION HISTORY
 ================
+v0.10.17 - 2020-08-28
+  - Fix an error where the WAV codec is incorrectly excluded from the build depending on which compile time options are set.
+  - Fix a bug in ma_audio_buffer_read_pcm_frames() where it isn't returning the correct number of frames processed.
+  - Fix compilation error on Android.
+  - Core Audio: Fix a bug with full-duplex mode.
+  - Add ma_decoder_get_cursor_in_pcm_frames().
+  - Update WAV codec.
+
 v0.10.16 - 2020-08-14
   - WASAPI: Fix a potential crash due to using an uninitialized variable.
   - OpenSL: Enable runtime linking.
