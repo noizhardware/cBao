@@ -2,14 +2,20 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020h29-1211 */
+/* 2020h31-0101 */
 
 /* C90 compliant <3 */
 
 /* TODO:
-
+     * triangle wave with slew
+     * trapezoid (slewable square - dual control on rise and fall)
+     * looping AR - ASR - ADSR
+     * noises
 */
 
+#include <stdbool.h>
+#include <math.h>
+#include <float.h>
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
@@ -24,6 +30,9 @@
 
 #define MONO 1
 #define STEREO 2
+#define QUAD 4
+
+#define sndOut *Samples
 
 #define SND_INIT \
      ma_device_config deviceConfig; \
@@ -56,6 +65,50 @@
 
 #define DEVICE_NAME \
      device.playback.name
+
+
+     /*In playback mode copy data to pOutput. In capture mode read data from pInput. In full-duplex mode, both
+     pOutput and pInput will be valid and you can move data from pInput into pOutput. Never process more than
+     frameCount frames.*/
+     /* "Samples" is just a (castless in this case) cast of the "pOutput" float pointer */ 
+#define WAVE_BEGIN(format, ch, sr) \
+          int DEVICE_FORMAT = format; \
+          int DEVICE_CHANNELS = ch; \
+          int DEVICE_SAMPLE_RATE = sr; \
+          /* \
+          #define DEVICE_FORMAT F32 \
+          #define DEVICE_CHANNELS     MONO \
+          #define DEVICE_SAMPLE_RATE  48000 \
+          */     \
+     void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount){ \
+          static float clk = 0; \
+          float* Samples = pOutput; \
+          ma_uint32 SampleIndex \
+
+#define WAVE_PRE_SOUND \
+     for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
+          clk=clk*(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a dicontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running. Needs fixing LoL. */
+          
+#define WAVE_END \
+          clk++; \
+          Samples++;} \
+     (void)pDevice; \
+     (void)pInput;} \
+     __asm__("nop") /* just a dummy line to allow a semicolon after the function */
      
+#define RISE 1
+#define FALL 0
+
+#define sigNorm(x) \
+     ((x/2)+.5)
+     
+#define saw(freq, rise) \
+     (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) + \
+     (!rise*((1-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2-1))
+#define sine(freq) \
+     ((float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq))
+#define sq(freq, duty) \
+     (((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1)
+
 
 #endif /* __BAOSND_H__ */
