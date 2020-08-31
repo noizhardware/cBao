@@ -12,6 +12,7 @@
 * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
 
  TODO:
+     * clip(th)
      * phase control
      * triangle wave with slew
      * trapezoid (slewable square - dual control on rise and fall)
