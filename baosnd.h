@@ -2,7 +2,7 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020h31-0101 */
+/* 2020h31-1431 */
 
 /* C90 compliant <3 */
 
