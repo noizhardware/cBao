@@ -6,12 +6,19 @@
 
 /* C90 compliant <3 */
 
-/* TODO:
+/***
+* `sine(freq)` : frequency(float)
+* `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
+* `sq(freq, duty)` : frequency(float), duty cycle[0..1]
+
+ TODO:
+     * phase control
      * triangle wave with slew
      * trapezoid (slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR
      * noises
-*/
+     * s&h
+***/
 
 #include <stdbool.h>
 #include <math.h>
@@ -21,12 +28,17 @@
 #define MA_NO_ENCODING
 #define MINIAUDIO_IMPLEMENTATION
      #include "miniaudio.h"
-
+     
+/***
+Formats:
+***/
+/*a*/
 #define F32 ma_format_f32 /* [-1, 1] */
 #define I16 ma_format_s16 /* [-32768, 32767] */
 #define I24 ma_format_s24 /* [-8388608, 8388607] */
 #define I32 ma_format_s32 /* [-2147483648, 2147483647] */
 #define U8 ma_format_u8 /* [0, 255] */
+/*b*/
 
 #define MONO 1
 #define STEREO 2
