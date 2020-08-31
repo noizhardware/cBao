@@ -11,14 +11,25 @@
 * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
 * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
 
+- `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
+
  TODO:
      * clip(th)
+     * range : [x..y] to [z..w]
+     * ntof(root) - fton(root)
+     * linn(a, b, t) - linearly interpolate a to b in t time
+     * invert signal
+     * coinflip(a, b) : returns a or b randomly
+     * crossfade : equal power
      * phase control
      * triangle wave with slew
      * trapezoid (slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR
      * noises
      * s&h
+     * halfwave : half-wave rectifier - keeps positive part
+     * halfwaveneg : half-wave rectifier - keeps negative part
+     * fullwave : full-wave rectifier
 ***/
 
 #include <stdbool.h>
