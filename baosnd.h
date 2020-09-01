@@ -2,11 +2,36 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020h31-1431 */
+/* 2020i01-1516 */
 
 /* C90 compliant <3 */
 
 /***
+# ANSI C sound library
+## OS backend is managed by [miniaudio](https://miniaud.io)
+
+Sample usage:
+~~~~
+#include "baosnd.h"
+WAVE_BEGIN(F32, MONO, 48000);
+     --user variables definitions here
+WAVE_PRE_SOUND;
+     sndOut = --put your signal generating code here
+WAVE_END;
+
+int main(){
+     SND_INIT;
+          --do something before the sound start here
+     SND_START;
+          --Do something here. Probably your program's main loop.
+     SND_STOP;
+return 0;}
+~~~~
+
+* variables:
+     - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
+     
+
 * `sine(freq)` : frequency(float)
 * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
 * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
@@ -15,7 +40,8 @@
 
  TODO:
      * clip(th)
-     * range : [x..y] to [z..w]
+     * tanh
+     * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
      * ntof(root) - fton(root)
      * linn(a, b, t) - linearly interpolate a to b in t time
      * invert signal
@@ -26,10 +52,11 @@
      * trapezoid (slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR
      * noises
+     * perlin noise
      * s&h
-     * halfwave : half-wave rectifier - keeps positive part
-     * halfwaveneg : half-wave rectifier - keeps negative part
-     * fullwave : full-wave rectifier
+     * hwav : half-wave rectifier - keeps positive part
+     * hwavn : half-wave rectifier - keeps negative part
+     * hwav : full-wave rectifier
 ***/
 
 #include <stdbool.h>
@@ -111,7 +138,7 @@ Formats:
 
 #define WAVE_PRE_SOUND \
      for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
-          clk=clk*(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a dicontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running. Needs fixing LoL. */
+          clk=clk*(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a dicontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running at 48kHz. Needs fixing LoL. */
           
 #define WAVE_END \
           clk++; \
