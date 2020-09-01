@@ -2,9 +2,7 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020i01-1516 */
-
-/* C90 compliant <3 */
+/* 2020i01-1525 */
 
 /***
 # ANSI C sound library
@@ -52,7 +50,7 @@ return 0;}
      * trapezoid (slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR
      * noises
-     * perlin noise
+     * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)
      * s&h
      * hwav : half-wave rectifier - keeps positive part
      * hwavn : half-wave rectifier - keeps negative part
