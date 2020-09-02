@@ -7,6 +7,8 @@
 /***
 # ANSI C sound library
 ## OS backend is managed by [miniaudio](https://miniaud.io)
+All functions are currently branchless
+Use -O3 to optimize for branchless
 
 Sample usage:
 ~~~~
@@ -161,19 +163,25 @@ Formats:
 #define RISE 1
 #define FALL 0
 
+/* UTILITIES */
 static __inline__ float sigNorm(float x){
      return ((x/2)+.5);}
+
+static __inline__ float clip(float sig, float th){
+     /*return (sig*((sig<=th)||(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}*/
+     return (sig*((sig<=th)||(sig>=(-th))));}
      
-     
+
+/* GENERATORS */               
 static __inline__ float saw(float freq, bool rise){
      return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) +
      (!rise*((1-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2-1));} 
      
 static __inline__ float sq(float freq, float duty){
-     return (((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1);}
+     return ((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1;}
      
 static __inline__ float sine(float freq){
-     return ((float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq));}
+     return (float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq);}
 
 
 #endif /* __BAOSND_H__ */
