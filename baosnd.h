@@ -2,7 +2,7 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020i01-1525 */
+/* 2020i02-0857 */
 
 /***
 # ANSI C sound library
@@ -26,17 +26,23 @@ int main(){
 return 0;}
 ~~~~
 
-* variables:
+Compile with:
+* Windows:
+     - `gcc -g0 test.c -o test.exe -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
+* Linux>
+     - `gcc -g0 test.c -o test -ldl -lm -lpthread -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
+
+### System variables:
      - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
      
+### Functions:
+     * `sine(freq)` : frequency(float)
+     * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
+     * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
 
-* `sine(freq)` : frequency(float)
-* `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
-* `sq(freq, duty)` : frequency(float), duty cycle[0..1]
+     - `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
 
-- `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
-
- TODO:
+ #### TODO:
      * clip(th)
      * tanh
      * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
@@ -49,7 +55,7 @@ return 0;}
      * triangle wave with slew
      * trapezoid (slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR
-     * noises
+     * noises (see "Numerical Recipes in C")
      * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)
      * s&h
      * hwav : half-wave rectifier - keeps positive part
@@ -65,6 +71,13 @@ return 0;}
 #define MA_NO_ENCODING
 #define MINIAUDIO_IMPLEMENTATION
      #include "miniaudio.h"
+     
+     
+     static float clk = 0;
+     int DEVICE_FORMAT;
+     int DEVICE_CHANNELS;
+     int DEVICE_SAMPLE_RATE;
+
      
 /***
 Formats:
@@ -130,7 +143,7 @@ Formats:
           #define DEVICE_SAMPLE_RATE  48000 \
           */     \
      void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount){ \
-          static float clk = 0; \
+          /*static float clk = 0;*/ \
           float* Samples = pOutput; \
           ma_uint32 SampleIndex \
 
@@ -148,16 +161,19 @@ Formats:
 #define RISE 1
 #define FALL 0
 
-#define sigNorm(x) \
-     ((x/2)+.5)
+static __inline__ float sigNorm(float x){
+     return ((x/2)+.5);}
      
-#define saw(freq, rise) \
-     (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) + \
-     (!rise*((1-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2-1))
-#define sine(freq) \
-     ((float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq))
-#define sq(freq, duty) \
-     (((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1)
+     
+static __inline__ float saw(float freq, bool rise){
+     return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) +
+     (!rise*((1-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2-1));} 
+     
+static __inline__ float sq(float freq, float duty){
+     return (((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1);}
+     
+static __inline__ float sine(float freq){
+     return ((float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq));}
 
 
 #endif /* __BAOSND_H__ */
