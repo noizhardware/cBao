@@ -37,15 +37,17 @@ Compile with:
 ### System variables:
      - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
      
-### Functions:
+### Signal Generators:
      * `sine(freq)` : frequency(float)
      * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
      * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
 
-     - `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
+### Utilities:
+     * `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
+     * `clip(th)` : threshold(float) - everything outside the range [-th..th] gets clipped to th
 
  #### TODO:
-     * clip(th)
+     * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
      * tanh
      * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
      * ntof(root) - fton(root)
@@ -168,8 +170,7 @@ static __inline__ float sigNorm(float x){
      return ((x/2)+.5);}
 
 static __inline__ float clip(float sig, float th){
-     /*return (sig*((sig<=th)||(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}*/
-     return (sig*((sig<=th)||(sig>=(-th))));}
+     return (sig *((sig<=th)&&(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}
      
 
 /* GENERATORS */               
