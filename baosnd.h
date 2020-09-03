@@ -2,7 +2,7 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020i02-0857 */
+/* 2020i03-09.11 */
 
 /***
 # ANSI C sound library
@@ -44,6 +44,7 @@ Compile with:
 
 ### Utilities:
      * `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
+     * `normSig(x)` : reverse of sigNorm,  `x` from range [0..1] to [-1..1]
      * `clip(th)` : threshold(float) - everything outside the range [-th..th] gets clipped to th
 
  #### TODO:
@@ -168,6 +169,9 @@ Formats:
 /* UTILITIES */
 static __inline__ float sigNorm(float x){
      return ((x/2)+.5);}
+
+static __inline__ float normSig(float x){
+     return ((x-.5)*2);}
 
 static __inline__ float clip(float sig, float th){
      return (sig *((sig<=th)&&(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}
