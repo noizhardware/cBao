@@ -2,7 +2,7 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020i03-09.11 */
+/* 2020i03-1123 */
 
 /***
 # ANSI C sound library
@@ -35,6 +35,7 @@ Compile with:
      - `gcc -g0 test.c -o test -ldl -lm -lpthread -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
 
 ### System variables:
+     - `DEVICE_NAME` : string containing the name of the currently selected audio device
      - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
      
 ### Signal Generators:
@@ -43,9 +44,12 @@ Compile with:
      * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
 
 ### Utilities:
-     * `sigNorm(x)` : normalize signal `x` from range [-1..1] to [0..1]
-     * `normSig(x)` : reverse of sigNorm,  `x` from range [0..1] to [-1..1]
-     * `clip(th)` : threshold(float) - everything outside the range [-th..th] gets clipped to th
+     * `sigNorm(sig)` : normalize signal `x` from range [-1..1] to [0..1]
+     * `normSig(sig)` : reverse of sigNorm,  `x` from range [0..1] to [-1..1]
+     * `clip(sig, th)` : threshold(float) - everything outside the range [-th..th] gets clipped to th
+     * `hwav(sig)` : half-wave rectifier - keeps positive part
+     * `hwavn(sig)` : half-wave rectifier - keeps negative part
+     * `fwav(sig)` : full-wave rectifier
 
  #### TODO:
      * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
@@ -63,9 +67,7 @@ Compile with:
      * noises (see "Numerical Recipes in C")
      * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)
      * s&h
-     * hwav : half-wave rectifier - keeps positive part
-     * hwavn : half-wave rectifier - keeps negative part
-     * hwav : full-wave rectifier
+     * sidechain compressor
 ***/
 
 #include <stdbool.h>
@@ -175,7 +177,15 @@ static __inline__ float normSig(float x){
 
 static __inline__ float clip(float sig, float th){
      return (sig *((sig<=th)&&(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}
-     
+
+static __inline__ float hwav(float sig){
+     return (sig*(sig>0));}
+
+static __inline__ float hwavn(float sig){
+     return (sig*(sig<0));}
+
+static __inline__ float fwav(float sig){
+     return (sig*(sig>0))-(sig*(sig<0));}
 
 /* GENERATORS */               
 static __inline__ float saw(float freq, bool rise){
