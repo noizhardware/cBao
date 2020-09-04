@@ -2,7 +2,7 @@
 #ifndef __BAOSND_H__
 #define __BAOSND_H__
 
-/* 2020i03-1123 */
+/* 2020i04-1018 */
 
 /***
 # ANSI C sound library
@@ -37,6 +37,7 @@ Compile with:
 ### System variables:
      - `DEVICE_NAME` : string containing the name of the currently selected audio device
      - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
+     - `tt` : float, seconds from the start of the program
      
 ### Signal Generators:
      * `sine(freq)` : frequency(float)
@@ -47,6 +48,7 @@ Compile with:
      * `sigNorm(sig)` : normalize signal `x` from range [-1..1] to [0..1]
      * `normSig(sig)` : reverse of sigNorm,  `x` from range [0..1] to [-1..1]
      * `clip(sig, th)` : threshold(float) - everything outside the range [-th..th] gets clipped to th
+     * `tclip(sig, mul)` : soft clipping with tanh, mul premultiplies the signal
      * `hwav(sig)` : half-wave rectifier - keeps positive part
      * `hwavn(sig)` : half-wave rectifier - keeps negative part
      * `fwav(sig)` : full-wave rectifier
@@ -81,6 +83,7 @@ Compile with:
      
      
      static float clk = 0;
+     static float tt = 0;
      int DEVICE_FORMAT;
      int DEVICE_CHANNELS;
      int DEVICE_SAMPLE_RATE;
@@ -156,7 +159,8 @@ Formats:
 
 #define WAVE_PRE_SOUND \
      for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
-          clk=clk*(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a dicontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running at 48kHz. Needs fixing LoL. */
+          clk=clk*(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a discontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running at 48kHz. Needs fixing LoL. */ \
+          tt = clk/DEVICE_SAMPLE_RATE; /* same problem here LoL */
           
 #define WAVE_END \
           clk++; \
@@ -177,6 +181,9 @@ static __inline__ float normSig(float x){
 
 static __inline__ float clip(float sig, float th){
      return (sig *((sig<=th)&&(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}
+
+static __inline__ float tclip(float sig, float mul){
+     return tanh(sig*mul);}
 
 static __inline__ float hwav(float sig){
      return (sig*(sig>0));}
