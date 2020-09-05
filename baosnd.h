@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2020i05-0258 */
+/* 2020i05-1829 */
 
 /***
 # ANSI C sound library
@@ -55,6 +55,7 @@ Compile with:
      * `hwav(sig)` : half-wave rectifier - keeps positive part
      * `hwavn(sig)` : half-wave rectifier - keeps negative part
      * `fwav(sig)` : full-wave rectifier
+     * `mix(unsigned char qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
 
  #### TODO:
      * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
@@ -197,6 +198,16 @@ static __inline__ float hwavn(float sig){
 
 static __inline__ float fwav(float sig){
      return (sig*(sig>0))-(sig*(sig<0));}
+
+static __inline__ float mix(unsigned char qty, ...){
+     va_list ap;
+     unsigned char i;
+     float out = 0;
+     va_start (ap, qty); /* Initialize the argument list. */
+     for (i = 0; i < qty; i++){
+          out += va_arg(ap, double) / qty;} /* Get the next argument value. */
+     va_end (ap); /* Clean up. */
+     return out;}
 
 
 /* GENERATORS */               
