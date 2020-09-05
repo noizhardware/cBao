@@ -1,5 +1,5 @@
-#ifndef __BAOUTIL_H__
-#define __BAOUTIL_H__
+#ifndef _BAOUTIL_H_
+#define _BAOUTIL_H_
 /* 202008152305 */
 
 /* C90 compliant <3 */
@@ -49,4 +49,4 @@ THIS ONE I THINK IS NOT C90 compliant :( */
 }
 #endif
 
-#endif /* __BAOUTIL_H__ */
+#endif /* _BAOUTIL_H_ */

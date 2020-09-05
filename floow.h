@@ -1,5 +1,5 @@
-#ifndef __FLOOW_H__
-#define __FLOOW_H__
+#ifndef _FLOOW_H_
+#define _FLOOW_H_
 /* 202007241415 */
 
 #ifdef WIN32
@@ -46,4 +46,4 @@ int main()
     return 0;
 }
 */
-#endif /* __FLOOW_H__ */
+#endif /* _FLOOW_H_ */

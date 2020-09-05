@@ -1,5 +1,5 @@
-#ifndef __BAOSTRING_H__
-#define __BAOSTRING_H__
+#ifndef _BAOSTRING_H_
+#define _BAOSTRING_H_
 
 /* 202008081633 */
 
@@ -217,4 +217,4 @@ static __inline__ char* terminateStringOnString(char* in, char* marker, bool del
 }
 #endif
 
-#endif /* __BAOSTRING_H__ */
+#endif /* _BAOSTRING_H_ */

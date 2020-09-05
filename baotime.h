@@ -1,5 +1,5 @@
-#ifndef __BAOTIME_H__
-#define __BAOTIME_H__
+#ifndef _BAOTIME_H_
+#define _BAOTIME_H_
 
 /* 202007240242 */
 
@@ -176,4 +176,4 @@ static __inline__ void getTime(){
 static __inline__ float sec_to_hm(unsigned long int sec){
      return floor(((float)sec / 3600)) + ((((float)sec / 3600) - floor(((float)sec / 3600))) * 0.6);}
 
-#endif /* __BAOTIME_H__ */
+#endif /* _BAOTIME_H_ */

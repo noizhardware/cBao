@@ -1,3 +1,9 @@
+#ifndef _NYX_H_
+     #ifdef __cplusplus
+     extern "C" {
+     #endif
+#define _NYX_H_
+
 #define PIEZO 2
 
 #define MORSE_FREQ 108
@@ -45,3 +51,8 @@ uint16_t DBL(uint16_t x, unsigned char t){
 #define IRQPIN  3
   
 #define VIBRO 7 // pin where the vibro is connected
+
+     #ifdef __cplusplus
+     }
+     #endif
+#endif /* _NYX_H_ */

@@ -1,8 +1,11 @@
 /* this file has to be included as the first thing */
-#ifndef __BAOSND_H__
-#define __BAOSND_H__
+#ifndef _BAOSND_H_
+     #ifdef __cplusplus
+     extern "C" {
+     #endif
+#define _BAOSND_H_
 
-/* 2020i04-1018 */
+/* 2020i05-0258 */
 
 /***
 # ANSI C sound library
@@ -75,6 +78,7 @@ Compile with:
 #include <stdbool.h>
 #include <math.h>
 #include <float.h>
+#include <stdarg.h>
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
@@ -194,6 +198,7 @@ static __inline__ float hwavn(float sig){
 static __inline__ float fwav(float sig){
      return (sig*(sig>0))-(sig*(sig<0));}
 
+
 /* GENERATORS */               
 static __inline__ float saw(float freq, bool rise){
      return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) +
@@ -206,4 +211,7 @@ static __inline__ float sine(float freq){
      return (float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq);}
 
 
-#endif /* __BAOSND_H__ */
+     #ifdef __cplusplus
+     }
+     #endif
+#endif /* _BAOSND_H_ */

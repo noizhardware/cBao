@@ -16,8 +16,8 @@
 */
 
 
-#ifndef __BITTY_H__
-#define __BITTY_H__
+#ifndef _BITTY_H_
+#define _BITTY_H_
 /* 202007241413 */
 
 #include <stdint.h>
@@ -73,4 +73,4 @@ static inline uint8_t onehot8Set (const uint8_t elem){ // elem [0..7], (returns 
 static inline uint8_t BIT8clip (const intmax_t in){ // clips a value in the range [0..255]
   return (in <= 255) ? (in >= 0) ? in : 0 : 255;}
 
-#endif // __BITTY_H__
+#endif // _BITTY_H_

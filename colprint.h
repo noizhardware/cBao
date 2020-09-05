@@ -1,5 +1,5 @@
-#ifndef __COLPRINT_H__
-#define __COLPRINT_H__
+#ifndef _COLPRINT_H_
+#define _COLPRINT_H_
 /* 202007241414 */
 
 #ifdef __cplusplus
@@ -102,4 +102,4 @@ int colprint(int color, const char* format, ...) {
 }
 #endif
 
-#endif // __COLPRINT_H__
+#endif // _COLPRINT_H_

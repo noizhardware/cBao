@@ -1,5 +1,5 @@
-#ifndef __HTML_H__
-#define __HTML_H__
+#ifndef _HTML_H_
+#define _HTML_H_
 /* 202007241418 */
 
 /* C90 compliant <3 */
@@ -142,4 +142,4 @@ static __inline__ char* htmlList(char** list, bool freeTheSource){
 }
 #endif
 
-#endif /* __HTML_H__ */
+#endif /* _HTML_H_ */
