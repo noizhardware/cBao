@@ -56,14 +56,13 @@ Compile with:
      * `hwavn(sig)` : half-wave rectifier - keeps negative part
      * `fwav(sig)` : full-wave rectifier
      * `mix(unsigned char qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
+     * `inv(signal)` : returns the inverted signal
 
  #### TODO:
      * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
-     * tanh
      * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
      * ntof(root) - fton(root)
      * linn(a, b, t) - linearly interpolate a to b in t time
-     * invert signal
      * coinflip(a, b) : returns a or b randomly
      * crossfade : equal power
      * phase control
@@ -74,6 +73,8 @@ Compile with:
      * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)
      * s&h
      * sidechain compressor
+     
+     - file output (.wav)(.mp3)
 ***/
 
 #include <stdbool.h>
@@ -209,6 +210,8 @@ static __inline__ float mix(unsigned char qty, ...){
      va_end (ap); /* Clean up. */
      return out;}
 
+static __inline__ float inv(float sig){
+     return -sig;}
 
 /* GENERATORS */               
 static __inline__ float saw(float freq, bool rise){
