@@ -68,11 +68,14 @@ Compile with:
      * phase control
      * triangle wave with slew
      * trapezoid (slewable square - dual control on rise and fall)
-     * looping AR - ASR - ADSR
+     * looping AR - ASR - ADSR - exponential: ear
      * noises (see "Numerical Recipes in C")
      * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)
      * s&h
      * sidechain compressor
+     * vactrol
+     * stereo
+     * sig-in >> split >> rnd jitter->(distortion) >> stereo out
      
      - file output (.wav)(.mp3)
 ***/
@@ -206,7 +209,7 @@ static __inline__ float mix(unsigned char qty, ...){
      float out = 0;
      va_start (ap, qty); /* Initialize the argument list. */
      for (i = 0; i < qty; i++){
-          out += va_arg(ap, double) / qty;} /* Get the next argument value. */
+          out += va_arg(ap, double) / qty;} /* va_arg advances the pointer ap every tine it gets called */
      va_end (ap); /* Clean up. */
      return out;}
 
