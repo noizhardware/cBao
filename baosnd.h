@@ -75,6 +75,7 @@ Compile with:
      * sidechain compressor
      * vactrol
      * stereo
+     * stereo positioning - pan
      * sig-in >> split >> rnd jitter->(distortion) >> stereo out
      
      - file output (.wav)(.mp3)
