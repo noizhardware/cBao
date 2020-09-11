@@ -46,6 +46,7 @@ Compile with:
      * `sine(freq)` : frequency(float)
      * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
      * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
+     * `noiw()` : white noise
 
 ### Utilities:
      * `sigNorm(sig)` : normalize signal `x` from range [-1..1] to [0..1]
@@ -59,6 +60,7 @@ Compile with:
      * `inv(signal)` : returns the inverted signal
 
  #### TODO:
+     * stdint all types
      * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
      * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
      * ntof(root) - fton(root)
@@ -85,6 +87,7 @@ Compile with:
 #include <math.h>
 #include <float.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
@@ -94,9 +97,9 @@ Compile with:
      
      static float clk = 0;
      static float tt = 0;
-     int DEVICE_FORMAT;
-     int DEVICE_CHANNELS;
-     int DEVICE_SAMPLE_RATE;
+     int32_t DEVICE_FORMAT;
+     int32_t DEVICE_CHANNELS;
+     int32_t DEVICE_SAMPLE_RATE;
 
      
 /***
@@ -154,9 +157,9 @@ Formats:
      frameCount frames.*/
      /* "Samples" is just a (castless in this case) cast of the "pOutput" float pointer */ 
 #define WAVE_BEGIN(format, ch, sr) \
-          int DEVICE_FORMAT = format; \
-          int DEVICE_CHANNELS = ch; \
-          int DEVICE_SAMPLE_RATE = sr; \
+          int32_t DEVICE_FORMAT = format; \
+          int32_t DEVICE_CHANNELS = ch; \
+          int32_t DEVICE_SAMPLE_RATE = sr; \
           /* \
           #define DEVICE_FORMAT F32 \
           #define DEVICE_CHANNELS     MONO \
@@ -227,6 +230,19 @@ static __inline__ float sq(float freq, float duty){
      
 static __inline__ float sine(float freq){
      return (float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq);}
+     
+static __inline__ float noiw(){ /* white noise - based on https://github.com/velipso/sndfilter/blob/master/src/reverb.c*/
+	static uint32_t seed = 123; /* doesn't matter */
+	static uint32_t i = 456; /* doesn't matter */
+	uint32_t m = 0x5bd1e995;
+	uint32_t k = i++ * m;
+     uint32_t R;
+     union { uint32_t i; float f; } u;
+     
+	seed = (k ^ (k >> 24) ^ (seed * m)) * m;
+	R = (seed ^ (seed >> 13)) & 0x007FFFFF; /* get 23 random bits */
+	u.i = 0x3F800000 | R;
+	return (u.f - 1.5) *2;}
 
 
      #ifdef __cplusplus
