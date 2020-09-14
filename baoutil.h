@@ -1,8 +1,8 @@
 #ifndef _BAOUTIL_H_
 #define _BAOUTIL_H_
-/* 202008152305 */
+/* 2020i14-2224 */
 
-/* C90 compliant <3 */
+/* ANSI C compliant <3 */
 
 #include <stdbool.h>
 
@@ -44,6 +44,8 @@ THIS ONE I THINK IS NOT C90 compliant :( */
 #define forever for(;;) /* use: forever{ my_code_here; } - use break to exit the forever loop*/
 
 #define elif else if
+
+#define DUMMY __asm__("nop") /* dummy line, might be used to allow a semicolon after a function closing bracket '}' */
 
 #ifdef __cplusplus
 }

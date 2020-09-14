@@ -16,17 +16,20 @@ Use -O3 to optimize for branchless
 Sample usage:
 ~~~~
 #include "baosnd.h"
+     -- global variable and function definitions here
 WAVE_BEGIN(F32, MONO, 48000);
-     --user variables definitions here
+     -- audio-callback variable definitions here
 WAVE_PRE_SOUND;
-     sndOut = --put your signal generating code here
+     sndOut = sine(432);
 WAVE_END;
 
 int main(){
      SND_INIT;
-          --do something before the sound start here
+          printf("== Device Name: %s\n", DEVICE_NAME);
      SND_START;
-          --Do something here. Probably your program's main loop.
+          printf("~~~ You should hear sound now ~~~\n");
+          printf("== Press Enter to quit...");
+          getchar();
      SND_STOP;
 return 0;}
 ~~~~
@@ -45,8 +48,8 @@ Compile with:
 ### Signal Generators:
      * `sine(freq)` : frequency(float)
      * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
-     * `sq(freq, duty)` : frequency(float), duty cycle[0..1]
-     * `noiw()` : white noise
+     * `sq(freq, duty)` : square wave : frequency(float), duty cycle[0..1]
+     * `noiw()` : white noise [-1..1]
 
 ### Utilities:
      * `sigNorm(sig)` : normalize signal `x` from range [-1..1] to [0..1]
@@ -58,16 +61,20 @@ Compile with:
      * `fwav(sig)` : full-wave rectifier
      * `mix(unsigned char qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
      * `inv(signal)` : returns the inverted signal
+     * `tik(interval, length, offset)` : jumps to 1 every "interval" seconds, and stays up for "length" seconds. if "length" is 0, it stays up for a single sample(digital trigger)
 
  #### TODO:
-     * stdint all types
+     * ttog : trigger to gate
+     * flipflop (for triggers)
      * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
      * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
      * ntof(root) - fton(root)
      * linn(a, b, t) - linearly interpolate a to b in t time
      * coinflip(a, b) : returns a or b randomly
+     * bernoulli gate
      * crossfade : equal power
      * phase control
+     * dirac
      * triangle wave with slew
      * trapezoid (slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR - exponential: ear
@@ -172,7 +179,7 @@ Formats:
 
 #define WAVE_PRE_SOUND \
      for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
-          clk=clk*(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a discontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running at 48kHz. Needs fixing LoL. */ \
+          clk*=(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a discontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running at 48kHz. Needs fixing LoL. */ \
           tt = clk/DEVICE_SAMPLE_RATE; /* same problem here LoL */
           
 #define WAVE_END \
@@ -185,7 +192,9 @@ Formats:
 #define RISE 1
 #define FALL 0
 
-/* UTILITIES */
+/*************************************/
+/************* UTILITIES *************/
+/*************************************/
 static __inline__ float sigNorm(float x){
      return ((x/2)+.5);}
 
@@ -195,6 +204,7 @@ static __inline__ float normSig(float x){
 static __inline__ float clip(float sig, float th){
      return (sig *((sig<=th)&&(sig>=(-th)))) + ((th)*(sig>th)) + ((-th)*(sig<(-th)));}
 
+#define TANH_MAKEUP 1.3130352855 /* multiplier to bring tanh(1) to 1 */
 static __inline__ float tclip(float sig, float mul){
      return tanh(sig*mul);}
 
@@ -213,14 +223,20 @@ static __inline__ float mix(unsigned char qty, ...){
      float out = 0;
      va_start (ap, qty); /* Initialize the argument list. */
      for (i = 0; i < qty; i++){
-          out += va_arg(ap, double) / qty;} /* va_arg advances the pointer ap every tine it gets called */
+          out += va_arg(ap, double) / qty;} /* va_arg advances the pointer ap every time it gets called */
      va_end (ap); /* Clean up. */
      return out;}
 
 static __inline__ float inv(float sig){
      return -sig;}
 
-/* GENERATORS */               
+static __inline__ float tik(float interval, float len, float offset){
+     return    (len<=0)*(fmod(tt-offset, interval)==0) +
+               (len>0)*((fmod(tt-offset, interval)>=0)&&(fmod(tt-offset, interval)<=(len)));}
+
+/**************************************/
+/************* GENERATORS *************/
+/**************************************/
 static __inline__ float saw(float freq, bool rise){
      return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) +
      (!rise*((1-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2-1));} 
@@ -229,7 +245,10 @@ static __inline__ float sq(float freq, float duty){
      return ((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1;}
      
 static __inline__ float sine(float freq){
-     return (float)sin(clk/DEVICE_SAMPLE_RATE*MA_TAU*freq);}
+     if(tik(.75,0,0)){
+          printf("== freq : %.2f\n", freq);}
+          
+     return (float)sin((double)(tt*MA_TAU*freq));}
      
 static __inline__ float noiw(){ /* white noise - based on https://github.com/velipso/sndfilter/blob/master/src/reverb.c*/
 	static uint32_t seed = 123; /* doesn't matter */
@@ -243,7 +262,6 @@ static __inline__ float noiw(){ /* white noise - based on https://github.com/vel
 	R = (seed ^ (seed >> 13)) & 0x007FFFFF; /* get 23 random bits */
 	u.i = 0x3F800000 | R;
 	return (u.f - 1.5) *2;}
-
 
      #ifdef __cplusplus
      }
