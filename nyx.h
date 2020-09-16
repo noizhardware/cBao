@@ -45,6 +45,8 @@ uint16_t DBL(uint16_t x, unsigned char t){
   tone(PIEZO, 1200, DOT);\
   delay(100);\
   tone(PIEZO, 2400, DASH);
+
+#define ERROR_SOUND tone(PIEZO, 600, DOT);
   
 // pins where the PS/2 keyboard is connected
 #define DATAPIN 4

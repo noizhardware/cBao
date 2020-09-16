@@ -88,6 +88,7 @@ Compile with:
      * sig-in >> split >> rnd jitter->(distortion) >> stereo out
      
      - file output (.wav)(.mp3)
+     - midi CC input (http://www.cs.cmu.edu/~rbd/software/midi.htm)
 ***/
 
 #include <stdbool.h>

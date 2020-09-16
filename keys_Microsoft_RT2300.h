@@ -1,4 +1,5 @@
 #include <stdbool.h>
+
 #define kkQ 81
 #define kkW 87
 #define kkE 69
@@ -80,8 +81,6 @@
 #define kkQUESTION 16444
 #define kkANGLEUP 16479
 
-
-
 #define kkENTER 286
 #define kkBACKSPACE 284
 #define kkESC 283
@@ -129,4 +128,4 @@
 #define kkF12 364                                           
 
 bool isKey_Microsoft_RT2300(uint16_t key){
-     return (key<=18000) ? true : false;}
+     return (key<=18000);}
