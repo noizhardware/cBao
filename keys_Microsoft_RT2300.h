@@ -125,7 +125,91 @@
 #define kkF9 361
 #define kkF10 362
 #define kkF11 363
-#define kkF12 364                                           
+#define kkF12 364
 
-bool isKey_Microsoft_RT2300(uint16_t key){
+static __inline__ uint8_t kbdToChar(uint16_t kbd){
+     return
+          'q'*(kbd==kkQ) +
+          'w'*(kbd==kkW) +
+          'e'*(kbd==kkE) +
+          '€'*(kbd==kkEURO) +
+          'r'*(kbd==kkR) +
+          't'*(kbd==kkT) +
+          'y'*(kbd==kkY) +
+          'u'*(kbd==kkU) +
+          'i'*(kbd==kkI) +
+          'o'*(kbd==kkO) +
+          'p'*(kbd==kkP) +
+          'è'*(kbd==kkEE) +
+          'é'*(kbd==kkEEE) +
+          '+'*(kbd==kkPLUS) +
+          '*'*(kbd==kkASTERISK) +
+          'a'*(kbd==kkA) +
+          's'*(kbd==kkS) +
+          'd'*(kbd==kkD) +
+          'f'*(kbd==kkF) +
+          'g'*(kbd==kkG) +
+          'h'*(kbd==kkH) +
+          'j'*(kbd==kkJ) +
+          'k'*(kbd==kkK) +
+          'l'*(kbd==kkL) +
+          'ò'*(kbd==kkOO) +
+          'ç'*(kbd==kkCEDILLA) +
+          '@'*(kbd==kkAT) +
+          'à'*(kbd==kkAT) +
+          '°'*(kbd==kkDEGREE) +
+          '#'*(kbd==kkHASHTAG) +
+          'ù'*(kbd==kkUU) +
+          '§'*(kbd==kkSECTION) +
+          '<'*(kbd==kkANGL) +
+          '>'*(kbd==kkANGR) +
+          'z'*(kbd==kkZ) +
+          'x'*(kbd==kkX) +
+          'c'*(kbd==kkC) +
+          'v'*(kbd==kkV) +
+          'b'*(kbd==kkB) +
+          'n'*(kbd==kkN) +
+          'm'*(kbd==kkM) +
+          ','*(kbd==kkCOMMA) +
+          '.'*(kbd==kkPERIOD) +
+          '-'*(kbd==kkDASH) +
+          ';'*(kbd==kSEMICOLON) +
+          ':'*(kbd==kCOLON) +
+          '_'*(kbd==kkUNDERSCORE) +
+          ' '*(kbd==kkSPACE) +
+          '\\'*(kbd==kkBACKSLASH) +
+          '1'*(kbd==kk1) +
+          '2'*(kbd==kk2) +
+          '3'*(kbd==kk3) +
+          '4'*(kbd==kk4) +
+          '5'*(kbd==kk5) +
+          '6'*(kbd==kk6) +
+          '7'*(kbd==kk7) +
+          '8'*(kbd==kk8) +
+          '9'*(kbd==kk9) +
+          '0'*(kbd==kk0) +
+          '\''*(kbd==kkQUOTESINGLE) +
+          'ì'*(kbd==kkII) +
+          '|'*(kbd==kkPIPE) +
+          '!'*(kbd==kkEXCLAMATION) +
+          '\"'*(kbd==kkQUOTEDOUBLE) +
+          '£'*(kbd==kkGBP) +
+          '$'*(kbd==kkDOLLAR) +
+          '%'*(kbd==kkPERCENT) +
+          '&'*(kbd==kkAMPERSAND) +
+          '/'*(kbd==kkSLASH) +
+          '('*(kbd==kkBRACKETOPEN) +
+          ')'*(kbd==kkBRACKETCLOSE) +
+          '='*(kbd==kkEQUAL) +
+          '?'*(kbd==kkQUESTION) +
+          '^'*(kbd==kkANGLEUP) +
+          '\r'*(kbd==kkENTER) +
+          '['*(kbd==kkSQUAREOPEN) +
+          ']'*(kbd==kkSQUARECLOSE) +
+          '{'*(kbd==kkCURLYOPEN) +
+          '}'*(kbd==kkCURLYCLOSE) +
+          '\t'*(kbd==kkTAB) +
+          '^'*(kbd==kkANGLEUP);}
+
+static __inline__ bool isKey_Microsoft_RT2300(uint16_t key){
      return (key<=18000);}
