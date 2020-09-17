@@ -48,23 +48,25 @@ uint16_t DBL(uint16_t x, unsigned char t){
 
 #define WRYTE_STARTUP_SOUND \
      tone(PIEZO, MORSE_FREQ*4, DOT);
+     
+#define WRYTE_FREQ MORSE_FREQ*8
 
 #define BEEP_WRYTE_EEPROM_ONE \
-     tone(PIEZO, MORSE_FREQ, DOT);
+     tone(PIEZO, WRYTE_FREQ, DOT);
 #define BEEP_WRYTE_EEPROM_TWO \
-     tone(PIEZO, MORSE_FREQ, DOT);\
+     tone(PIEZO, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DOT);
+     tone(PIEZO, WRYTE_FREQ, DOT);
 #define BEEP_WRYTE_EEPROM_THREE \
-     tone(PIEZO, MORSE_FREQ, DOT);\
+     tone(PIEZO, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DOT);\
+     tone(PIEZO, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DOT);
+     tone(PIEZO, WRYTE_FREQ, DOT);
 #define BEEP_WRYTE_EEPROM_FOUR \
-     tone(PIEZO, MORSE_FREQ, DASH*2);
+     tone(PIEZO, WRYTE_FREQ, DASH*2);
 #define BEEP_WRYTE_EEPROM_FULL \
-     tone(PIEZO, MORSE_FREQ*2, DASH*2);
+     tone(PIEZO, WRYTE_FREQ*2, DASH*2);
      
 #define ERROR_SOUND \
      tone(PIEZO, MORSE_FREQ*10, DASH);
