@@ -27,7 +27,7 @@ static inline bool EEPROMaddrisOK(const unsigned int eepromAddr){
   return ((eepromAddr <= EEPROM.length()) && (eepromAddr >= 0));
 }
 
-static inline bool setEEPROMbit (const uint16_t eepromAddr, const uint18_t bitpos, const bool bittoset){ // bitpos=[0..7] [LSB..MSB]
+static inline bool setEEPROMbit (const uint16_t eepromAddr, const uint8_t bitpos, const bool bittoset){ // bitpos=[0..7] [LSB..MSB]
     EEPROM.update(eepromAddr, setBit(EEPROM.read(eepromAddr), bitpos, bittoset)); // do it only if necessary (update checks identity before writing)
     return SUCCESS;}
 
@@ -55,7 +55,7 @@ static inline bool setEEPROMshort(const uint16_t eepromAddr, const uint16_t valu
 
 static inline uint16_t getEEPROMshort(const uint16_t eepromAddr){
      uint16_t out = (EEPROM.read(eepromAddr + 1) << 8);
-     out |= EEPROM.read(location);
+     out |= EEPROM.read(eepromAddr);
      return out;}
 
 

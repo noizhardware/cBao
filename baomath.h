@@ -1,9 +1,9 @@
 #ifndef __BAOMATH_H__
 #define __BAOMATH_H__
 
-/* 202007311333 */
+/* 2020i17-1011 */
 
-/* C90 compliant <3 */
+/* ANSI C compliant <3 */
 
 #ifdef _WIN32
 #include <Math.h>
@@ -23,6 +23,7 @@ static __inline__ float roundDec_up(float num, unsigned char prec);
 
 static __inline__ int minn(int a, int b);
 static __inline__ int maxx(int a, int b);
+static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high);
 /* prototypes END */
 
 
@@ -39,6 +40,9 @@ static __inline__ int minn(int a, int b){
      return a*(a<b) + b*(b<a) + a*(a==b);}
 static __inline__ int maxx(int a, int b){
      return a*(a>b) + b*(b>a) + a*(a==b);}
+
+static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high) { 
+     return  ((x-low) <= (high-low));} 
 
 #ifdef __cplusplus
 }

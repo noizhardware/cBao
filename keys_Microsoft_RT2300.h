@@ -1,30 +1,51 @@
 #include <stdbool.h>
 
+// _C are CAPITAL letters
+
 #define kkQ 81
+     #define kkQ_C 16465
 #define kkW 87
+     #define kkW_C 16471
 #define kkE 69
+     #define kkE_C 16453
 #define kkEURO 1093
 #define kkR 82
+     #define kkR_C 16466
 #define kkT 84
+     #define kkT_C 16468
 #define kkY 89
+     #define kkY_C 16473
 #define kkU 85
+     #define kkU_C 16469
 #define kkI 73
+     #define kkI_C 16457
 #define kkO 79
+     #define kkO_C 16463
 #define kkP 80
+     #define kkP_C 16464
 #define kkEE 93
 #define kkEEE 16477
 #define kkPLUS 94
 #define kkASTERISK 16478
 
 #define kkA 65
+     #define kkA_C 16449
 #define kkS 83
+     #define kkS_C 16467
 #define kkD 68
+     #define kkD_C 16452
 #define kkF 70
+     #define kkF_C 16454
 #define kkG 71
+     #define kkG_C 16455
 #define kkH 72
+     #define kkH_C 16456
 #define kkJ 74
+     #define kkJ_C 16458
 #define kkK 75
+     #define kkK_C 16459
 #define kkL 76
+     #define kkL_C 16460
 #define kkOO 91
 #define kkCCEDILLA 16475
 #define kkAT 1115
@@ -37,12 +58,19 @@
 #define kkANGL 139
 #define kkANGR 16523
 #define kkZ 90
+     #define kkZ_C 16474
 #define kkX 88
+     #define kkX_C 16472
 #define kkC 67
+     #define kkC_C 16451
 #define kkV 86
+     #define kkV_C 16470
 #define kkB 66
+     #define kkB_C 16450
 #define kkN 78
+     #define kkN_C 16462
 #define kkM 77
+     #define kkM_C 16461
 #define kkCOMMA 59
 #define kkPERIOD 61
 #define kkDASH 62
@@ -102,7 +130,9 @@
 #define kkCALC 386
 #define kkTAB 285
 #define kkSHIFTL 16646
+     #define kkSHIFTL_RELEASE 33030
 #define kkSHIFTR 16647
+     #define kkSHIFTR_RELEASE 33031
 #define kkCTRLL 8456
 #define kkCTRLR 8457
 #define kkALT 2314
@@ -130,8 +160,11 @@
 static __inline__ uint8_t kbdToChar(uint16_t kbd){
      return
           'q'*(kbd==kkQ) +
+               'Q'*(kbd==kkQ_C) +
           'w'*(kbd==kkW) +
+               'W'*(kbd==kkW_C) +
           'e'*(kbd==kkE) +
+               'E'*(kbd==kkE_C) +
           '€'*(kbd==kkEURO) +
           'r'*(kbd==kkR) +
           't'*(kbd==kkT) +
@@ -140,10 +173,17 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
           'i'*(kbd==kkI) +
           'o'*(kbd==kkO) +
           'p'*(kbd==kkP) +
-          'è'*(kbd==kkEE) +
-          'é'*(kbd==kkEEE) +
-          '+'*(kbd==kkPLUS) +
-          '*'*(kbd==kkASTERISK) +
+                         'R'*(kbd==kkR_C) +
+                         'T'*(kbd==kkT_C) +
+                         'Y'*(kbd==kkY_C) +
+                         'U'*(kbd==kkU_C) +
+                         'I'*(kbd==kkI_C) +
+                         'O'*(kbd==kkO_C) +
+                         'P'*(kbd==kkP_C) +
+               130*(kbd==kkEE) +
+                    138*(kbd==kkEEE) +
+               '+'*(kbd==kkPLUS) +
+                    '*'*(kbd==kkASTERISK) +
           'a'*(kbd==kkA) +
           's'*(kbd==kkS) +
           'd'*(kbd==kkD) +
@@ -153,16 +193,25 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
           'j'*(kbd==kkJ) +
           'k'*(kbd==kkK) +
           'l'*(kbd==kkL) +
-          'ò'*(kbd==kkOO) +
-          'ç'*(kbd==kkCEDILLA) +
-          '@'*(kbd==kkAT) +
-          'à'*(kbd==kkAT) +
-          '°'*(kbd==kkDEGREE) +
-          '#'*(kbd==kkHASHTAG) +
-          'ù'*(kbd==kkUU) +
-          '§'*(kbd==kkSECTION) +
+                         'A'*(kbd==kkA_C) +
+                         'S'*(kbd==kkS_C) +
+                         'D'*(kbd==kkD_C) +
+                         'F'*(kbd==kkF_C) +
+                         'G'*(kbd==kkG_C) +
+                         'H'*(kbd==kkH_C) +
+                         'J'*(kbd==kkJ_C) +
+                         'K'*(kbd==kkK_C) +
+                         'L'*(kbd==kkL_C) +
+               'ò'*(kbd==kkOO) +
+                    'ç'*(kbd==kkCCEDILLA) +
+                         '@'*(kbd==kkAT) +
+               'à'*(kbd==kkAT) +
+                    '°'*(kbd==kkDEGREE) +
+                         '#'*(kbd==kkHASHTAG) +
+               'ù'*(kbd==kkUU) +
+                    '§'*(kbd==kkSECTION) +
           '<'*(kbd==kkANGL) +
-          '>'*(kbd==kkANGR) +
+               '>'*(kbd==kkANGR) +
           'z'*(kbd==kkZ) +
           'x'*(kbd==kkX) +
           'c'*(kbd==kkC) +
@@ -170,14 +219,22 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
           'b'*(kbd==kkB) +
           'n'*(kbd==kkN) +
           'm'*(kbd==kkM) +
-          ','*(kbd==kkCOMMA) +
-          '.'*(kbd==kkPERIOD) +
-          '-'*(kbd==kkDASH) +
-          ';'*(kbd==kSEMICOLON) +
-          ':'*(kbd==kCOLON) +
-          '_'*(kbd==kkUNDERSCORE) +
+                         'Z'*(kbd==kkZ_C) +
+                         'X'*(kbd==kkX_C) +
+                         'C'*(kbd==kkC_C) +
+                         'V'*(kbd==kkV_C) +
+                         'B'*(kbd==kkB_C) +
+                         'N'*(kbd==kkN_C) +
+                         'M'*(kbd==kkM_C) +
+               ','*(kbd==kkCOMMA) +
+                    ';'*(kbd==kkSEMICOLON) +
+               '.'*(kbd==kkPERIOD) +
+                    ':'*(kbd==kkCOLON) +
+               '-'*(kbd==kkDASH) +
+                    '_'*(kbd==kkUNDERSCORE) +
           ' '*(kbd==kkSPACE) +
           '\\'*(kbd==kkBACKSLASH) +
+               '|'*(kbd==kkPIPE) +
           '1'*(kbd==kk1) +
           '2'*(kbd==kk2) +
           '3'*(kbd==kk3) +
@@ -188,9 +245,10 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
           '8'*(kbd==kk8) +
           '9'*(kbd==kk9) +
           '0'*(kbd==kk0) +
-          '\''*(kbd==kkQUOTESINGLE) +
-          'ì'*(kbd==kkII) +
-          '|'*(kbd==kkPIPE) +
+               '\''*(kbd==kkQUOTESINGLE) +
+                    '\?'*(kbd==kkQUESTION) +
+               'ì'*(kbd==kkII) +
+                    '^'*(kbd==kkANGLEUP) +
           '!'*(kbd==kkEXCLAMATION) +
           '\"'*(kbd==kkQUOTEDOUBLE) +
           '£'*(kbd==kkGBP) +
@@ -201,15 +259,97 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
           '('*(kbd==kkBRACKETOPEN) +
           ')'*(kbd==kkBRACKETCLOSE) +
           '='*(kbd==kkEQUAL) +
-          '?'*(kbd==kkQUESTION) +
           '^'*(kbd==kkANGLEUP) +
-          '\r'*(kbd==kkENTER) +
+               176*(kbd==kkENTER) +
           '['*(kbd==kkSQUAREOPEN) +
           ']'*(kbd==kkSQUARECLOSE) +
           '{'*(kbd==kkCURLYOPEN) +
           '}'*(kbd==kkCURLYCLOSE) +
-          '\t'*(kbd==kkTAB) +
-          '^'*(kbd==kkANGLEUP);}
+               '\t'*(kbd==kkTAB);}
+               
+static __inline__ bool isTypable(uint16_t kbd){ // it's missing capital letters
+     return
+          (kbd==kkQ) ||
+          (kbd==kkW) ||
+          (kbd==kkE) ||
+          (kbd==kkEURO) ||
+          (kbd==kkR) ||
+          (kbd==kkT) ||
+          (kbd==kkY) ||
+          (kbd==kkU) ||
+          (kbd==kkI) ||
+          (kbd==kkO) ||
+          (kbd==kkP) ||
+               (kbd==kkEE) ||
+                    (kbd==kkEEE) ||
+               (kbd==kkPLUS) ||
+                    (kbd==kkASTERISK) ||
+          (kbd==kkA) ||
+          (kbd==kkS) ||
+          (kbd==kkD) ||
+          (kbd==kkF) ||
+          (kbd==kkG) ||
+          (kbd==kkH) ||
+          (kbd==kkJ) ||
+          (kbd==kkK) ||
+          (kbd==kkL) ||
+               (kbd==kkOO) ||
+                    (kbd==kkCCEDILLA) ||
+                         (kbd==kkAT) ||
+               (kbd==kkAT) ||
+                    (kbd==kkDEGREE) ||
+                         (kbd==kkHASHTAG) ||
+               (kbd==kkUU) ||
+                    (kbd==kkSECTION) ||
+          (kbd==kkANGL) ||
+               (kbd==kkANGR) ||
+          (kbd==kkZ) ||
+          (kbd==kkX) ||
+          (kbd==kkC) ||
+          (kbd==kkV) ||
+          (kbd==kkB) ||
+          (kbd==kkN) ||
+          (kbd==kkM) ||
+               (kbd==kkCOMMA) ||
+                    (kbd==kkSEMICOLON) ||
+               (kbd==kkPERIOD) ||
+                    (kbd==kkCOLON) ||
+               (kbd==kkDASH) ||
+                    (kbd==kkUNDERSCORE) ||
+          (kbd==kkSPACE) ||
+          (kbd==kkBACKSLASH) ||
+               (kbd==kkPIPE) ||
+          (kbd==kk1) ||
+          (kbd==kk2) ||
+          (kbd==kk3) ||
+          (kbd==kk4) ||
+          (kbd==kk5) ||
+          (kbd==kk6) ||
+          (kbd==kk7) ||
+          (kbd==kk8) ||
+          (kbd==kk9) ||
+          (kbd==kk0) ||
+               (kbd==kkQUOTESINGLE) ||
+                    (kbd==kkQUESTION) ||
+               (kbd==kkII) ||
+                    (kbd==kkANGLEUP) ||
+          (kbd==kkEXCLAMATION) ||
+          (kbd==kkQUOTEDOUBLE) ||
+          (kbd==kkGBP) ||
+          (kbd==kkDOLLAR) ||
+          (kbd==kkPERCENT) ||
+          (kbd==kkAMPERSAND) ||
+          (kbd==kkSLASH) ||
+          (kbd==kkBRACKETOPEN) ||
+          (kbd==kkBRACKETCLOSE) ||
+          (kbd==kkEQUAL) ||
+          (kbd==kkANGLEUP) ||
+               (kbd==kkENTER) ||
+          (kbd==kkSQUAREOPEN) ||
+          (kbd==kkSQUARECLOSE) ||
+          (kbd==kkCURLYOPEN) ||
+          (kbd==kkCURLYCLOSE) ||
+               (kbd==kkTAB);}
 
-static __inline__ bool isKey_Microsoft_RT2300(uint16_t key){
+static __inline__ bool isKey_Microsoft_RT2300(uint16_t key){ /* verify if it's not a key release code */
      return (key<=18000);}

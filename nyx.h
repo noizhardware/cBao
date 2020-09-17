@@ -22,31 +22,52 @@ uint16_t DBL(uint16_t x, unsigned char t){
      return out;}
 
 #define STARTUP_SOUND \
-  tone(PIEZO, MORSE_FREQ, DASH);\
-  delay(DASH + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, MORSE_FREQ, DOT);\
-  delay(DOT + PAUSE_BETWEEN_LETTERS);\
-  tone(PIEZO, MORSE_FREQ, DASH);\
-  delay(DASH + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, MORSE_FREQ, DOT);\
-  delay(DOT + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, MORSE_FREQ, DASH);\
-  delay(DASH + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, MORSE_FREQ, DASH);\
-  delay(DASH + PAUSE_BETWEEN_LETTERS);\
-  tone(PIEZO, 1000, DASH);\
-  delay(DASH + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, 1200, DOT);\
-  delay(DOT + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, 600, DOT);\
-  delay(DOT + PAUSE_BETWEEN_SIGNS);\
-  tone(PIEZO, 900, DASH);\
-  delay(100);\
-  tone(PIEZO, 1200, DOT);\
-  delay(100);\
-  tone(PIEZO, 2400, DASH);
+     tone(PIEZO, MORSE_FREQ, DASH);\
+     delay(DASH + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DOT);\
+     delay(DOT + PAUSE_BETWEEN_LETTERS);\
+     tone(PIEZO, MORSE_FREQ, DASH);\
+     delay(DASH + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DOT);\
+     delay(DOT + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DASH);\
+     delay(DASH + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DASH);\
+     delay(DASH + PAUSE_BETWEEN_LETTERS);\
+     tone(PIEZO, 1000, DASH);\
+     delay(DASH + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, 1200, DOT);\
+     delay(DOT + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, 600, DOT);\
+     delay(DOT + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, 900, DASH);\
+     delay(100);\
+     tone(PIEZO, 1200, DOT);\
+     delay(100);\
+     tone(PIEZO, 2400, DASH);
 
-#define ERROR_SOUND tone(PIEZO, 600, DOT);
+#define WRYTE_STARTUP_SOUND \
+     tone(PIEZO, MORSE_FREQ*4, DOT);
+
+#define BEEP_WRYTE_EEPROM_ONE \
+     tone(PIEZO, MORSE_FREQ, DOT);
+#define BEEP_WRYTE_EEPROM_TWO \
+     tone(PIEZO, MORSE_FREQ, DOT);\
+     delay(DOT + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DOT);
+#define BEEP_WRYTE_EEPROM_THREE \
+     tone(PIEZO, MORSE_FREQ, DOT);\
+     delay(DOT + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DOT);\
+     delay(DOT + PAUSE_BETWEEN_SIGNS);\
+     tone(PIEZO, MORSE_FREQ, DOT);
+#define BEEP_WRYTE_EEPROM_FOUR \
+     tone(PIEZO, MORSE_FREQ, DASH*2);
+#define BEEP_WRYTE_EEPROM_FULL \
+     tone(PIEZO, MORSE_FREQ*2, DASH*2);
+     
+#define ERROR_SOUND \
+     tone(PIEZO, MORSE_FREQ*10, DASH);
   
 // pins where the PS/2 keyboard is connected
 #define DATAPIN 4
