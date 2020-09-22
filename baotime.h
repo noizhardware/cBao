@@ -4,12 +4,13 @@
 /* 202007240242 */
 
 /*
- * C90 compliant
+ * ANSI C compliant
  * need to use -Wno-long-long
  */
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
      #include <windows.h>
+     #include <time.h>
 #endif
 
 #ifdef __linux__
@@ -26,6 +27,7 @@
 
 #include <stdbool.h>
 #include <math.h>
+#include "baostring.h"
 
 /* gettimeofday for WINDOWS */
 #ifdef WIN32
@@ -35,10 +37,12 @@
 /*     time_t     tv_sec;*/    /* seconds */
 /*     useconds_t tv_usec;*/   /* microseconds */
 /*} timeval;*/
-typedef struct timezone{
-     int tz_minuteswest;     /* minutes west of Greenwich */
-     int tz_dsttime;         /* type of DST correction */
-} timezone;
+
+/* already defined in c:\mingw\include\time.h:382:22 */
+/*typedef struct timezone{*/
+     /*int tz_minuteswest; */    /* minutes west of Greenwich */
+     /*int tz_dsttime;  */       /* type of DST correction */
+/*} timezone;*/
 
 int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unused))) /*  __attribute__((unused)) is a GCC flag to suppress the -Wunused-parameter for this variable */
 {
@@ -175,5 +179,27 @@ static __inline__ void getTime(){
 
 static __inline__ float sec_to_hm(unsigned long int sec){
      return floor(((float)sec / 3600)) + ((((float)sec / 3600) - floor(((float)sec / 3600))) * 0.6);}
+
+static __inline__ uint16_t getYear(){
+     time_t t = time(NULL);
+     struct tm tm = *localtime(&t);
+     return (uint16_t)(tm.tm_year + 1900);}
+
+static __inline__ uint16_t getMonth(){
+     time_t t = time(NULL);
+     struct tm tm = *localtime(&t);
+     return (uint16_t)(tm.tm_mon + 1);}
+
+static __inline__ uint16_t getDay(){
+     time_t t = time(NULL);
+     struct tm tm = *localtime(&t);
+     return (uint16_t)(tm.tm_mday);}
+
+/*static __inline__ void getFloowDate(char* storage){
+     char* out;
+     sprintf(out, "%d", getYear());*/
+     /*out[7]='\0';*/
+     /*return out;}*/
+     
 
 #endif /* _BAOTIME_H_ */

@@ -165,7 +165,7 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
                'W'*(kbd==kkW_C) +
           'e'*(kbd==kkE) +
                'E'*(kbd==kkE_C) +
-          '€'*(kbd==kkEURO) +
+          '€'*(kbd==kkEURO) + /* not actually supported by Keyboard.write */
           'r'*(kbd==kkR) +
           't'*(kbd==kkT) +
           'y'*(kbd==kkY) +
@@ -202,10 +202,10 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
                          'J'*(kbd==kkJ_C) +
                          'K'*(kbd==kkK_C) +
                          'L'*(kbd==kkL_C) +
-               'ò'*(kbd==kkOO) +
+               162*(kbd==kkOO) + /* ò */
                     'ç'*(kbd==kkCCEDILLA) +
                          '@'*(kbd==kkAT) +
-               'à'*(kbd==kkAT) +
+               133*(kbd==kkAA) + /* à */
                     '°'*(kbd==kkDEGREE) +
                          '#'*(kbd==kkHASHTAG) +
                'ù'*(kbd==kkUU) +
@@ -247,7 +247,7 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){
           '0'*(kbd==kk0) +
                '\''*(kbd==kkQUOTESINGLE) +
                     '\?'*(kbd==kkQUESTION) +
-               'ì'*(kbd==kkII) +
+               141*(kbd==kkII) + /* ì */
                     '^'*(kbd==kkANGLEUP) +
           '!'*(kbd==kkEXCLAMATION) +
           '\"'*(kbd==kkQUOTEDOUBLE) +
@@ -353,3 +353,34 @@ static __inline__ bool isTypable(uint16_t kbd){ // it's missing capital letters
 
 static __inline__ bool isKey_Microsoft_RT2300(uint16_t key){ /* verify if it's not a key release code */
      return (key<=18000);}
+
+static __inline__ int toKeyboardCode(int in){
+     Serial.print("============= ");
+     Serial.println(in);
+     if(in==130){return 123;} // è
+     else if(in==138){return 91;} // é
+     else if(in=='ù'){return 92;} // ù
+     else if(in==133){return 39;} // à
+     else if(in==162){return 59;} // ò
+     else if(in=='ç'){return 58;} // ç
+     else if(in==141){return 61;} // ì
+     else if(in=='-'){return 47;} // -
+     else{return in;} // all other raw bytes*
+     /* !°£$%/à)=(^,'.-0123456789çò;ì:_"ABCDEFGHIJKLMNOPQRSTUVWXYZèù+&?\abcdefghijklmnopqrstuvwxyzé§*| */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -268,3 +268,9 @@ static __inline__ float noiw(){ /* white noise - based on https://github.com/vel
      }
      #endif
 #endif /* _BAOSND_H_ */
+
+/*
+,,code
+,,sound
+,,synth
+*/

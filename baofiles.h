@@ -1,11 +1,12 @@
 #ifndef __BAOFILES_H__
 #define __BAOFILES_H__
 
-/* 2020h18-1600 */
+/* 2020i18-1842 */
 
-/* C90 compliant <3 */
+/* ANSI C compliant <3 */
 
 /* TODO:
+* get rid of mallocs and use fixed-size buffers???
 * append to file
 * prepend to file
 * all branchless
@@ -16,8 +17,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-     #include "direntWin.h"
+/* cacca -- direntwin has an error - disabling it for win for now... */
+#ifndef __WIN32__
+     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+          #include "direntWin.h"
+     #endif
 #endif
 
 #ifdef __linux__
@@ -36,6 +40,36 @@ static __inline__ long int fileSize(char* filename);
 static __inline__ bool fileWrite(char* fileName, char* stuffToWrite);
 static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile);
 /* prototypes END */
+
+static __inline__ void fileRead_nomalloc(char* file, char* buf){
+     FILE* fp;
+     long fileSize;
+     /*char* fileContents;*/
+
+     fp = fopen ( file , "rb" );
+     if(!fp){
+          perror(file);
+          exit(1);}
+
+     /* this block writes the size of the file in fileSize */
+     fseek( fp , 0L , SEEK_END);
+     fileSize = ftell( fp );
+     rewind( fp );
+
+     /* let's just NOT check if the buffer size is enough LoL */
+     /*if(ARRAYELEMS(buf)<fileSize+1){
+          fclose(fp);
+          fputs("buffer is too small",stderr);
+          exit(1);}*/
+
+     /* copy the file into the buffer */
+     if(fread(buf, fileSize, 1, fp) != 1){
+          fclose(fp);
+          fputs("entire read fails",stderr);
+          exit(1);}
+
+     /* close the file */
+     fclose(fp);}
 
 static __inline__ char* fileRead(char* file){
      FILE* fp;
@@ -105,8 +139,8 @@ static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, u
      fclose(fptr);
      return line;}
 
-     /* dirlist */
-
+     /* dirlist - cacca - disabled for win for now */
+#ifndef __WIN32__
 static __inline__ char** dirList(char* directory, unsigned int maxFilesInDir, unsigned int maxFilenameLen){
     char** dirList = makeStringTable(maxFilesInDir, maxFilenameLen);
 
@@ -127,6 +161,7 @@ static __inline__ char** dirList(char* directory, unsigned int maxFilesInDir, un
           fprintf(stderr, "Cannot find specified directory.\n");}
     return dirList;
 }
+#endif
 
 #ifdef __cplusplus
 }

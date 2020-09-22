@@ -63,13 +63,26 @@ uint16_t DBL(uint16_t x, unsigned char t){
      tone(PIEZO, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
      tone(PIEZO, WRYTE_FREQ, DOT);
-#define BEEP_WRYTE_EEPROM_FOUR \
-     tone(PIEZO, WRYTE_FREQ, DASH*2);
-#define BEEP_WRYTE_EEPROM_FULL \
-     tone(PIEZO, WRYTE_FREQ*2, DASH*2);
+               #define BEEP_WRYTE_EEPROM_FOUR_A \
+                    tone(PIEZO, WRYTE_FREQ, DASH*3);
+               #define BEEP_WRYTE_EEPROM_FOUR_B \
+                    tone(PIEZO, WRYTE_FREQ, DASH*3);\
+                    delay(DASH*3 + PAUSE_BETWEEN_SIGNS);\
+                    tone(PIEZO, WRYTE_FREQ, DOT);
+               #define BEEP_WRYTE_EEPROM_FOUR_C \
+                    tone(PIEZO, WRYTE_FREQ, DASH*3);\
+                    delay(DASH*3 + PAUSE_BETWEEN_SIGNS);\
+                    tone(PIEZO, WRYTE_FREQ, DOT);\
+                    delay(DOT + PAUSE_BETWEEN_SIGNS);\
+                    tone(PIEZO, WRYTE_FREQ, DOT);
+     #define BEEP_WRYTE_EEPROM_FULL \
+          tone(PIEZO, WRYTE_FREQ*2, DASH*4);
      
 #define ERROR_SOUND \
-     tone(PIEZO, MORSE_FREQ*10, DASH);
+     tone(PIEZO, MORSE_FREQ*10, DASH); \
+     delay(DASH); \
+     tone(PIEZO, MORSE_FREQ*20, DASH);
+     
   
 // pins where the PS/2 keyboard is connected
 #define DATAPIN 4

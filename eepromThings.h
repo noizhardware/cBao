@@ -2,6 +2,9 @@
 
 #define EEPROM_SIZE EEPROM.length()
 
+#define EEPROM_START 2 // 0 and 1 are reserved for possible flags-stuff
+
+
 #ifndef SUCCESS
      #define SUCCESS 1
 #endif
@@ -9,10 +12,22 @@
      #define FAIL 0
 #endif
 
-void wipeEEPROM(){
-  for (int i = 0 ; i < EEPROM_SIZE ; i++) {
-      EEPROM.update(i, 0);} //write 0 to address i
-  Serial.println("EEPROM wiped");}   
+void wipeEEPROMsoft(){
+     uint16_t i;
+     for (i = 0 ; i < EEPROM_SIZE ; i++) {
+          EEPROM.update(i, 0);} //write 0 to address i
+     #ifdef DEBUG
+          Serial.println("EEPROM softly wiped");
+          #endif
+}
+void wipeEEPROMhard(){
+     uint16_t i;
+     for (i = 0 ; i < EEPROM_SIZE ; i++) {
+          EEPROM.write(i, 0);} //write 0 to address i
+     #ifdef DEBUG
+          Serial.println("EEPROM hard wiped");
+          #endif
+}   
 
 static inline bool getBit (const unsigned char source, const unsigned char bitpos){ // bitpos=[0..7] [LSB..MSB]
   return ((source & (1 << bitpos)) >> bitpos)!=0;}
@@ -24,7 +39,7 @@ static inline unsigned char flipBit (const unsigned char source, const unsigned 
   return source ^ (1 << bitpos);}
 
 static inline bool EEPROMaddrisOK(const unsigned int eepromAddr){
-  return ((eepromAddr <= EEPROM.length()) && (eepromAddr >= 0));
+  return ((eepromAddr <= EEPROM_SIZE) && (eepromAddr >= 0));
 }
 
 static inline bool setEEPROMbit (const uint16_t eepromAddr, const uint8_t bitpos, const bool bittoset){ // bitpos=[0..7] [LSB..MSB]
@@ -49,14 +64,26 @@ static inline unsigned char getEEPROMbyte (const unsigned int eepromAddr){
 }
       
 static inline bool setEEPROMshort(const uint16_t eepromAddr, const uint16_t valuetoset){
-     EEPROM.write(eepromAddr, valuetoset);
-     EEPROM.write(eepromAddr + 1, valuetoset >> 8);
+     EEPROM.update(eepromAddr, valuetoset);
+     EEPROM.update(eepromAddr + 1, valuetoset >> 8);
      return SUCCESS;}
 
 static inline uint16_t getEEPROMshort(const uint16_t eepromAddr){
      uint16_t out = (EEPROM.read(eepromAddr + 1) << 8);
      out |= EEPROM.read(eepromAddr);
      return out;}
+
+static inline uint16_t getEEPROMptr(){ /* gets the position of the first '\0' in the eeprom. for when I'm using the eeprom as a string */
+     uint16_t i;
+     for (i = EEPROM_START ; i < EEPROM_SIZE ; i++) {
+          #ifdef DEBUG
+               Serial.print(i);
+               Serial.print("th byte: ");
+               Serial.println(getEEPROMbyte(i));
+               #endif
+          if(getEEPROMbyte(i)=='\0'){
+               return i;}}
+     return EEPROM_SIZE;} // if a '\0' is not found, max memory usage is assumed (cacca) might create problems */
 
 
 
