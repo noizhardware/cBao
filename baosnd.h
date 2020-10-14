@@ -34,6 +34,14 @@ int main(){
 return 0;}
 ~~~~
 
+Ultrashort mode:
+~~~~
+#include "baosnd.h"
+JUST_PRE_SOUND;
+     sndOut =  sine(432);
+JUST_POST_SOUND;
+~~~~
+
 Compile with:
 * Windows:
      - `gcc -g0 test.c -o test.exe -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
@@ -188,10 +196,31 @@ Formats:
           Samples++;} \
      (void)pDevice; \
      (void)pInput;} \
-     __asm__("nop") /* just a dummy line to allow a semicolon after the function */
+     __asm__("") /* just a dummy line to allow a semicolon after the function */
      
 #define RISE 1
 #define FALL 0
+
+/* for ultracompact code */
+#define MAIN   WAVE_END; \
+               int main(){ \
+               SND_INIT;
+#define END   SND_STOP; \
+               return 0;} \
+               __asm__("")
+
+#define JUST_PRE_SOUND   WAVE_BEGIN(F32, MONO, 48000); \
+                         WAVE_PRE_SOUND;
+
+#define JUST_POST_SOUND  MAIN; \
+                              printf("== Device Name: %s\n", DEVICE_NAME); \
+                         SND_START; \
+                              printf("~~~ You should hear sound now ~~~\n"); \
+                              printf("== Press Enter to quit..."); \
+                              getchar(); \
+                         END; \
+                         __asm__("")
+                    
 
 /*************************************/
 /************* UTILITIES *************/
