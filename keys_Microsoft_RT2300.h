@@ -118,8 +118,8 @@
 #define kkCURLYOPEN 17501
 #define kkCURLYCLOSE 17502
 
-#define kkEMAIL 385
-#define kkHOUSE 389
+#define kkMAIL 385
+#define kkHOME 389
 #define kkSTAR 394
 #define kkPLAY 380
 #define kkVOLUP 382
@@ -157,7 +157,7 @@
 #define kkF11 363
 #define kkF12 364
 
-static __inline__ uint8_t kbdToChar(uint16_t kbd){
+static __inline__ uint8_t kbdToChar(uint16_t kbd){ /* returns 0 if not typable */
      return
           'q'*(kbd==kkQ) +
                'Q'*(kbd==kkQ_C) +
@@ -351,8 +351,8 @@ static __inline__ bool isTypable(uint16_t kbd){ // it's missing capital letters
           (kbd==kkCURLYCLOSE) ||
                (kbd==kkTAB);}
 
-static __inline__ bool isKey_Microsoft_RT2300(uint16_t key){ /* verify if it's not a key release code */
-     return (key<=18000);}
+static __inline__ bool isTypable_Microsoft_RT2300(uint16_t keyCode){ /* verify it's a typable char, not a key release code, not the mysterious 170 or 250 that appears at startup */
+     return (keyCode<=17502)&&(keyCode>=48)&&(keyCode!=170)&(keyCode!=250);}
 
 static __inline__ int toKeyboardCode(int in){
      Serial.print("============= ");

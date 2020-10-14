@@ -76,7 +76,7 @@ Compile with:
      * phase control
      * dirac
      * triangle wave with slew
-     * trapezoid (slewable square - dual control on rise and fall)
+     * trapezoid (ASR envelope(loopable))(slewable square - dual control on rise and fall)
      * looping AR - ASR - ADSR - exponential: ear
      * noises (see "Numerical Recipes in C")
      * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)

@@ -2,6 +2,15 @@
 #define __BAORAND_H__
 
 /* 202008152105 */
+/* ANSI C compliant <3 */
+/* usage:
+```
+int main(){
+     rand_init();
+     printf("Random number, in range 3..19: %lu\n", rand_(3, 19));
+     return 0;}
+```
+*/
 
 #include <stdlib.h>
 #include <sys/time.h>
