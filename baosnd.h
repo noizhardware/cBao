@@ -42,6 +42,12 @@ JUST_PRE_SOUND;
 JUST_POST_SOUND;
 ~~~~
 
+Uberfuckingshort mode:
+~~~~
+#include "baosnd.h"
+     snd(sine(432));
+~~~~
+
 Compile with:
 * Windows:
      - `gcc -g0 test.c -o test.exe -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
@@ -202,25 +208,35 @@ Formats:
 #define FALL 0
 
 /* for ultracompact code */
-#define MAIN   WAVE_END; \
-               int main(){ \
-               SND_INIT;
-#define END   SND_STOP; \
-               return 0;} \
-               __asm__("")
+#define MAIN \
+     WAVE_END; \
+     int main(){ \
+     SND_INIT;
+#define END \
+     SND_STOP; \
+     return 0;} \
+     __asm__("")
 
-#define JUST_PRE_SOUND   WAVE_BEGIN(F32, MONO, 48000); \
-                         WAVE_PRE_SOUND;
+#define JUST_PRE_SOUND \
+     WAVE_BEGIN(F32, MONO, 48000); \
+     WAVE_PRE_SOUND;
 
-#define JUST_POST_SOUND  MAIN; \
-                              printf("== Device Name: %s\n", DEVICE_NAME); \
-                         SND_START; \
-                              printf("~~~ You should hear sound now ~~~\n"); \
-                              printf("== Press Enter to quit..."); \
-                              getchar(); \
-                         END; \
-                         __asm__("")
-                    
+#define JUST_POST_SOUND \
+     MAIN; \
+          printf("== Device Name: %s\n", DEVICE_NAME); \
+     SND_START; \
+          printf("~~~ You should hear sound now ~~~\n"); \
+          printf("== Press Enter to quit..."); \
+          getchar(); \
+     END; \
+     __asm__("")
+
+/* uberfucking compact */
+#define snd(x) \
+     JUST_PRE_SOUND; \
+          sndOut=x; \
+     JUST_POST_SOUND; \
+     __asm__("")
 
 /*************************************/
 /************* UTILITIES *************/
