@@ -11,7 +11,9 @@ static inline void vibDash(unsigned int ms);
 unsigned char vibroPin;
 
 static inline void vibInit(unsigned char vibPin){
-     vibroPin = vibPin;}
+     vibroPin = vibPin;
+     pinMode(vibPin, OUTPUT);
+     digitalWrite(vibPin, 0);}
 
 static inline void vibDash(unsigned int ms){
      digitalWrite(vibroPin, 1);

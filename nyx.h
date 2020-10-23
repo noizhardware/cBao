@@ -4,7 +4,15 @@
      #endif
 #define _NYX_H_
 
-#define PIEZO 2
+#include "ardumicro.h"
+
+#define PIEZO A5 /* pin where the piezo buzzer is connected */
+#define VIBRO A4 /* pin where the vibro is connected */
+
+/* pins where the PS/2 keyboard is connected */
+#define DATAPIN A3 /* can be any pin */
+#define IRQPIN 2 /* (clock), must me an interrupt pin, on Arduino Micro: TX, RX, 2, 3 */
+  
 
 #define MORSE_FREQ 108
 #define MORSE_UNIT 35
@@ -82,13 +90,6 @@ uint16_t DBL(uint16_t x, unsigned char t){
      tone(PIEZO, MORSE_FREQ*10, DASH); \
      delay(DASH); \
      tone(PIEZO, MORSE_FREQ*20, DASH);
-     
-  
-// pins where the PS/2 keyboard is connected
-#define DATAPIN 4
-#define IRQPIN  3
-  
-#define VIBRO 7 // pin where the vibro is connected
 
      #ifdef __cplusplus
      }
