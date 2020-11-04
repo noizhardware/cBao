@@ -35,9 +35,18 @@ void dw(uint8_t pin, bool val){ /* slim digitalWrite */
 }
 
 bool cycleCheck(uint32_t* lastMillis, uint16_t cycleLength){ /* branchless protothreading */
-     uint32_t currentMillis = millis(); /* overflows every 49.7 days - 136 years if I manage to keep trasck of seconds on another int32 and manage the overflow */
+     uint32_t currentMillis = millis(); /* overflows every 49.7 days - 136 years if I keep track of seconds on another int32 and manage the overflow */
      bool cond = (currentMillis - *lastMillis >= cycleLength); /* has (cycleLength) milliseconds passed since last reading? */
      *lastMillis = (currentMillis * cond) + ((*lastMillis)*(!cond)); /* if yes, update lastMillis with current time, if not, lastMillis remains unchanged */
-     return cond;} /* retuns of the (cycleLength) time has passed or not */
+     return cond;} /* retuns whether the (cycleLength) time has passed or not */
+
+bool microCheck(uint32_t* lastUsec, uint16_t cycleLength){ /* usec resolution */
+     uint32_t currentUsec = micros(); /* overflows every 71.58 minutes */
+     bool cond = (currentUsec - *lastUsec >= cycleLength); /* has (cycleLength) microseconds passed since last reading? */
+     *lastUsec = (currentUsec * cond) + ((*lastUsec)*(!cond)); /* if yes, update lastUsec with current time, if not, lastUsec remains unchanged */
+     return cond;} /* retuns whether the (cycleLength) time has passed or not */
+
+void arduReset(){ /* Restarts program from beginning but does not reset the peripherals and registers */
+     asm volatile ("  jmp 0");}
 
 #endif /* _BAOAVR_H_ */

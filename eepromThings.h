@@ -1,3 +1,6 @@
+#ifndef _EEPROMTHINGS_H_
+#define _EEPROMTHINGS_H_
+
 #include <EEPROM.h>
 
 #define EEPROM_SIZE EEPROM.length()
@@ -39,7 +42,7 @@ static inline unsigned char flipBit (const unsigned char source, const unsigned 
   return source ^ (1 << bitpos);}
 
 static inline bool EEPROMaddrisOK(const unsigned int eepromAddr){
-  return ((eepromAddr <= EEPROM_SIZE) && (eepromAddr >= 0));
+  return (eepromAddr <= EEPROM_SIZE);
 }
 
 static inline bool setEEPROMbit (const uint16_t eepromAddr, const uint8_t bitpos, const bool bittoset){ // bitpos=[0..7] [LSB..MSB]
@@ -55,23 +58,33 @@ static inline bool setEEPROMbyte (const uint16_t eepromAddr, const uint8_t bytet
       return SUCCESS;}
     else{
       return FAIL;}}
-      
 static inline unsigned char getEEPROMbyte (const unsigned int eepromAddr){
-  if(EEPROMaddrisOK(eepromAddr)){
-    return EEPROM.read(eepromAddr);}
-  else{
-    /* ERROR!!! address out of range!*/}
+  /*if(EEPROMaddrisOK(eepromAddr)){*/
+    return EEPROM.read(eepromAddr);/*}*/
+    /* cacca: I'm not managing the exception */
+  /*else{*/
+    /* ERROR!!! address out of range!*//*}*/
 }
       
 static inline bool setEEPROMshort(const uint16_t eepromAddr, const uint16_t valuetoset){
      EEPROM.update(eepromAddr, valuetoset);
      EEPROM.update(eepromAddr + 1, valuetoset >> 8);
      return SUCCESS;}
-
 static inline uint16_t getEEPROMshort(const uint16_t eepromAddr){
      uint16_t out = (EEPROM.read(eepromAddr + 1) << 8);
      out |= EEPROM.read(eepromAddr);
      return out;}
+
+static inline bool setEEPROMfloat(const uint16_t eepromAddr, const float valuetoset){
+     /*EEPROM.put(address, data)
+     address: the location to write to, starting from 0 (int)
+     data: the data to write, can be a primitive type (eg. float) or a custom struct
+     This function uses EEPROM.update() to perform the write, so does not rewrites the value if it didn't change.*/
+     return EEPROM.put(eepromAddr, valuetoset);}
+static inline float getEEPROMfloat(const uint16_t eepromAddr){
+     float temp;
+     EEPROM.get(eepromAddr, temp);
+     return temp;}
 
 static inline uint16_t getEEPROMptr(){ /* gets the position of the first '\0' in the eeprom. for when I'm using the eeprom as a string */
      uint16_t i;
@@ -83,7 +96,7 @@ static inline uint16_t getEEPROMptr(){ /* gets the position of the first '\0' in
                #endif
           if(getEEPROMbyte(i)=='\0'){
                return i;}}
-     return EEPROM_SIZE;} // if a '\0' is not found, max memory usage is assumed (cacca) might create problems */
+     return EEPROM_SIZE;} // if no '\0' is found, max memory usage is assumed (cacca) might create problems */
 
 
 
@@ -122,3 +135,4 @@ static inline bool EEPROMflag(const unsigned char flagID){ // GET : flagID=[0..3
     return getEEPROMbit(3, (flagID - 24));}
   else{/* ERROR!!! flagID out of range!*/}} 
   
+#endif /* _EEPROMTHINGS_H_ */

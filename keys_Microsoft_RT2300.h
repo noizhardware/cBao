@@ -1,3 +1,6 @@
+#ifndef _KEYS_MICROSOFT_RT2300_H_
+#define _KEYS_MICROSOFT_RT2300_H_
+
 #include <stdbool.h>
 
 /*
@@ -51,7 +54,7 @@ and kkSHIFT_ESC_REL things, still to complete
 #define kkPLUS 94
      #define kkPLUS_REL 32862
 #define kkASTERISK 16478
-     #define kkASTERISK 49246
+     #define kkASTERISK_REL 49246
 
 #define kkA 65
      #define kkA_REL 32833
@@ -63,7 +66,7 @@ and kkSHIFT_ESC_REL things, still to complete
      #define kkD_REL 32836
           #define kkD_CAP 16452
 #define kkF 70
-     #define kkF_CAP 32838
+     #define kkF_REL 32838
           #define kkF_CAP 16454
 #define kkG 71
      #define kkG_REL 32839
@@ -137,10 +140,10 @@ and kkSHIFT_ESC_REL things, still to complete
 
 #define kkSPACE 287
      #define kkSPACE 287
-#define kkSPACE_RELEASE 33055
+#define kkSPACE_REL 33055
 
-#define kkBACKSLASH 64
-     #define kkBACKSLASH_REL 33052
+// #define kkBACKSLASH 64
+     // #define kkBACKSLASH_REL 33052
 #define kk1 49
      #define kk1_REL 32817
 #define kk2 50
@@ -282,7 +285,7 @@ and kkSHIFT_ESC_REL things, still to complete
 #define kkF10 362
      #define kkF10_REL 33130
 #define kkF11 363
-     #define kkF1_REL 33131
+     #define kkF11_REL 33131
 #define kkF12 364
      #define kkF12_REL 33132
 
@@ -294,7 +297,7 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){ /* returns 0 if not typable *
                'W'*(kbd==kkW_CAP) +
           'e'*(kbd==kkE) +
                'E'*(kbd==kkE_CAP) +
-          '€'*(kbd==kkEURO) + /* not actually supported by Keyboard.write */
+          // '€'*(kbd==kkEURO) + /* not actually supported by Keyboard.write */
           'r'*(kbd==kkR) +
           't'*(kbd==kkT) +
           'y'*(kbd==kkY) +
@@ -332,13 +335,13 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){ /* returns 0 if not typable *
                          'K'*(kbd==kkK_CAP) +
                          'L'*(kbd==kkL_CAP) +
                162*(kbd==kkOO) + /* ò */
-                    'ç'*(kbd==kkCCEDILLA) +
+                    // 'ç'*(kbd==kkCCEDILLA) +
                          '@'*(kbd==kkAT) +
                133*(kbd==kkAA) + /* à */
-                    '°'*(kbd==kkDEGREE) +
+                    // '°'*(kbd==kkDEGREE) +
                          '#'*(kbd==kkHASHTAG) +
-               'ù'*(kbd==kkUU) +
-                    '§'*(kbd==kkSECTION) +
+               // 'ù'*(kbd==kkUU) +
+                    // '§'*(kbd==kkSECTION) +
           '<'*(kbd==kkANGL) +
                '>'*(kbd==kkANGR) +
           'z'*(kbd==kkZ) +
@@ -380,7 +383,7 @@ static __inline__ uint8_t kbdToChar(uint16_t kbd){ /* returns 0 if not typable *
                     '^'*(kbd==kkHAT) +
           '!'*(kbd==kkEXCLAMATION) +
           '\"'*(kbd==kkQUOTEDOUBLE) +
-          '£'*(kbd==kkGBP) +
+          // '£'*(kbd==kkGBP) +
           '$'*(kbd==kkDOLLAR) +
           '%'*(kbd==kkPERCENT) +
           '&'*(kbd==kkAMPERSAND) +
@@ -487,28 +490,14 @@ static __inline__ int toKeyboardCode(int in){
      Serial.println(in);
      if(in==130){return 123;} // è
      else if(in==138){return 91;} // é
-     else if(in=='ù'){return 92;} // ù
+     // else if(in=='ù'){return 92;} // ù
      else if(in==133){return 39;} // à
      else if(in==162){return 59;} // ò
-     else if(in=='ç'){return 58;} // ç
+     // else if(in=='ç'){return 58;} // ç
      else if(in==141){return 61;} // ì
      else if(in=='-'){return 47;} // -
      else{return in;} // all other raw bytes*
      /* !°£$%/à)=(^,'.-0123456789çò;ì:_"ABCDEFGHIJKLMNOPQRSTUVWXYZèù+&?\abcdefghijklmnopqrstuvwxyzé§*| */
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* _KEYS_MICROSOFT_RT2300_H_ */

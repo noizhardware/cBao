@@ -6,7 +6,7 @@
 
 #include "ardumicro.h"
 
-#define PIEZO A5 /* pin where the piezo buzzer is connected */
+#define BUZZER A5 /* pin where the piezo buzzer is connected */
 #define VIBRO A4 /* pin where the vibro is connected */
 
 /* pins where the PS/2 keyboard is connected */
@@ -30,66 +30,66 @@ uint16_t DBL(uint16_t x, unsigned char t){
      return out;}
 
 #define STARTUP_SOUND \
-     tone(PIEZO, MORSE_FREQ, DASH);\
+     tone(BUZZER, MORSE_FREQ, DASH);\
      delay(DASH + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DOT);\
+     tone(BUZZER, MORSE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_LETTERS);\
-     tone(PIEZO, MORSE_FREQ, DASH);\
+     tone(BUZZER, MORSE_FREQ, DASH);\
      delay(DASH + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DOT);\
+     tone(BUZZER, MORSE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DASH);\
+     tone(BUZZER, MORSE_FREQ, DASH);\
      delay(DASH + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, MORSE_FREQ, DASH);\
+     tone(BUZZER, MORSE_FREQ, DASH);\
      delay(DASH + PAUSE_BETWEEN_LETTERS);\
-     tone(PIEZO, 1000, DASH);\
+     tone(BUZZER, 1000, DASH);\
      delay(DASH + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, 1200, DOT);\
+     tone(BUZZER, 1200, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, 600, DOT);\
+     tone(BUZZER, 600, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, 900, DASH);\
+     tone(BUZZER, 900, DASH);\
      delay(100);\
-     tone(PIEZO, 1200, DOT);\
+     tone(BUZZER, 1200, DOT);\
      delay(100);\
-     tone(PIEZO, 2400, DASH);
+     tone(BUZZER, 2400, DASH);
 
 #define WRYTE_STARTUP_SOUND \
-     tone(PIEZO, MORSE_FREQ*4, DOT);
+     tone(BUZZER, MORSE_FREQ*4, DOT);
      
 #define WRYTE_FREQ MORSE_FREQ*8
 
 #define BEEP_WRYTE_EEPROM_ONE \
-     tone(PIEZO, WRYTE_FREQ, DOT);
+     tone(BUZZER, WRYTE_FREQ, DOT);
 #define BEEP_WRYTE_EEPROM_TWO \
-     tone(PIEZO, WRYTE_FREQ, DOT);\
+     tone(BUZZER, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, WRYTE_FREQ, DOT);
+     tone(BUZZER, WRYTE_FREQ, DOT);
 #define BEEP_WRYTE_EEPROM_THREE \
-     tone(PIEZO, WRYTE_FREQ, DOT);\
+     tone(BUZZER, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, WRYTE_FREQ, DOT);\
+     tone(BUZZER, WRYTE_FREQ, DOT);\
      delay(DOT + PAUSE_BETWEEN_SIGNS);\
-     tone(PIEZO, WRYTE_FREQ, DOT);
+     tone(BUZZER, WRYTE_FREQ, DOT);
                #define BEEP_WRYTE_EEPROM_FOUR_A \
-                    tone(PIEZO, WRYTE_FREQ, DASH*3);
+                    tone(BUZZER, WRYTE_FREQ, DASH*3);
                #define BEEP_WRYTE_EEPROM_FOUR_B \
-                    tone(PIEZO, WRYTE_FREQ, DASH*3);\
+                    tone(BUZZER, WRYTE_FREQ, DASH*3);\
                     delay(DASH*3 + PAUSE_BETWEEN_SIGNS);\
-                    tone(PIEZO, WRYTE_FREQ, DOT);
+                    tone(BUZZER, WRYTE_FREQ, DOT);
                #define BEEP_WRYTE_EEPROM_FOUR_C \
-                    tone(PIEZO, WRYTE_FREQ, DASH*3);\
+                    tone(BUZZER, WRYTE_FREQ, DASH*3);\
                     delay(DASH*3 + PAUSE_BETWEEN_SIGNS);\
-                    tone(PIEZO, WRYTE_FREQ, DOT);\
+                    tone(BUZZER, WRYTE_FREQ, DOT);\
                     delay(DOT + PAUSE_BETWEEN_SIGNS);\
-                    tone(PIEZO, WRYTE_FREQ, DOT);
+                    tone(BUZZER, WRYTE_FREQ, DOT);
      #define BEEP_WRYTE_EEPROM_FULL \
-          tone(PIEZO, WRYTE_FREQ*2, DASH*4);
+          tone(BUZZER, WRYTE_FREQ*2, DASH*4);
      
 #define ERROR_SOUND \
-     tone(PIEZO, MORSE_FREQ*10, DASH); \
+     tone(BUZZER, MORSE_FREQ*10, DASH); \
      delay(DASH); \
-     tone(PIEZO, MORSE_FREQ*20, DASH);
+     tone(BUZZER, MORSE_FREQ*20, DASH);
 
      #ifdef __cplusplus
      }
