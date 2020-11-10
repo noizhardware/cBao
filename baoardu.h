@@ -1,5 +1,5 @@
-#ifndef _BAOAVR_H_
-#define _BAOAVR_H_
+#ifndef _BAOARDU_H_
+#define _BAOARDU_H_
 
 void dw(uint8_t pin, bool val);
 
@@ -49,4 +49,4 @@ bool microCheck(uint32_t* lastUsec, uint16_t cycleLength){ /* usec resolution */
 void arduReset(){ /* Restarts program from beginning but does not reset the peripherals and registers */
      asm volatile ("  jmp 0");}
 
-#endif /* _BAOAVR_H_ */
+#endif /* _BAOARDU_H_ */

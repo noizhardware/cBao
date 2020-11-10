@@ -8,6 +8,7 @@
 /* TODO:
  * get rid of all malloc / calloc
  * prepend to string
+ * file to string: bool ftos(fileName, char* buf) >> fills the buffer, returns 1 if buffer space was enough to contain the file, 0 if not
 */
 
 #include <stdio.h>
