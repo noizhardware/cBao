@@ -37,6 +37,8 @@ static __inline__ void* reallok(void* source, size_t size);
 static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker);
 static __inline__ char* clearStringUntilChar(char* inputString, char marker, bool deleteMarker);
 static __inline__ char* terminateStringOnString(char* in, char* marker, bool deleteMarker);
+     static __inline__ char* terminateStringOnString(char* in, char* marker, bool deleteMarker);
+
 
 static __inline__ bool startsWith(const char* str, const char* with);
 
@@ -194,13 +196,21 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
           return outputString;}
      else{ /* not found*/
           return inputString;}}
+static __inline__ void clearStringUntilChar_nomalloc(char* inputString, char marker, bool deleteMarker, char* bufferOut){ /* cacca: probably not working, use strtok() if you can */
+     char* ptr;
+     ptr = strchr(inputString, marker);
+     if (ptr != NULL){ /* we've got a match!*/
+          ptr += deleteMarker;
+          strcpy(bufferOut, ptr);}
+     else{ /* not found*/
+          strcpy(bufferOut, inputString);}}
 
 /* startsWith */
 #ifndef BRANCH
      static __inline__ bool startsWith(const char* str, const char* with){
-          int i;
+          unsigned int i;
           size_t c = 0;
-          for(i=0; i<(minn(strlen(with),strlen(str))); i++){
+          for(i=0; i<((unsigned int)minn(strlen(with),strlen(str))); i++){
                c += str[i]==with[i];}
           return (c==strlen(with))&&(strlen(with)<strlen(str));}
 #endif
@@ -241,6 +251,16 @@ static __inline__ char* terminateStringOnString(char* in, char* marker, bool del
           out=(char*)calloc(1, lenStr+1); /* cacca: char* cast added for Arduino warning */
           strcpy(out, in);}
      return out;}
+/* terminates the string on a match, if there is one, otherwise returns the same string */
+static __inline__ void terminateStringOnString_nomalloc(char* in, char* marker, bool deleteMarker, char* bufferOut){
+     size_t lenMark = strlen(marker);
+     char* match = strstr(in, marker);
+     if(match != NULL){
+          memcpy(bufferOut, in, match-in + ((!deleteMarker)*lenMark)); /* cacca: not checking for bufferOut max size */
+          bufferOut[match-in + ((!deleteMarker)*lenMark)] = '\0'; /* terminate the string */
+     }
+     else{
+          strcpy(bufferOut, in);}}
 
 #ifdef __cplusplus
 }

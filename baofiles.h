@@ -39,6 +39,10 @@ static __inline__ char* fileRead(char* fileName);
 static __inline__ long int fileSize(char* filename);
 static __inline__ bool fileWrite(char* fileName, char* stuffToWrite);
 static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile);
+
+static __inline__ void fileRead_nomalloc(char* file, char* buf);
+/*static __inline__ void fileToLines_nomalloc(char* fileName, char** linesBuf, unsigned int maxLineSize, unsigned int maxLinesInFile);*/
+
 /* prototypes END */
 
 static __inline__ void fileRead_nomalloc(char* file, char* buf){
@@ -138,6 +142,26 @@ static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, u
      line[i][0]=(char)EOF;
      fclose(fptr);
      return line;}
+
+/* (file)>>(array of lines) cacca non funzia ncazzo */
+/*static __inline__ void fileToLines_nomalloc(char* fileName, char* linesBuf[], unsigned int maxLineSize, unsigned int maxLinesInFile){
+     FILE* fptr = NULL;
+     unsigned int line = 0;
+     unsigned int charac = 0;
+     char c;
+     char* test = "";
+     fptr = fopen(fileName, "r");
+     printf("file opened...\n");
+     for(line=0;line<maxLinesInFile;line++){
+          for(charac=0;charac<maxLineSize;charac++){
+               c=fgetc(fptr);
+               if(feof(fptr)){ break;}
+               *linesBuf[line][charac]=c;
+               if(c=='\0'){ break;}
+          }
+     }
+
+     fclose(fptr);}*/
 
      /* dirlist - cacca - disabled for win for now */
 #ifndef __WIN32__
