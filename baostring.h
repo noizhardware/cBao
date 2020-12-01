@@ -212,7 +212,7 @@ static __inline__ void clearStringUntilChar_nomalloc(char* inputString, char mar
           size_t c = 0;
           for(i=0; i<((unsigned int)minn(strlen(with),strlen(str))); i++){
                c += str[i]==with[i];}
-          return (c==strlen(with))&&(strlen(with)<strlen(str));}
+          return (c==strlen(with))&&(strlen(with)<=strlen(str));} /* "with" must be smaller OR EQUAL to the string! if they are the same, we will return true */
 #endif
 /* branching version: */
 #ifdef BRANCH
