@@ -1,7 +1,7 @@
 #ifndef _BAOSTRING_H_
 #define _BAOSTRING_H_
 
-/* 202008081633 */
+/* 2020w21-0014 */
 
 /* C90 compliant <3 */
 
@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <ctype.h>
 
 #include "baomath.h"
 
@@ -35,9 +36,12 @@ static __inline__ bool strEqual(const char* st1, const char* st2);
 static __inline__ char* removeSubstr(char* str, char* toRemove);
 static __inline__ void* reallok(void* source, size_t size);
 static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker);
+
 static __inline__ char* clearStringUntilChar(char* inputString, char marker, bool deleteMarker);
+static __inline__ void clearStringUntilChar_nomalloc(char* inputString, char marker, bool deleteMarker, char* bufferOut);
+
 static __inline__ char* terminateStringOnString(char* in, char* marker, bool deleteMarker);
-     static __inline__ char* terminateStringOnString(char* in, char* marker, bool deleteMarker);
+static __inline__ void terminateStringOnString_nomalloc(char* in, char* marker, bool deleteMarker, char* bufferOut);
 
 
 static __inline__ bool startsWith(const char* str, const char* with);
@@ -50,7 +54,25 @@ static __inline__ bool char_isNum(char c);
 static __inline__ uint16_t str_toUint16(char *s);
 static __inline__ float str_toFloat(char* str);
 
+static __inline__ char* trim(char* in);
+
 /* prototypes END */
+
+static __inline__ char* trim(char* in){ /* cacca: ha un return, ma modifica anche ciò che gli entra */
+     unsigned int i = 0;
+     char* out = in;
+     while(isspace(in[strlen(in)-i-1])){
+          /*printf("before: |%s| ", in);*/
+          memset((in+strlen(in)-i-1), '\0', 1);
+          /*printf("after: |%s|\n", in);*/
+          i++;}
+     i=0;
+     while(isspace(in[i])){
+          out = in+i+1;
+          i++;}
+     return out;
+}
+
 
 static __inline__ bool char_isNum(char c){
 	return c >= '0' && c <= '9';}
@@ -72,7 +94,7 @@ static __inline__ float str_toFloat(char* str){
 static __inline__ char* toUpper(char* str){
      int len = strlen(str);
      int i;
-     char* out = (char*)malloc(len+1); /* cacca: char* cast added for Arduino warning */
+     char* out = (char*)malloc(len+1); /* cacca: char* cast added for Arduino IDE warning */
      strcpy(out, str);
      for(i=0; i<len; i++){
           out[i] -= 32*(out[i] >= 'a' && out[i] <= 'z');} /* branchless!! */
@@ -80,7 +102,7 @@ static __inline__ char* toUpper(char* str){
 
 static __inline__ char* appendChar(char* str, char c){
          size_t len = strlen(str);
-         char *out = (char*)calloc(1, len + 2); /* one for the extra char, one for trailing zero */ /* cacca: char* cast added for Arduino warning */
+         char *out = (char*)calloc(1, len + 2); /* one for the extra char, one for trailing zero */ /* cacca: char* cast added for Arduino IDE warning */
          strcpy(out, str);
          out[len] = c;
          out[len + 1] = '\0';
@@ -92,7 +114,7 @@ static __inline__ char* appendString(char* str1, char* str2){
      size_t len1 = strlen(str1);
      size_t len2 = strlen(str2);
      char* out;
-     if((out = (char*)calloc(1, len1 + len2 + 1)) != NULL){ /* one for trailing zero */ /* cacca: char* cast added for Arduino warning */
+     if((out = (char*)calloc(1, len1 + len2 + 1)) != NULL){ /* one for trailing zero */ /* cacca: char* cast added for Arduino IDE warning */
           /*snprintf(out, len1 + len2 + 1, "%s%s", str1, str2);*/
           /* snprintf is C99 and up */
           sprintf(out, "%s%s", str1, str2);
@@ -138,11 +160,11 @@ static __inline__ char* removeSubstr(char* str, char* toRemove){
      char* out;
      char* match = strstr(str, toRemove);
      if(match != NULL){
-          out=(char*)calloc(1, lenStr-lenRem+1); /* cacca: char* cast added for Arduino warning */
+          out=(char*)calloc(1, lenStr-lenRem+1); /* cacca: char* cast added for Arduino IDE warning */
           memcpy(out, str, match-str);
           strcpy(out+(match-str), match+lenRem);}
      else{
-          out=(char*)calloc(1, lenStr+1); /* cacca: char* cast added for Arduino warning */
+          out=(char*)calloc(1, lenStr+1); /* cacca: char* cast added for Arduino IDE warning */
           strcpy(out, str);}
      return out;}
 
@@ -162,7 +184,7 @@ static __inline__ void* reallok(void* source, size_t size){ /* basically alloc w
 static __inline__ char* terminateStringOnChar(char* inputString, char marker, bool deleteMarker){
      char* ptr;
      char* outputString; /* new internal char* */
-     outputString = (char*)malloc(strlen(inputString)+1); /* cacca: char* cast added for Arduino warning */
+     outputString = (char*)malloc(strlen(inputString)+1); /* cacca: char* cast added for Arduino IDE warning */
      strcpy(outputString, inputString); /* copies inputString into outputString, now they're identical*/
      ptr = strchr(outputString, marker);
      if (ptr != NULL){
@@ -189,7 +211,7 @@ static __inline__ char* clearStringUntilChar(char* inputString, char marker, boo
      ptr = strchr(inputString, marker);
      if (ptr != NULL){ /* we've got a match!*/
           ptr += deleteMarker;
-          outputString = (char*)malloc(strlen(inputString)+1-(ptr-inputString)); /* allocate memory, smaller than inputString*/ /* cacca: char* cast added for Arduino warning */
+          outputString = (char*)malloc(strlen(inputString)+1-(ptr-inputString)); /* allocate memory, smaller than inputString*/ /* cacca: char* cast added for Arduino IDE warning */
           outputString = ptr;
           /*if(freeTheSource){
                //free(inputString);} // frees the old allocation*/
@@ -228,8 +250,8 @@ static __inline__ void clearStringUntilChar_nomalloc(char* inputString, char mar
 
 static __inline__ char** makeStringTable(unsigned int dimensionA, unsigned int dimensionB){
      unsigned int i;
-     char* values = (char*)calloc(dimensionA*dimensionB, sizeof(char)); /* cacca: char* cast added for Arduino warning */
-     char** rows = (char**)calloc(dimensionB, sizeof(char*)); /* cacca: char** cast added for Arduino warning */
+     char* values = (char*)calloc(dimensionA*dimensionB, sizeof(char)); /* cacca: char* cast added for Arduino IDE warning */
+     char** rows = (char**)calloc(dimensionB, sizeof(char*)); /* cacca: char** cast added for Arduino IDE warning */
      for (i=0; i<dimensionB; i++){
           rows[i] = values + i*dimensionA;}
      return rows;}
@@ -245,10 +267,10 @@ static __inline__ char* terminateStringOnString(char* in, char* marker, bool del
      char* out;
      char* match = strstr(in, marker);
      if(match != NULL){
-          out=(char*)calloc(1, match-in+1 + ((!deleteMarker)*lenMark)); /* cacca: char* cast added for Arduino warning */
+          out=(char*)calloc(1, match-in+1 + ((!deleteMarker)*lenMark)); /* cacca: char* cast added for Arduino IDE IDE warning */
           memcpy(out, in, match-in + ((!deleteMarker)*lenMark));}
      else{
-          out=(char*)calloc(1, lenStr+1); /* cacca: char* cast added for Arduino warning */
+          out=(char*)calloc(1, lenStr+1); /* cacca: char* cast added for Arduino IDE warning */
           strcpy(out, in);}
      return out;}
 /* terminates the string on a match, if there is one, otherwise returns the same string */
@@ -261,6 +283,16 @@ static __inline__ void terminateStringOnString_nomalloc(char* in, char* marker, 
      }
      else{
           strcpy(bufferOut, in);}}
+static __inline__ void terminateStringOnString_destructive(char* in, char* marker, bool deleteMarker){
+     size_t lenMark = strlen(marker);
+     char* match = strstr(in, marker);
+     /*printf("==string: %s || marker: %s || match: %d\n", in, marker, match);
+     printf("==in match address: %s\n", match);*/
+     if(match != NULL){
+          memset(match + ((!deleteMarker)*lenMark), '\0', 1);
+     /*printf("==after memset: %s\n", match);*/
+          
+     }}
 
 #ifdef __cplusplus
 }

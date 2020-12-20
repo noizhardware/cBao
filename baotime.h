@@ -1,11 +1,11 @@
 #ifndef _BAOTIME_H_
 #define _BAOTIME_H_
 
-/* 202007240242 */
+/* 2020w20-1821 */
 
 /*
  * ANSI C compliant
- * need to use -Wno-long-long
+ * need to use -Wno-long-long >> define BAOTIME_LONGLONG_ENABLED if you do so
  */
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
@@ -44,6 +44,7 @@
      /*int tz_dsttime;  */       /* type of DST correction */
 /*} timezone;*/
 
+#ifdef BAOTIME_LONGLONG_ENABLED
 int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unused))) /*  __attribute__((unused)) is a GCC flag to suppress the -Wunused-parameter for this variable */
 {
     /* Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
@@ -55,6 +56,8 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unuse
     SYSTEMTIME  system_time; /* for .wMilliseconds >> 16bits */
     FILETIME    file_time/*, EPOCHdiff*/; /* for dwLowDateTime and dwHighDateTime >> unsigned 32bits */
     uint64_t    time;
+    
+    (void)tzp;
 
     GetSystemTime( &system_time ); /* system time can be retrieved only in SYSTEMTIME format (year,month,day....) mSec precision*/
     SystemTimeToFileTime( &system_time, &file_time ); /* here is converted in FILETIME format (number of 100-nanosecond intervals since January 1, 1601 (UTC)) */
@@ -66,7 +69,8 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp __attribute__((unuse
     tp->tv_usec = (long) (system_time.wMilliseconds * 1000); /* will ALWAYS have 3 non-information-carrying trailing zeroes */
     return 0;
 }
-#endif
+#endif /* #ifdef BAOTIME_LONGLONG_ENABLED */
+#endif /* #ifdef WIN32 */
 /**********************************/
 
 /* globals: */
@@ -79,19 +83,30 @@ bool __BAOTIME_H__running = false;
 
 /* prototypes: */
 static __inline__ float sec_to_hm(unsigned long int sec);
-static __inline__ void pauseTimer();
-static __inline__ void startTimer();
-static __inline__ void splitTimer();
-static __inline__ void timertoggle();
+static __inline__ unsigned long int hm_to_sec(float hm);
+
+#ifdef BAOTIME_LONGLONG_ENABLED
+     static __inline__ void pauseTimer();
+     static __inline__ void startTimer();
+     static __inline__ void splitTimer();
+     static __inline__ void getTime();
+     static __inline__ void stopTimer();
+     static __inline__ void timertoggle();
+#endif /* #ifdef BAOTIME_LONGLONG_ENABLED */
+
 static __inline__ void resetTimer();
 static __inline__ struct timeval timevalDiff(struct timeval a, struct timeval b);
 static __inline__ struct timeval timevalSum(struct timeval a, struct timeval b);
-static __inline__ void getTime();
 static __inline__ void sleep_ms(int milliseconds);
 static __inline__ struct timeval elapsed();
 static __inline__ struct timeval getSplit();
+static __inline__ float hm_add(float a, float b);
+
 
 /**********************************/
+
+static __inline__ float hm_add(float a, float b){
+     return sec_to_hm(hm_to_sec(a)+hm_to_sec(b));}
 
 static __inline__ void sleep_ms(int milliseconds){ /* cross-platform sleep function */
      #ifdef WIN32
@@ -107,7 +122,7 @@ static __inline__ void sleep_ms(int milliseconds){ /* cross-platform sleep funct
 }
 
 /* SW StopWatch functions: */
-
+#ifdef BAOTIME_LONGLONG_ENABLED
 /* writes current time in __BAOTIME_H__startTime, if timer already running, it gets reset and started */
 static __inline__ void startTimer(){
           gettimeofday(&__BAOTIME_H__startTime, NULL);
@@ -123,6 +138,7 @@ static __inline__ void stopTimer(){
 static __inline__ void splitTimer(){
      if(__BAOTIME_H__running){
           gettimeofday(&__BAOTIME_H__splitTime, NULL);}}
+#endif /* #ifdef BAOTIME_LONGLONG_ENABLED */
           
 static __inline__ void resetTimer(){
   __BAOTIME_H__savedTime.tv_sec = 0; __BAOTIME_H__savedTime.tv_usec = 0;
@@ -137,6 +153,7 @@ static __inline__ struct timeval elapsed(){
 static __inline__ struct timeval getSplit(){
      return timevalDiff(__BAOTIME_H__splitTime, __BAOTIME_H__startTime);}
 
+#ifdef BAOTIME_LONGLONG_ENABLED
 static __inline__ void pauseTimer(){
      if ((__BAOTIME_H__difference.tv_sec == 0) && (__BAOTIME_H__difference.tv_usec == 0)){
      } /* if timer never started, don't allow pause button to do anything */
@@ -153,6 +170,7 @@ static __inline__ void timertoggle(){
          startTimer();}
      else{
          pauseTimer();}}
+#endif /* #ifdef BAOTIME_LONGLONG_ENABLED */
 
 
 
@@ -169,16 +187,20 @@ static __inline__ struct timeval timevalSum(struct timeval a, struct timeval b){
      output.tv_sec = a.tv_sec + b.tv_sec;
      output.tv_usec = a.tv_usec + b.tv_usec;
      return output;}
-
+     
+#ifdef BAOTIME_LONGLONG_ENABLED
 static __inline__ void getTime(){
      gettimeofday(&__BAOTIME_H__updatedTime, NULL);
      if ((__BAOTIME_H__savedTime.tv_sec >= 0) && (__BAOTIME_H__savedTime.tv_usec >= 0)){
           __BAOTIME_H__difference = timevalSum(timevalDiff(__BAOTIME_H__updatedTime, __BAOTIME_H__startTime), __BAOTIME_H__savedTime);}
      else {
           __BAOTIME_H__difference =  timevalDiff(__BAOTIME_H__updatedTime, __BAOTIME_H__startTime);}}
+#endif /* #ifdef BAOTIME_LONGLONG_ENABLED */
 
 static __inline__ float sec_to_hm(unsigned long int sec){
      return floor(((float)sec / 3600)) + ((((float)sec / 3600) - floor(((float)sec / 3600))) * 0.6);}
+static __inline__ unsigned long int hm_to_sec(float hm){
+     return (unsigned long int)(floor(hm)*3600) + (unsigned long int)(fmod(hm, 1.0)*6000.f);}
 
 static __inline__ uint16_t getYear(){
      time_t t = time(NULL);

@@ -6,6 +6,8 @@
 #include <windows.h>
  
 unsigned char* getFloowDate();
+
+/***************************************/
  
 unsigned char* getFloowDate(){
      unsigned char* floowOut;
@@ -24,6 +26,8 @@ unsigned char* getFloowDate(){
      else{
           itoa(local.wDay,floowOut+5,10);}
      return floowOut;}
+
+
 
 
 
