@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2020i05-1829 */
+/* 2021a20-2109 */
 
 /***
 # ANSI C sound library
@@ -60,7 +60,7 @@ Compile with:
      - `tt` : float, seconds from the start of the program
      
 ### Signal Generators:
-     * `sine(freq)` : frequency(float)
+     * `sn(freq)` : frequency(float)
      * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
      * `sq(freq, duty)` : square wave : frequency(float), duty cycle[0..1]
      * `noiw()` : white noise [-1..1]
@@ -69,15 +69,20 @@ Compile with:
      * `sigNorm(sig)` : normalize signal `x` from range [-1..1] to [0..1]
      * `normSig(sig)` : reverse of sigNorm,  `x` from range [0..1] to [-1..1]
      * `clip(sig, th)` : threshold(float) - everything outside the range [-th..th] gets clipped to th
-     * `tclip(sig, mul)` : soft clipping with tanh, mul premultiplies the signal
+     * `tclip(sig, mul)` : soft clipping with tanh, mul premultiplies the signal. multiply for TANH_MAKEUP to compensate gain loss
      * `hwav(sig)` : half-wave rectifier - keeps positive part
      * `hwavn(sig)` : half-wave rectifier - keeps negative part
      * `fwav(sig)` : full-wave rectifier
      * `mix(unsigned char qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
      * `inv(signal)` : returns the inverted signal
      * `tik(interval, length, offset)` : jumps to 1 every "interval" seconds, and stays up for "length" seconds. if "length" is 0, it stays up for a single sample(digital trigger)
+     * `tikS(interval, length, offset)` : jumps to 1 every "interval" SAMPLES, and stays up for "length" SAMPLES. if "length" is 0, it stays up for a single sample(digital trigger)
+     * `sh(input, trigger)` : sample and hold, triggers whenever trigger==1
+     * `gate(input, threshold)` : sound is passing thru only when trigger>=threshold
 
  #### TODO:
+     * soft gate
+     * linear interpolator
      * ttog : trigger to gate
      * flipflop (for triggers)
      * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
@@ -94,11 +99,11 @@ Compile with:
      * looping AR - ASR - ADSR - exponential: ear
      * noises (see "Numerical Recipes in C")
      * perlin noise (see https://gpfault.net/posts/perlin-sound.txt.html)
-     * s&h
      * sidechain compressor
      * vactrol
      * stereo
      * stereo positioning - pan
+     * more than stereo? 4ch
      * sig-in >> split >> rnd jitter->(distortion) >> stereo out
      
      - file output (.wav)(.mp3)
@@ -111,29 +116,25 @@ Compile with:
 #include <stdarg.h>
 #include <stdint.h>
 
+
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
 #define MINIAUDIO_IMPLEMENTATION
      #include "miniaudio.h"
-     
-     
+
      static float clk = 0;
      static float tt = 0;
      int32_t DEVICE_FORMAT;
      int32_t DEVICE_CHANNELS;
      int32_t DEVICE_SAMPLE_RATE;
 
-     
-/***
-Formats:
-***/
-/*a*/
+
+/* Formats: */
 #define F32 ma_format_f32 /* [-1, 1] */
 #define I16 ma_format_s16 /* [-32768, 32767] */
 #define I24 ma_format_s24 /* [-8388608, 8388607] */
 #define I32 ma_format_s32 /* [-2147483648, 2147483647] */
 #define U8 ma_format_u8 /* [0, 255] */
-/*b*/
 
 #define MONO 1
 #define STEREO 2
@@ -172,7 +173,6 @@ Formats:
 
 #define DEVICE_NAME \
      device.playback.name
-
 
      /*In playback mode copy data to pOutput. In capture mode read data from pInput. In full-duplex mode, both
      pOutput and pInput will be valid and you can move data from pInput into pOutput. Never process more than
@@ -238,6 +238,19 @@ Formats:
      JUST_POST_SOUND; \
      __asm__("")
 
+#define DEFAULT_MAIN \
+     int main(){ \
+          SND_INIT; \
+               printf("== Device Name: %s\n", DEVICE_NAME); \
+               printf("== sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
+          SND_START; \
+               printf("~~~ You should hear sound now ~~~\n"); \
+               printf("== Press Enter to quit...\n"); \
+               getchar(); \
+          SND_STOP; \
+     return 0;} \
+     __asm__("")
+
 /*************************************/
 /************* UTILITIES *************/
 /*************************************/
@@ -279,6 +292,19 @@ static __inline__ float inv(float sig){
 static __inline__ float tik(float interval, float len, float offset){
      return    (len<=0)*(fmod(tt-offset, interval)==0) +
                (len>0)*((fmod(tt-offset, interval)>=0)&&(fmod(tt-offset, interval)<=(len)));}
+static __inline__ float tikS(float interval, float len, float offset){ /* same, but in SAMPLES */
+     return    (len<=0)*(fmod(clk-offset, interval)==0) +
+               (len>0)*((fmod(clk-offset, interval)>=0)&&(fmod(clk-offset, interval)<=(len)));}
+
+static float sh_states[255] = {0.f};
+#define sh(i, t) sh_(i, t, __COUNTER__)
+static __inline__ float sh_(float in, float trig, uint8_t sh_state_id){
+     if(trig==1.){
+          sh_states[sh_state_id] = in;}
+     return sh_states[sh_state_id];}
+
+static __inline__ float gate(float in, float th){
+     return in>=th;}
 
 /**************************************/
 /************* GENERATORS *************/
@@ -289,12 +315,27 @@ static __inline__ float saw(float freq, bool rise){
      
 static __inline__ float sq(float freq, float duty){
      return ((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1;}
-     
-static __inline__ float sine(float freq){
-     if(tik(.75,0,0)){
-          printf("== freq : %.2f\n", freq);}
-          
-     return (float)sin((double)(tt*MA_TAU*freq));}
+
+#define sn(f) sinewave(f, __COUNTER__) /* call the sine() function with an unique ID - naaaasty */
+static double global_cycles[255] = {0.L};
+static __inline__ float sinewave(float freq, uint8_t unique_id){
+     /*   phase needs to advance for each sample
+          multiplying by MA_TAU is needed to convert cycles>>radians
+          freq / DEVICE_SAMPLE_RATE = (cycle/sec)/(samples/sec) = cycle/sample => how many cycles I need to advance every sample
+          freq / DEVICE_SAMPLE_RATE * MA_TAU =>  how many RADIANS I need to advance every sample
+          (freq / DEVICE_SAMPLE_RATE) = cycles that need to be added for each sample */
+     /* e.g. after 10 samples my position on the circumference is going to be (10 * (freq / DEVICE_SAMPLE_RATE)). unit of measurement: cycles*/
+     /* there's a problem with float precision -- so I'm using doubles https://blog.demofox.org/2017/11/21/floating-point-precision/ */
+     global_cycles[unique_id] += (double)(freq / DEVICE_SAMPLE_RATE); /* let's increment the number of cycles on each sample. unit of measurement: cycles */
+     /*global_cycles[unique_id] = fmod(global_cycles[unique_id] + (freq / (float)(DEVICE_SAMPLE_RATE)), freq*(float)MA_TAU);*/ /* here I was trying to periodically zero-out the float, getting annoying clicks */
+
+      /*
+          y(phase) = sin(phase + phase_offset)
+          phase = 2*PI*f*t
+          phase = cycle*2*PI
+          y(t) = sin(2 * PI * freq * time + phase_offset)
+      */
+     return (float)sin((double)(global_cycles[unique_id] * (float)MA_TAU));} /* here I'm multiplying for MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
      
 static __inline__ float noiw(){ /* white noise - based on https://github.com/velipso/sndfilter/blob/master/src/reverb.c*/
 	static uint32_t seed = 123; /* doesn't matter */
@@ -309,9 +350,10 @@ static __inline__ float noiw(){ /* white noise - based on https://github.com/vel
 	u.i = 0x3F800000 | R;
 	return (u.f - 1.5) *2;}
 
-     #ifdef __cplusplus
-     }
-     #endif
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* _BAOSND_H_ */
 
 /*

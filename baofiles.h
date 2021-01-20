@@ -36,11 +36,12 @@ extern "C" {
 
 /* prototypes */
 static __inline__ char* fileRead(char* fileName);
+static __inline__ void fileRead_nomalloc(char* file, char* buf);
+
 static __inline__ long int fileSize(char* filename);
 static __inline__ bool fileWrite(char* fileName, char* stuffToWrite);
-static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile);
 
-static __inline__ void fileRead_nomalloc(char* file, char* buf);
+static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, unsigned int maxLinesInFile);
 /*static __inline__ void fileToLines_nomalloc(char* fileName, char** linesBuf, unsigned int maxLineSize, unsigned int maxLinesInFile);*/
 
 /* prototypes END */
@@ -165,26 +166,26 @@ static __inline__ char** fileToLines(char* fileName, unsigned int maxLineSize, u
 
      /* dirlist - cacca - disabled for win for now */
 #ifndef __WIN32__
-static __inline__ char** dirList(char* directory, unsigned int maxFilesInDir, unsigned int maxFilenameLen){
-    char** dirList = makeStringTable(maxFilesInDir, maxFilenameLen);
+     static __inline__ char** dirList(char* directory, unsigned int maxFilesInDir, unsigned int maxFilenameLen){
+         char** dirList = makeStringTable(maxFilesInDir, maxFilenameLen);
 
-     DIR *d;
-     struct dirent *dir;
-     unsigned int arrIndex = 0;
+          DIR *d;
+          struct dirent *dir;
+          unsigned int arrIndex = 0;
 
-     d = opendir(directory);
-         if(d){
-             while (((dir = readdir(d)) != NULL)&&(arrIndex<(maxFilenameLen-1))){ /* the -1 is to leave space for the EOF terminator */
-               /*printf("arrIndex: %d\n", arrIndex);*/
-                 sprintf(dirList[arrIndex], "%s", dir->d_name);
-                 /*dirList[arrIndex][0] = 0;*/
-                 arrIndex++;}
-             closedir(d);
-             sprintf(dirList[arrIndex], "%c", EOF);}
-        else{
-          fprintf(stderr, "Cannot find specified directory.\n");}
-    return dirList;
-}
+          d = opendir(directory);
+              if(d){
+                  while (((dir = readdir(d)) != NULL)&&(arrIndex<(maxFilenameLen-1))){ /* the -1 is to leave space for the EOF terminator */
+                    /*printf("arrIndex: %d\n", arrIndex);*/
+                      sprintf(dirList[arrIndex], "%s", dir->d_name);
+                      /*dirList[arrIndex][0] = 0;*/
+                      arrIndex++;}
+                  closedir(d);
+                  sprintf(dirList[arrIndex], "%c", EOF);}
+             else{
+               fprintf(stderr, "Cannot find specified directory.\n");}
+         return dirList;
+     }
 #endif
 
 #ifdef __cplusplus

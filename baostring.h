@@ -58,7 +58,7 @@ static __inline__ char* trim(char* in);
 
 /* prototypes END */
 
-static __inline__ char* trim(char* in){ /* cacca: ha un return, ma modifica anche ciò che gli entra */
+static __inline__ char* trim(char* in){ /* cacca: ha un return, ma modifica anche ciò che gli entra >> vedi qui sotto "trimwhitespace" */
      unsigned int i = 0;
      char* out = in;
      while(isspace(in[strlen(in)-i-1])){
@@ -71,6 +71,88 @@ static __inline__ char* trim(char* in){ /* cacca: ha un return, ma modifica anch
           out = in+i+1;
           i++;}
      return out;
+}
+
+/* Stores the trimmed input string into the given output buffer, which must be
+// large enough to store the result.  If it is too small, the output is
+// truncated.*/
+size_t trimwhitespace(char *out, size_t len, const char *str)
+{
+    const char *end;
+    size_t out_size;
+  
+  if(len == 0){
+       return 0;}
+
+
+
+  /* Trim leading space*/
+  while(isspace((unsigned char)*str)){
+        str++;}
+
+  if(*str == 0)  /* All spaces?*/
+  {
+    *out = 0;
+    return 1;
+  }
+
+  /* Trim trailing space*/
+  end = str + strlen(str) - 1;
+  while(end > str && isspace((unsigned char)*end)) end--;
+  end++;
+
+  /* Set output size to minimum of trimmed string length and buffer size minus 1*/
+  out_size = (end - str) < (int)len-1 ? (size_t)(end - str) : len-1;
+
+  /* Copy trimmed string and add null terminator*/
+  memcpy(out, str, out_size);
+  out[out_size] = 0;
+
+  return out_size;
+}
+
+
+/*
+Here's one that shifts the string into the first position of your buffer. You might want this behavior so that if you dynamically allocated the string, you can still free it on the same pointer that trim() returns:
+*/
+char *trim2(char *str)
+{
+    size_t len = 0;
+    char *frontp = str;
+    char *endp = NULL;
+
+    if( str == NULL ) { return NULL; }
+    if( str[0] == '\0' ) { return str; }
+
+    len = strlen(str);
+    endp = str + len;
+
+    /* Move the front and back pointers to address the first non-whitespace
+     * characters from each end.
+     */
+    while( isspace((unsigned char) *frontp) ) { ++frontp; }
+    if( endp != frontp )
+    {
+        while( isspace((unsigned char) *(--endp)) && endp != frontp ) {}
+    }
+
+    if( frontp != str && endp == frontp )
+            *str = '\0';
+    else if( str + len - 1 != endp )
+            *(endp + 1) = '\0';
+
+    /* Shift the string so that it starts at str so that if it's dynamically
+     * allocated, we can still free it on the returned pointer.  Note the reuse
+     * of endp to mean the front of the string buffer now.
+     */
+    endp = str;
+    if( frontp != str )
+    {
+            while( *frontp ) { *endp++ = *frontp++; }
+            *endp = '\0';
+    }
+
+    return str;
 }
 
 

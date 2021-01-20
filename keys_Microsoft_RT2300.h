@@ -14,6 +14,8 @@ and kkSHIFT_ESC_REL things, still to complete
 * _CAP_REL
 */
 
+#define KEYS_QTY 114
+
 #define kkQ 81
      #define kkQ_REL 32849
           #define kkQ_CAP 16465
@@ -142,8 +144,8 @@ and kkSHIFT_ESC_REL things, still to complete
      #define kkSPACE 287
 #define kkSPACE_REL 33055
 
-// #define kkBACKSLASH 64
-     // #define kkBACKSLASH_REL 33052
+#define kkBACKSLASH 64
+     #define kkBACKSLASH_REL 32832
 #define kk1 49
      #define kk1_REL 32817
 #define kk2 50
@@ -238,9 +240,9 @@ and kkSHIFT_ESC_REL things, still to complete
 #define kkTAB 285
      #define kkTAB_REL 33053
 #define kkSHIFTL 16646
-     #define kkSHIFTL_RELEASE 33030
+     #define kkSHIFTL_REL 33030
 #define kkSHIFTR 16647
-     #define kkSHIFTR_RELEASE 33031
+     #define kkSHIFTR_REL 33031
 #define kkCTRLL 8456
      #define kkCTRLL_REL 33032
 #define kkCTRLR 8457
@@ -253,8 +255,6 @@ and kkSHIFT_ESC_REL things, still to complete
      #define kkWINL_REL 33036
 #define kkWINR 270
      #define kkWINR_REL 33038
-#define kkBACKSLASH 64
-     #define kkBACKSLASH_REL 32832
 #define kkARROWUP 279
      #define kkARROWUP_REL 33047
 #define kkARROWDN 280
