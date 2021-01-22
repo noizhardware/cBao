@@ -30,7 +30,7 @@ uint8_t twZone[4] = {4, 8, 9, 10};
 #ifdef __cplusplus
 }
 #endif
-#endif /* _BAOSND_H_ */
+#endif /* _BAOMUS_H_ */
 
 /*
 ,,code

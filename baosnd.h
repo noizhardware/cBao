@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2021a21-1049 */
+/* 2021a22-1148 */
 
 /***
 # ANSI C sound library
@@ -20,7 +20,7 @@ Sample usage:
 WAVE_BEGIN(F32, MONO, 48000);
      -- audio-callback variable definitions here
 WAVE_PRE_SOUND;
-     sndOut = sine(432);
+     sndOut = sine(432.);
 WAVE_END;
 
 int main(){
@@ -34,18 +34,26 @@ int main(){
 return 0;}
 ~~~~
 
+You can also use `DEFAULT_MAIN;` right after `WAVE_END;` if you don't need to do anything in the main loop
+Short mode:
+~~~~
+#include "baosnd.h"
+     -- global variable and function definitions here
+WAVE_BEGIN(F32, MONO, 48000);
+     -- audio-callback variable definitions here
+WAVE_PRE_SOUND;
+     sndOut = (
+          sn(50.)
+               *tclip(sigNorm(sn(1.)
+                    /sn(2.)), 2.) );
+WAVE_END;
+DEFAULT_MAIN;
+~~~~
+
 Ultrashort mode:
 ~~~~
 #include "baosnd.h"
-JUST_PRE_SOUND;
-     sndOut =  sine(432);
-JUST_POST_SOUND;
-~~~~
-
-Uberfuckingshort mode:
-~~~~
-#include "baosnd.h"
-     snd(sine(432));
+     snd(sine(432.));
 ~~~~
 
 Compile with:
@@ -59,11 +67,11 @@ Compile with:
      - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
      - `tt` : float, seconds from the start of the program
      
-### Signal Generators:
-     * `sn(freq)` : frequency(float)
-     * `saw(freq, rise)` : frequency(float), rising or falling saw (use constants RISE and FALL)
-     * `sq(freq, duty)` : square wave : frequency(float), duty cycle[0..1]
-     * `noiw()` : white noise [-1..1]
+### Signal Generators: (output in range [-1..1])
+     * `sn(freq)` : sinewave
+     * `saw(freq, rise)` : rising or falling saw (use constants RISE and FALL)
+     * `sq(freq, duty)` : square wave, duty cycle in range [0..1]
+     * `noiw()` : white noise
 
 ### Utilities:
      * `sigNorm(sig)` : normalize signal `x` from range [-1..1] to [0..1]
@@ -73,11 +81,11 @@ Compile with:
      * `hwav(sig)` : half-wave rectifier - keeps positive part
      * `hwavn(sig)` : half-wave rectifier - keeps negative part
      * `fwav(sig)` : full-wave rectifier
-     * `mix(uint8_t qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
+     * `mix(uint8_t qty, ...)` : mixes a number(qty) of signals, each signal equally present in the mix, output is MAX 0dB if none of the inputs exceeds 0dB
      * `inv(signal)` : returns the inverted signal
      * `tik(interval, length, offset)` : jumps to 1 every "interval" seconds, and stays up for "length" seconds. if "length" is 0, it stays up for a single sample(digital trigger)
      * `tikS(interval, length, offset)` : jumps to 1 every "interval" SAMPLES, and stays up for "length" SAMPLES. if "length" is 0, it stays up for a single sample(digital trigger)
-     * `sh(input, trigger)` : sample and hold, triggers whenever trigger==1
+     * `sh(input, trigger)` : sample and hold, triggers whenever trigger>=1.
      * `gate(input, threshold)` : sound is passing thru only when trigger>=threshold
 
  #### TODO:
@@ -107,7 +115,8 @@ Compile with:
      * sig-in >> split >> rnd jitter->(distortion) >> stereo out
      
      - file output (.wav)(.mp3)
-     - midi CC input (http://www.cs.cmu.edu/~rbd/software/midi.htm)
+     - midi CC-notes input (http://www.cs.cmu.edu/~rbd/software/midi.htm)
+     - OSC input
 ***/
 
 #include <stdbool.h>
@@ -302,8 +311,7 @@ static __inline__ float tikS(float interval, float len, float offset){ /* same, 
 static float sh_states[255] = {0.f};
 #define sh(i, t) sh_(i, t, __COUNTER__)
 static __inline__ float sh_(float in, float trig, uint8_t sh_state_id){
-     if(trig==1.){
-          sh_states[sh_state_id] = in;}
+     sh_states[sh_state_id] = (trig>=1.)*in + (trig<1.)*sh_states[sh_state_id];
      return sh_states[sh_state_id];}
 
 static __inline__ float gate(float in, float th){
@@ -319,26 +327,31 @@ static __inline__ float saw(float freq, bool rise){
 static __inline__ float sq(float freq, float duty){
      return ((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1;}
 
-#define sn(f) sinewave(f, __COUNTER__) /* call the sine() function with an unique ID - naaaasty */
-static double global_cycles[255] = {0.L};
+#define sn(f) sinewave(f, __COUNTER__) /* call the sine() function with a preprocessor-generated unique ID - naaaasty */
+static float global_cycles[255] = {0.f};
 static __inline__ float sinewave(float freq, uint8_t unique_id){
-     /*   phase needs to advance for each sample
+     /*   
+          phase needs to advance for each sample
           multiplying by MA_TAU is needed to convert cycles>>radians
           freq / DEVICE_SAMPLE_RATE = (cycle/sec)/(samples/sec) = cycle/sample => how many cycles I need to advance every sample
           freq / DEVICE_SAMPLE_RATE * MA_TAU =>  how many RADIANS I need to advance every sample
-          (freq / DEVICE_SAMPLE_RATE) = cycles that need to be added for each sample */
-     /* e.g. after 10 samples my position on the circumference is going to be (10 * (freq / DEVICE_SAMPLE_RATE)). unit of measurement: cycles*/
-     /* there's a problem with float precision -- so I'm using doubles https://blog.demofox.org/2017/11/21/floating-point-precision/ */
-     global_cycles[unique_id] += (double)(freq / DEVICE_SAMPLE_RATE); /* let's increment the number of cycles on each sample. unit of measurement: cycles */
-     /*global_cycles[unique_id] = fmod(global_cycles[unique_id] + (freq / (float)(DEVICE_SAMPLE_RATE)), freq*(float)MA_TAU);*/ /* here I was trying to periodically zero-out the float, getting annoying clicks */ /* AAAAAAAAAAAHHHH devo fare mod 1, perchè è quella la mia base, per tau moltiplico solo dopo! */
-
+          (freq / DEVICE_SAMPLE_RATE) = cycles that need to be added for each sample
+          e.g. after 10 samples my position on the circumference is going to be (10 * (freq / DEVICE_SAMPLE_RATE)). unit of measurement: cycles
+     
+          Also, there's a problem with float precision; https://blog.demofox.org/2017/11/21/floating-point-precision/ 
+          The global_cycles[unique_id] float value is always rising, it quite early hits the precision limis of floats, the smallest possible increment I can represent with the float gets smaller and smaller as global_cycles[unique_id] gets bigger.
+          The solution is to wrap the value of global_cycles[unique_id]
+          I'm wrapping to 1. as the unit of measurement here is "cycles", and sin(1cycle)==0
+          So global_cycles[unique_id] will always reset when the function==0, and there won't be clicks
+     */
+     global_cycles[unique_id] = fmod(global_cycles[unique_id] + (freq / (float)(DEVICE_SAMPLE_RATE)), 1.f); /* incrementing the number of cycles on each sample. unit of measurement: cycles */
       /*
           y(phase) = sin(phase + phase_offset)
           phase = 2*PI*f*t
           phase = cycle*2*PI
-          y(t) = sin(2 * PI * freq * time + phase_offset)
+          y(t) = sin(2 * PI * freq * time + phase_offset) -- TODO: user-exposed phase offset
       */
-     return (float)sin((double)(global_cycles[unique_id] * (float)MA_TAU));} /* here I'm multiplying for MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
+     return (float)sin((double)(global_cycles[unique_id] * (float)MA_TAU));} /* multiplying cycles by MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
      
 static __inline__ float noiw(){ /* white noise - based on https://github.com/velipso/sndfilter/blob/master/src/reverb.c*/
 	static uint32_t seed = 123; /* doesn't matter */
