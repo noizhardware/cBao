@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2021a20-2109 */
+/* 2021a21-1049 */
 
 /***
 # ANSI C sound library
@@ -73,7 +73,7 @@ Compile with:
      * `hwav(sig)` : half-wave rectifier - keeps positive part
      * `hwavn(sig)` : half-wave rectifier - keeps negative part
      * `fwav(sig)` : full-wave rectifier
-     * `mix(unsigned char qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
+     * `mix(uint8_t qty, ...)` : mixes a number(qty) of signals, total amplitude will be maintaned at 0dB
      * `inv(signal)` : returns the inverted signal
      * `tik(interval, length, offset)` : jumps to 1 every "interval" seconds, and stays up for "length" seconds. if "length" is 0, it stays up for a single sample(digital trigger)
      * `tikS(interval, length, offset)` : jumps to 1 every "interval" SAMPLES, and stays up for "length" SAMPLES. if "length" is 0, it stays up for a single sample(digital trigger)
@@ -141,6 +141,8 @@ Compile with:
 #define QUAD 4
 
 #define sndOut *Samples
+
+#define MUTE 0.* /* use to quickly mute a part of a function */
 
 #define SND_INIT \
      ma_device_config deviceConfig; \
@@ -224,6 +226,7 @@ Compile with:
 #define JUST_POST_SOUND \
      MAIN; \
           printf("== Device Name: %s\n", DEVICE_NAME); \
+          printf("== Sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
      SND_START; \
           printf("~~~ You should hear sound now ~~~\n"); \
           printf("== Press Enter to quit..."); \
@@ -242,7 +245,7 @@ Compile with:
      int main(){ \
           SND_INIT; \
                printf("== Device Name: %s\n", DEVICE_NAME); \
-               printf("== sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
+               printf("== Sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
           SND_START; \
                printf("~~~ You should hear sound now ~~~\n"); \
                printf("== Press Enter to quit...\n"); \
@@ -276,10 +279,10 @@ static __inline__ float hwavn(float sig){
 static __inline__ float fwav(float sig){
      return (sig*(sig>0))-(sig*(sig<0));}
 
-static __inline__ float mix(unsigned char qty, ...){
+static __inline__ float mix(uint8_t qty, ...){
      va_list ap;
-     unsigned char i;
-     float out = 0;
+     uint8_t i;
+     float out = 0.f;
      va_start (ap, qty); /* Initialize the argument list. */
      for (i = 0; i < qty; i++){
           out += va_arg(ap, double) / qty;} /* va_arg advances the pointer ap every time it gets called */
@@ -327,7 +330,7 @@ static __inline__ float sinewave(float freq, uint8_t unique_id){
      /* e.g. after 10 samples my position on the circumference is going to be (10 * (freq / DEVICE_SAMPLE_RATE)). unit of measurement: cycles*/
      /* there's a problem with float precision -- so I'm using doubles https://blog.demofox.org/2017/11/21/floating-point-precision/ */
      global_cycles[unique_id] += (double)(freq / DEVICE_SAMPLE_RATE); /* let's increment the number of cycles on each sample. unit of measurement: cycles */
-     /*global_cycles[unique_id] = fmod(global_cycles[unique_id] + (freq / (float)(DEVICE_SAMPLE_RATE)), freq*(float)MA_TAU);*/ /* here I was trying to periodically zero-out the float, getting annoying clicks */
+     /*global_cycles[unique_id] = fmod(global_cycles[unique_id] + (freq / (float)(DEVICE_SAMPLE_RATE)), freq*(float)MA_TAU);*/ /* here I was trying to periodically zero-out the float, getting annoying clicks */ /* AAAAAAAAAAAHHHH devo fare mod 1, perchè è quella la mia base, per tau moltiplico solo dopo! */
 
       /*
           y(phase) = sin(phase + phase_offset)
@@ -360,4 +363,6 @@ static __inline__ float noiw(){ /* white noise - based on https://github.com/vel
 ,,code
 ,,sound
 ,,synth
+,,music
+,,livecoding
 */

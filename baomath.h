@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+/* defines */
+#define PHI ((1.+sqrt(5.))/2.)
+#define MA_PHI 1.618033988749894848204586834
+
 /* prototypes: */
 static __inline__ float round_up(float num);
 static __inline__ float roundDec(float num, unsigned char prec);
