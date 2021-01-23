@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2021a22-1148 */
+/* 2021a23-1830 */
 
 /***
 # ANSI C sound library
@@ -59,7 +59,7 @@ Ultrashort mode:
 Compile with:
 * Windows:
      - `gcc -g0 test.c -o test.exe -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
-* Linux>
+* Linux:
      - `gcc -g0 test.c -o test -ldl -lm -lpthread -Wall -Wextra -Wshadow -Wvla -pedantic-errors -I $(includePath) -ansi`
 
 ### System variables:
@@ -87,8 +87,14 @@ Compile with:
      * `tikS(interval, length, offset)` : jumps to 1 every "interval" SAMPLES, and stays up for "length" SAMPLES. if "length" is 0, it stays up for a single sample(digital trigger)
      * `sh(input, trigger)` : sample and hold, triggers whenever trigger>=1.
      * `gate(input, threshold)` : sound is passing thru only when trigger>=threshold
+     * `asr(freq, attack, sustain, release)` : looping ASR envelope generator - range [0..1]
 
  #### TODO:
+     * need to adjust these functions so they can maintain state and rely on phase instead of frequency:
+          - saw
+          - sq
+          - asr
+     * exp envelope generator
      * soft gate
      * linear interpolator
      * ttog : trigger to gate
@@ -214,9 +220,6 @@ Compile with:
      (void)pDevice; \
      (void)pInput;} \
      __asm__("") /* just a dummy line to allow a semicolon after the function */
-     
-#define RISE 1
-#define FALL 0
 
 /* for ultracompact code */
 #define MAIN \
@@ -238,6 +241,7 @@ Compile with:
           printf("== Sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
      SND_START; \
           printf("~~~ You should hear sound now ~~~\n"); \
+          printf("== used %u unique IDs\n", __COUNTER__); \
           printf("== Press Enter to quit..."); \
           getchar(); \
      END; \
@@ -257,11 +261,17 @@ Compile with:
                printf("== Sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
           SND_START; \
                printf("~~~ You should hear sound now ~~~\n"); \
+               printf("== used %u unique IDs\n", __COUNTER__); \
                printf("== Press Enter to quit...\n"); \
                getchar(); \
           SND_STOP; \
      return 0;} \
      __asm__("")
+
+/*************************************/
+/********** static variables *********/
+/*************************************/
+static float global_cycles[255] = {0.f}; /* to maintain state of phase, unit of measurement: cycles -- max 255 slots, so it can be indexed with an uint8_t */
 
 /*************************************/
 /************* UTILITIES *************/
@@ -308,11 +318,10 @@ static __inline__ float tikS(float interval, float len, float offset){ /* same, 
      return    (len<=0)*(fmod(clk-offset, interval)==0) +
                (len>0)*((fmod(clk-offset, interval)>=0)&&(fmod(clk-offset, interval)<=(len)));}
 
-static float sh_states[255] = {0.f};
-#define sh(i, t) sh_(i, t, __COUNTER__)
+#define sh(i, t) sh_(i, t, __COUNTER__) /* call the sh_() function with a preprocessor-generated unique ID - naaaasty */
 static __inline__ float sh_(float in, float trig, uint8_t sh_state_id){
-     sh_states[sh_state_id] = (trig>=1.)*in + (trig<1.)*sh_states[sh_state_id];
-     return sh_states[sh_state_id];}
+     global_cycles[sh_state_id] = (trig>=1.)*in + (trig<1.)*global_cycles[sh_state_id];
+     return global_cycles[sh_state_id];}
 
 static __inline__ float gate(float in, float th){
      return in>=th;}
@@ -320,15 +329,38 @@ static __inline__ float gate(float in, float th){
 /**************************************/
 /************* GENERATORS *************/
 /**************************************/
+#define RISE 1
+#define FALL 0
 static __inline__ float saw(float freq, bool rise){
-     return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2-1)) +
-     (!rise*((1-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2-1));} 
+     /* (DEVICE_SAMPLE_RATE/freq) == wavelength, unit of measurement: samples 
+     DEVICE_SAMPLE_RATE * wavelength(in seconds) == DEVICE_SAMPLE_RATE * (1/freq) */
+     return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2.-1.)) +
+     (!rise*((1.-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2.-1.));}
+
+static __inline__ float asr(float freq, float attack, float sustain, float release){
+     /*
+          cycle length = 1/freq
+          A = rising trapezoid, goes to 1 in (attack)seconds and stays 1, resets on each cycle
+          B = falling trapezoid, is 1, and goes to 0 in (release)seconds, resets to 1 on each cycle
+               B is phase-shifted, it's delayed of (sustain)seconds respect to A
+          C = squarewave, ON for (attack+sustain+release)seconds, then 0 to delete the last part, until the next cycle
+     */
+     return 
+     clip((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)) * (1.f/attack)*(1.f/freq), 1.f) /* rising trapezoid */
+     * clip(
+          (1.-(fmod(
+               clk
+                    + ((DEVICE_SAMPLE_RATE/freq) - (DEVICE_SAMPLE_RATE*attack + DEVICE_SAMPLE_RATE*sustain + DEVICE_SAMPLE_RATE*release))
+               , (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))) * (1.f/release)*(1.f/freq)
+          , 1.f) /* falling trapezoid */
+     * (float)((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))
+          < ((DEVICE_SAMPLE_RATE*(attack+sustain+release))/(DEVICE_SAMPLE_RATE/freq)) ); /* squarewave that stays ON only in the a+s+r phase */
+}
      
 static __inline__ float sq(float freq, float duty){
-     return ((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2-1;}
+     return (float)((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2.f-1.f;}
 
 #define sn(f) sinewave(f, __COUNTER__) /* call the sine() function with a preprocessor-generated unique ID - naaaasty */
-static float global_cycles[255] = {0.f};
 static __inline__ float sinewave(float freq, uint8_t unique_id){
      /*   
           phase needs to advance for each sample
