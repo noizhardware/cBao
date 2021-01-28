@@ -1,7 +1,7 @@
 #ifndef _BAOSTRING_H_
 #define _BAOSTRING_H_
 
-/* 2020w21-0014 */
+/* 2021a28-2251 */
 
 /* C90 compliant <3 */
 
@@ -51,7 +51,8 @@ static __inline__ void freeStringTable(char** arr);
 
 static __inline__ uint8_t char_toNum(char c);
 static __inline__ bool char_isNum(char c);
-static __inline__ uint16_t str_toUint16(char *s);
+static __inline__ uint16_t str_toUint16(char *str);
+static __inline__ uint16_t str_toUint8(char* str);
 static __inline__ float str_toFloat(char* str);
 
 static __inline__ char* trim(char* in);
@@ -165,6 +166,13 @@ static __inline__ uint8_t char_toNum(char c){
 static __inline__ uint16_t str_toUint16(char* str){
 	uint8_t i = 0;
   uint16_t num = 0;
+	while(str[i] && char_isNum(str[i])){
+		num = num * 10 + char_toNum(str[i]);
+    i++;}
+	return num;}
+static __inline__ uint16_t str_toUint8(char* str){
+	uint8_t i = 0;
+  uint8_t num = 0;
 	while(str[i] && char_isNum(str[i])){
 		num = num * 10 + char_toNum(str[i]);
     i++;}

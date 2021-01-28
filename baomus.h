@@ -3,11 +3,9 @@
      extern "C" {
      #endif
 #define _BAOMUS_H_
-/* 2021a23-2033 */
+/* 2021a24-1321 */
 
-#define OCT(freq, oct) (freq*pow(2, oct))
 
-#define TET(x) pow(1.0594630943593, x) /* Twelve Equal Temperament ratio - https://en.wikipedia.org/wiki/Equal_temperament */
 const uint8_t maj[7] = {0, 2, 4, 5, 7, 9, 11};
      #define ionian maj
 const uint8_t dorian[7] = {0, 2, 3, 5, 7, 9, 10};
@@ -28,6 +26,13 @@ const uint8_t pentaMin[5] = {0, 3, 5, 7, 10};
 const uint8_t jap[5] = {1, 3, 6, 8, 0}; /* cacca: missing root */
 
 const uint8_t twZone[4] = {4, 8, 9, 10};
+
+static __inline__ float oct(float freq, int8_t oct){
+     return (freq*pow(2., oct));}
+
+static __inline__ float tet(float rootFreq){ /* Twelve Equal Temperament ratio - https://en.wikipedia.org/wiki/Equal_temperament */
+     return pow(1.0594630943593, rootFreq);}
+
 
 #ifdef __cplusplus
 }
