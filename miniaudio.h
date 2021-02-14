@@ -6201,12 +6201,16 @@ IMPLEMENTATION
 #include <stdarg.h>
 #include <stdio.h>
 #if !defined(_MSC_VER) && !defined(__DMC__)
-    #include <strings.h>    /* For strcasecmp(). */
-    #include <wchar.h>      /* For wcslen(), wcsrtombs() */
+    #include <strings.h> /* bao: quotes for local .h file for CToy */ /* For strcasecmp(). */
+    #include <wchar.h> /* bao: quotes for local .h file for CToy */ /* For wcslen(), wcsrtombs() */
 #endif
 
 #ifdef MA_WIN32
-#include <windows.h>
+     #ifdef __CTOY__ /* bao : CToy */
+          #include "windows.h"
+          #else
+          #include <windows.h>
+          #endif
 #else
 #include <stdlib.h>     /* For malloc(), free(), wcstombs(). */
 #include <string.h>     /* For memset() */
