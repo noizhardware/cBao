@@ -3,10 +3,13 @@
      extern "C" {
      #endif
 #define _BAOMUS_H_
-/* 2021b14-2329 */
+/* 2021b15-1337 */
 
 /* TODO:
      - chords
+     - todo: make scales with a list of semitone increments, loopable
+       - eg: maj_all[MAX_SCALE_SIZE] = {2, 2, 1, 2, 2, 2, 1};
+     - non-logarithmic TET?
 */
 
 #include <stdint.h>
@@ -34,8 +37,6 @@ void tuningInit(tuningSystem_t* ton, float rootFreq, float octMult, uint8_t inte
 typedef uint8_t interval_t;
 typedef int8_t octave_t;
 
-/* todo: make scales with a list of semitone increments, loopable */
-/* eg: maj_all[MAX_SCALE_SIZE] = {2, 2, 1, 2, 2, 2, 1}; */
 interval_t maj_all[MAX_SCALE_SIZE] = {0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29, 31, 32, 34};
 
 scale_t maj = {7, {0, 2, 4, 5, 7, 9, 11}};
