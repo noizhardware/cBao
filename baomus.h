@@ -106,15 +106,15 @@ static __inline__ uint8_t wrapz(uint8_t input, uint8_t wrapper){ /* modulus, inc
 static __inline__ uint8_t wrapzDone(uint8_t input, uint8_t wrapper){ /* how many times the wrapz did wrap */
      return (input - wrapz(input, wrapper))/(wrapper+1);}
 
-static __inline__ float freqMaker(tuningSystem_t ton, octave_t octShift, interval_t scale[MAX_SCALE_SIZE], interval_t interval_in){
+static __inline__ float freqMaker(tuningSystem_t tun, octave_t octShift, interval_t scale[MAX_SCALE_SIZE], interval_t interval_in){
      return octX(
-          octX(ton.rootFreq, octShift, ton.octMult) *
+          octX(tun.rootFreq, octShift, tun.octMult) *
                tetX(
-                    scale[wrapz(interval_in, majScaleSize(ton.intervals))]
-                    , ton.octMult
-                    , ton.intervals)
-          , wrapzDone(interval_in, majScaleSize(ton.intervals))
-          , ton.octMult
+                    scale[wrapz(interval_in, majScaleSize(tun.intervals))]
+                    , tun.octMult
+                    , tun.intervals)
+          , wrapzDone(interval_in, majScaleSize(tun.intervals))
+          , tun.octMult
      );
 }
 
