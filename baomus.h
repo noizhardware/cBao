@@ -12,14 +12,14 @@
 #include <stdint.h>
 #include <math.h>
 
-#define MAX_SCALE_SIZE 24
+#define MAX_SCALE_SIZE 21 /* 3x a major scale in western tuning >> max 32 intervals per octave */
 
-typedef struct{
+typedef struct scale_t_{
      const uint8_t size;
      const uint8_t scale[MAX_SCALE_SIZE];
 } scale_t;
 
-typedef struct{
+typedef struct tuningSystem_t_{
      float rootFreq; /* root frequency */
      float octMult; /* octave multiplier: you must multiply freq by this to obtain the same note in the next octave */
      uint8_t intervals; /* how many intervals an octave is divided in */
@@ -32,8 +32,11 @@ void tuningInit(tuningSystem_t* ton, float rootFreq, float octMult, uint8_t inte
 }
 
 typedef uint8_t interval_t;
+typedef int8_t octave_t;
 
-interval_t maj_all[MAX_SCALE_SIZE] = {0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23};
+/* todo: make scales with a list of semitone increments, loopable */
+/* eg: maj_all[MAX_SCALE_SIZE] = {2, 2, 1, 2, 2, 2, 1}; */
+interval_t maj_all[MAX_SCALE_SIZE] = {0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29, 31, 32, 34};
 
 scale_t maj = {7, {0, 2, 4, 5, 7, 9, 11}};
      #define ionian maj
@@ -63,11 +66,11 @@ scale_t maj_tet7 = {4,{0, 2, 4, 6}};
 scale_t maj_tet9 = {5, {0, 2, 4, 5, 7}};
 
 /* usage: oct(frequencyTotranspose, octavesbywhichitsgonabetransposed) */
-static __inline__ float oct(float freq, int8_t oct){ /* octaves happen on Doubling the frequency */
+static __inline__ float oct(float freq, octave_t oct){ /* octaves happen on Doubling the frequency */
      return (freq*pow(2., oct));}
-static __inline__ float octT(float freq, int8_t oct){ /* octaves happen on Tripling the frequency */
+static __inline__ float octT(float freq, octave_t oct){ /* octaves happen on Tripling the frequency */
      return (freq*pow(3., oct));}
-static __inline__ float octX(float freq, int8_t oct, float octMult){ /* octaves happen on (* octMult) the frequency */
+static __inline__ float octX(float freq, octave_t oct, float octMult){ /* octaves happen on (* octMult) the frequency */
      return (freq*pow(octMult, oct));}
 
 /* Twelve Equal Temperament ratio - https://en.wikipedia.org/wiki/Equal_temperament */
@@ -102,12 +105,13 @@ static __inline__ uint8_t wrapz(uint8_t input, uint8_t wrapper){ /* modulus, inc
 static __inline__ uint8_t wrapzDone(uint8_t input, uint8_t wrapper){ /* how many times the wrapz did wrap */
      return (input - wrapz(input, wrapper))/(wrapper+1);}
 
-static __inline__ float freqMaker(tuningSystem_t ton, interval_t scale[MAX_SCALE_SIZE], interval_t interval_in){
+static __inline__ float freqMaker(tuningSystem_t ton, octave_t octShift, interval_t scale[MAX_SCALE_SIZE], interval_t interval_in){
      return octX(
-          ton.rootFreq * tetX(
-               scale[wrapz(interval_in, majScaleSize(ton.intervals))]
-               , ton.octMult
-               , ton.intervals)
+          octX(ton.rootFreq, octShift, ton.octMult) *
+               tetX(
+                    scale[wrapz(interval_in, majScaleSize(ton.intervals))]
+                    , ton.octMult
+                    , ton.intervals)
           , wrapzDone(interval_in, majScaleSize(ton.intervals))
           , ton.octMult
      );

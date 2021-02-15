@@ -241,7 +241,7 @@ Compile with:
           printf("== Sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
      SND_START; \
           printf("~~~ You should hear sound now ~~~\n"); \
-          printf("== used %u unique IDs\n", __COUNTER__); \
+          printf("== used [%u] unique IDs\n", __COUNTER__); \
           printf("== Press Enter to quit..."); \
           getchar(); \
      END; \
@@ -261,7 +261,7 @@ Compile with:
                printf("== Sample rate: %u Hz\n", DEVICE_SAMPLE_RATE); \
           SND_START; \
                printf("~~~ You should hear sound now ~~~\n"); \
-               printf("== used %u unique IDs\n", __COUNTER__); \
+               printf("== used [%u] unique IDs\n", __COUNTER__); \
                printf("== Press Enter to quit...\n"); \
                getchar(); \
           SND_STOP; \
