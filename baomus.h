@@ -92,7 +92,7 @@ static __inline__ float tetT7(uint8_t interval){ /* Three 7 - octaves are on (* 
 static __inline__ float tetOH12(uint8_t interval){ /* One and Half 12 - octaves are on (* 1.5) and divided in 12 intervals */
      return pow(1.0343660831319166, interval);} /* 12th root of 1.5 */
 
-static __inline__ float root(uint8_t n, uint8_t input){ /* nth root of input */
+static __inline__ float root(uint8_t n, float input){ /* nth root of input */
   return pow(input, 1./n);}
 
 static __inline__ uint8_t majScaleSize(uint8_t intervals){ /* size of a major scale, depending on how many intervals I have in my equal temperament system */
