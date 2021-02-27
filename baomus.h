@@ -10,6 +10,8 @@
      - todo: make scales with a list of semitone increments, loopable
        - eg: maj_all[MAX_SCALE_SIZE] = {2, 2, 1, 2, 2, 2, 1};
      - non-logarithmic TET?
+     - 53 EDO
+     - complex numbers -- see R:\s\c\complex.c
 */
 
 #include <stdint.h>

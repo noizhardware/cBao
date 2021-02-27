@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef _BAOSTRING_H_
 #define _BAOSTRING_H_
 
@@ -20,9 +24,10 @@
 
 #include "baomath.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/*** DEFINES */
+#define str(x) # x
+#define xstr(x) str(x)
+/* DEFINES end. */
 
 /* prototypes */
 static __inline__ char* toUpper(char* str);
