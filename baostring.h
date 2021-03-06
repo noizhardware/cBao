@@ -5,7 +5,7 @@ extern "C" {
 #ifndef _BAOSTRING_H_
 #define _BAOSTRING_H_
 
-/* 2021a28-2251 */
+/* 2021c06-1703 */
 
 /* C90 compliant <3 */
 
@@ -56,6 +56,8 @@ static __inline__ void freeStringTable(char** arr);
 
 static __inline__ uint8_t char_toNum(char c);
 static __inline__ bool char_isNum(char c);
+static __inline__ bool string_isNum(char* s);
+static __inline__ bool string_isInt(char* s);
 static __inline__ uint16_t str_toUint16(char *str);
 static __inline__ uint16_t str_toUint8(char* str);
 static __inline__ float str_toFloat(char* str);
@@ -164,6 +166,24 @@ char *trim2(char *str)
 
 static __inline__ bool char_isNum(char c){
 	return c >= '0' && c <= '9';}
+static __inline__ bool string_isNum(char* s){
+     uint16_t i=0;
+     while(s[i]!='\0'){
+          if(!char_isNum(s[i]) && s[i]!='.'){
+               return false;
+          }
+          i++;
+     }
+	return true;}
+static __inline__ bool string_isInt(char* s){
+     uint16_t i=0;
+     while(s[i]!='\0'){
+          if(!char_isNum(s[i])){
+               return false;
+          }
+          i++;
+     }
+	return true;}
 
 static __inline__ uint8_t char_toNum(char c){
   return c - '0';}

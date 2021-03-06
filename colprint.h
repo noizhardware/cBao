@@ -13,7 +13,7 @@ extern "C" {
 #include <windows.h>
 #endif
 
-//usage: colprint(int color, string);
+/* usage: colprint(int color, string); */
 
 /*
  * Output colored text to ANSI (Linux, Mac, iPhone) and Windows terminals.
@@ -30,6 +30,9 @@ extern "C" {
 int colprint(int color, const char* format, ...) {
 	int fcolor = -1, retval = -99;
 	va_list args;
+	CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+	WORD wOldColorAttrs;
+	HANDLE hStdout;
 #ifdef _WIN32
 	if (color == 0) {
 		fcolor = FOREGROUND_RED;
@@ -44,9 +47,6 @@ int colprint(int color, const char* format, ...) {
 	} else if (color == 5) {
 		fcolor = FOREGROUND_GREEN | FOREGROUND_BLUE;
 	}
-	CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-	WORD wOldColorAttrs;
-	HANDLE hStdout;
 	if (fcolor != -1) {
 		hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 		if ((hStdout == NULL) || (hStdout == INVALID_HANDLE_VALUE)) {
@@ -102,4 +102,4 @@ int colprint(int color, const char* format, ...) {
 }
 #endif
 
-#endif // _COLPRINT_H_
+#endif /* _COLPRINT_H_ */
