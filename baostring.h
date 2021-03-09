@@ -168,8 +168,19 @@ static __inline__ bool char_isNum(char c){
 	return c >= '0' && c <= '9';}
 static __inline__ bool string_isNum(char* s){
      uint16_t i=0;
+     bool hasPoint = false;
+     
+     i=s[0]=='-'; /* if first char is Sign, accept it and advance pointer to [1] */
      while(s[i]!='\0'){
-          if(!char_isNum(s[i]) && s[i]!='.'){
+          if(s[i]=='.'){
+               if(!hasPoint){
+                    hasPoint=true;
+               }
+               else{
+                    return false; /* it has more than one point: it's not a valid number! */
+               }
+          }
+          if(!char_isNum(s[i])){ /* if even only one of the chars is not a digit, it's not a number! */
                return false;
           }
           i++;
