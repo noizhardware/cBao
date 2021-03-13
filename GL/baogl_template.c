@@ -3,6 +3,7 @@
 
 /*** DEFINES */
      #define SCREEN_QHD
+     #define ASPECT_RATIO_CORRECTION
 /* DEFINES end. */
 
 /*** INCLUDES */

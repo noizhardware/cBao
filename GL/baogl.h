@@ -1,7 +1,7 @@
 #ifndef _BAOGL_H_
 #define _BAOGL_H_
 
-#define FILENAME_VERSION "2021c13-1611"
+#define FILENAME_VERSION "2021c13-1944"
 
 /*** TODO
 
@@ -51,6 +51,10 @@
           #define SCREEN_WIDTH 256
           #define SCREEN_HEIGHT 144
      #endif
+     /*Screen dimension constants END. */
+     
+     #define aspectRatio (res.x<res.y?res.x/res.y:res.y/res.x)
+     
 /* DEFINES end. */
 
 /*** FUNCTION BLOCK DEFINES */     
@@ -168,6 +172,10 @@ static __inline__ void drawTri2dAA(triangle2d_t tri, vec3 col);
 
 static __inline__ vec3 vec3translate(vec3 in, vec3 trans);
 
+static __inline__ vec2 uv(vec2 uv);
+static __inline__ triangle2d_t uvTri2d(triangle2d_t tri);
+
+
 static __inline__ float length2d(vec2 a, vec2 b);
 static __inline__ float length3d(vec3 a, vec3 b);
 
@@ -176,6 +184,36 @@ static __inline__ vec3 norm3d(vec3 in);
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+
+static __inline__ vec2 uv(vec2 uv){ /* input uv[-1..+1], output actual coordinates */
+     return(
+          vec2make(
+               /*(uv.x/(res.x/res.y)+1)*.5*res.x,
+               res.y-((uv.y+1)*.5*res.y)*/
+               
+               /*      (uv.x*(res.x<res.y?res.x:res.y)+res.x)/2.,
+               res.y-(uv.y*(res.x<res.y?res.x:res.y)+res.y)/2.*/
+               
+               /* Normalized pixel coordinates (from 0 to 1) */
+               #ifdef ASPECT_RATIO_CORRECTION
+                    res.x*(aspectRatio*uv.x+1.)/2.,
+               #else
+                    res.x*(uv.x+1.)/2.,
+               #endif
+               res.y-res.y*(uv.y+1.)/2.
+          )
+     );
+}
+static __inline__ triangle2d_t uvTri2d(triangle2d_t tri){
+     return(
+          triangle2dMake(
+               uv(tri.a),
+               uv(tri.b),
+               uv(tri.c)
+          )
+     );
+}
+
 static __inline__ vec3 vec3translate(vec3 in, vec3 trans){
      return(
           vec3make(
