@@ -1,7 +1,7 @@
 #ifndef _BAOGL_H_
 #define _BAOGL_H_
 
-#define FILENAME_VERSION "2021c12-1225"
+#define FILENAME_VERSION "2021c13-1611"
 
 /*** TODO
 
@@ -20,9 +20,40 @@
 
 /*** DEFINES */
      /*Screen dimension constants*/
-     #define SCREEN_WIDTH 2560
-     #define SCREEN_HEIGHT 1440
-     
+     #if defined SCREEN_8K || defined SCREEN_4320P
+          #define SCREEN_WIDTH 7680
+          #define SCREEN_HEIGHT 4320
+     #elif defined SCREEN_4K || defined SCREEN_2160P
+          #define SCREEN_WIDTH 4096
+          #define SCREEN_HEIGHT 2160
+     #elif defined SCREEN_QHD || defined SCREEN_1440P
+          #define SCREEN_WIDTH 2560
+          #define SCREEN_HEIGHT 1440
+     #elif defined SCREEN_FULLHD || defined SCREEN_1080P
+          #define SCREEN_WIDTH 1920
+          #define SCREEN_HEIGHT 1080
+     #elif defined SCREEN_HD || SCREEN_HDREADY || defined SCREEN_720P
+          #define SCREEN_WIDTH 1280
+          #define SCREEN_HEIGHT 720
+     #elif defined SCREEN_SD
+          #define SCREEN_WIDTH 720
+          #define SCREEN_HEIGHT 576
+     #elif defined SCREEN_480P
+          #define SCREEN_WIDTH 852
+          #define SCREEN_HEIGHT 480
+     #elif defined SCREEN_360P
+          #define SCREEN_WIDTH 480
+          #define SCREEN_HEIGHT 360
+     #elif defined SCREEN_240P || defined SCREEN_NTSC
+          #define SCREEN_WIDTH 426
+          #define SCREEN_HEIGHT 240
+     #elif defined SCREEN_144P
+          #define SCREEN_WIDTH 256
+          #define SCREEN_HEIGHT 144
+     #endif
+/* DEFINES end. */
+
+/*** FUNCTION BLOCK DEFINES */     
      #define BAOGL_MAIN \
      int main(int argc, char* argv[]){  \
           bool quit;                    \
@@ -78,9 +109,8 @@
          return 0;\
      }\
      __asm__("") /* just a dummy line to allow a semicolon after the function */
-    
-          
-/* DEFINES end. */
+
+/* FUNCTION BLOCK DEFINES end. */     
 
 /*** TYPEDEFS */
      typedef struct vec3_{
@@ -120,10 +150,12 @@ static __inline__ vec3 vec3make(float x, float y, float z);
 static __inline__ void vec2init(vec2* in, float x, float y);
 static __inline__ void vec3init(vec3* in, float x, float y, float z);
 static __inline__ void triangle2dInit(triangle2d_t* in, vec2 a, vec2 b, vec2 c);
+static __inline__ triangle2d_t triangle2dMake(vec2 a, vec2 b, vec2 c);
 static __inline__ void triangle3dInit(triangle3d_t* in, vec3 a, vec3 b, vec3 c);
 static __inline__ void triangle3dInitF(triangle3d_t* in, float aa, float ab, float ac, float ba, float bb, float bc, float ca, float cb, float cc);
 
-static __inline__ void triangle3d2d(triangle3d_t* tri, triangle2d_t* tri_p, float maxDist);
+static __inline__ triangle2d_t triangle3d2d(triangle3d_t tri, float maxDist);
+static __inline__ void triangle3d2d_(triangle3d_t* tri, triangle2d_t* tri_p, float maxDist);
 
 static __inline__ void setColor(vec3 col);
 static __inline__ void drawPoint(vec2 p, vec3 col);
@@ -132,12 +164,28 @@ static __inline__ void _dla_changebrightness(vec3* colorIn, vec3* colorOut, floa
 static __inline__ void _dla_plot(vec2 point, vec3* col, float br);
 static __inline__ void drawLineAA(vec2 a, vec2 b, vec3 color);
 static __inline__ void drawTri2d(triangle2d_t tri, vec3 col);
+static __inline__ void drawTri2dAA(triangle2d_t tri, vec3 col);
 
-static __inline__ float length2(vec2 a, vec2 b);
+static __inline__ vec3 vec3translate(vec3 in, vec3 trans);
+
+static __inline__ float length2d(vec2 a, vec2 b);
+static __inline__ float length3d(vec3 a, vec3 b);
+
+static __inline__ vec3 norm3d(vec3 in);
 
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+static __inline__ vec3 vec3translate(vec3 in, vec3 trans){
+     return(
+          vec3make(
+               in.x+trans.x,
+               in.y+trans.y,
+               in.z+trans.z
+          )
+     );
+}
+
 static __inline__ vec2 div2(vec2 in, float div){
      vec2 out;
      out.x = in.x/div;
@@ -181,6 +229,11 @@ static __inline__ void triangle2dInit(triangle2d_t* in, vec2 a, vec2 b, vec2 c){
      in->c.x=c.x;
      in->c.y=c.y;
 }
+static __inline__ triangle2d_t triangle2dMake(vec2 a, vec2 b, vec2 c){
+     triangle2d_t out;
+     triangle2dInit(&out, a, b, c);
+     return out;
+}
 static __inline__ void triangle3dInit(triangle3d_t* in, vec3 a, vec3 b, vec3 c){
      in->a.x=a.x;
      in->a.y=a.y;
@@ -200,16 +253,33 @@ static __inline__ void triangle3dInitF(triangle3d_t* in, float aa, float ab, flo
      );
 }
 
-static __inline__ void triangle3d2d(triangle3d_t* tri, triangle2d_t* tri_p, float maxDist){ /* projects 3d triangle into 2d */
+static __inline__ void triangle3d2d_(triangle3d_t* tri, triangle2d_t* tri_p, float maxDist){ /* projects 3d triangle into 2d - maxDist is the maximum distance from the pov(0,0,0) */
      triangle2dInit(tri_p,
           vec2make(tri->a.x*(maxDist/tri->a.z), tri->a.y*(maxDist/tri->a.z)),
           vec2make(tri->b.x*(maxDist/tri->b.z), tri->b.y*(maxDist/tri->b.z)),
           vec2make(tri->c.x*(maxDist/tri->c.z), tri->c.y*(maxDist/tri->c.z))
      );
 }
+static __inline__ triangle2d_t triangle3d2d(triangle3d_t tri, float maxDist){ /* projects 3d triangle into 2d - maxDist is the maximum distance from the pov(0,0,0) */
+     triangle2d_t out;
+     triangle2dInit(&out,
+          vec2make(tri.a.x*(maxDist/tri.a.z), tri.a.y*(maxDist/tri.a.z)),
+          vec2make(tri.b.x*(maxDist/tri.b.z), tri.b.y*(maxDist/tri.b.z)),
+          vec2make(tri.c.x*(maxDist/tri.c.z), tri.c.y*(maxDist/tri.c.z))
+     );
+     return out;
+}
 
-static __inline__ float length2(vec2 a, vec2 b){
+static __inline__ float length2d(vec2 a, vec2 b){
      return sqrt(pow(b.x-a.x, 2)+pow(b.y-a.y, 2));
+}
+static __inline__ float length3d(vec3 a, vec3 b){
+     return sqrt(pow(b.x-a.x, 2)+pow(b.y-a.y, 2)+pow(b.z-a.z, 2));
+}
+
+static __inline__ vec3 norm3d(vec3 in){
+     float len = length3d(vec3make(.0, .0, .0), in);
+     return(vec3make(in.x/len, in.y/len, in.z/len));
 }
 
 static __inline__ void setColor(vec3 col){
@@ -245,6 +315,11 @@ static __inline__ void drawTri2d(triangle2d_t tri, vec3 col){
      drawLine(tri.a, tri.b, col);
      drawLine(tri.b, tri.c, col);
      drawLine(tri.c, tri.a, col);
+}
+static __inline__ void drawTri2dAA(triangle2d_t tri, vec3 col){
+     drawLineAA(tri.a, tri.b, col);
+     drawLineAA(tri.b, tri.c, col);
+     drawLineAA(tri.c, tri.a, col);
 }
 
 /*** antialias line - from https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm#Algorithm */

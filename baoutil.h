@@ -1,6 +1,6 @@
 #ifndef _BAOUTIL_H_
 #define _BAOUTIL_H_
-/* 2020i14-2224 */
+/* 2021c13-0053 */
 
 /* ANSI C compliant <3 */
 
@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#define NIL ((void*)0)
+/*#define NIL ((void*)0)*/
 
 #define PORCODIO \
      printf("______ ___________ _____ ___________ _____ _____\n"); \
@@ -35,12 +35,12 @@ static __inline__ char* boolToString(bool in){
         keep = !keep, count++) \
       for(item = (array) + count; keep; keep = !keep)
       /*
-// And can be used like
-// int values[] = { 1, 2, 3 };
-// foreach(int *v, values) {
-//     printf("value: %d\n", *v);}
-THIS ONE I THINK IS NOT C90 compliant :( */
-
+And can be used like
+int v = 0;
+int values[] = { 1, 2, 3 };
+foreach(&v, values) {
+    printf("value: %d\n", *v);}
+*/
 #define forever for(;;) /* use: forever{ my_code_here; } - use break to exit the forever loop*/
 
 #define elif else if
