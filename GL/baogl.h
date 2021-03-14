@@ -1,7 +1,7 @@
 #ifndef _BAOGL_H_
 #define _BAOGL_H_
 
-#define FILENAME_VERSION "2021c13-1944"
+#define BAOGL_VERSION "2021c14-2328"
 
 /*** TODO
 
@@ -158,9 +158,6 @@ static __inline__ triangle2d_t triangle2dMake(vec2 a, vec2 b, vec2 c);
 static __inline__ void triangle3dInit(triangle3d_t* in, vec3 a, vec3 b, vec3 c);
 static __inline__ void triangle3dInitF(triangle3d_t* in, float aa, float ab, float ac, float ba, float bb, float bc, float ca, float cb, float cc);
 
-static __inline__ triangle2d_t triangle3d2d(triangle3d_t tri, float maxDist);
-static __inline__ void triangle3d2d_(triangle3d_t* tri, triangle2d_t* tri_p, float maxDist);
-
 static __inline__ void setColor(vec3 col);
 static __inline__ void drawPoint(vec2 p, vec3 col);
 static __inline__ void drawLine(vec2 a, vec2 b, vec3 col);
@@ -291,23 +288,6 @@ static __inline__ void triangle3dInitF(triangle3d_t* in, float aa, float ab, flo
      );
 }
 
-static __inline__ void triangle3d2d_(triangle3d_t* tri, triangle2d_t* tri_p, float maxDist){ /* projects 3d triangle into 2d - maxDist is the maximum distance from the pov(0,0,0) */
-     triangle2dInit(tri_p,
-          vec2make(tri->a.x*(maxDist/tri->a.z), tri->a.y*(maxDist/tri->a.z)),
-          vec2make(tri->b.x*(maxDist/tri->b.z), tri->b.y*(maxDist/tri->b.z)),
-          vec2make(tri->c.x*(maxDist/tri->c.z), tri->c.y*(maxDist/tri->c.z))
-     );
-}
-static __inline__ triangle2d_t triangle3d2d(triangle3d_t tri, float maxDist){ /* projects 3d triangle into 2d - maxDist is the maximum distance from the pov(0,0,0) */
-     triangle2d_t out;
-     triangle2dInit(&out,
-          vec2make(tri.a.x*(maxDist/tri.a.z), tri.a.y*(maxDist/tri.a.z)),
-          vec2make(tri.b.x*(maxDist/tri.b.z), tri.b.y*(maxDist/tri.b.z)),
-          vec2make(tri.c.x*(maxDist/tri.c.z), tri.c.y*(maxDist/tri.c.z))
-     );
-     return out;
-}
-
 static __inline__ float length2d(vec2 a, vec2 b){
      return sqrt(pow(b.x-a.x, 2)+pow(b.y-a.y, 2));
 }
@@ -324,10 +304,15 @@ static __inline__ void setColor(vec3 col){
      SDL_SetRenderDrawColor(rendererMain, (int)255*col.x, (int)255*col.y, (int)255*col.z, 0xFF); /* last one is opacity */
 }
 
-static __inline__ void drawPoint(vec2 p, vec3 col){
+static __inline__ void drawPoint_(vec2 p, vec3 col){
      setColor(col);
      SDL_RenderDrawPoint(rendererMain, p.x, p.y);
 }
+static __inline__ void drawPoint(vec2 p, vec3 col){
+     setColor(col);
+     SDL_RenderDrawPoint(rendererMain, uv(p).x, uv(p).y);
+}
+
 static __inline__ void drawLine(vec2 a, vec2 b, vec3 col){
      float lenX = fabs(b.x-a.x);
           int8_t dirX = a.x<b.x ? 1 : -1;
