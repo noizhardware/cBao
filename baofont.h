@@ -1,13 +1,16 @@
 #ifndef _BAOFONT_H_
 #define _BAOFONT_H_
 
-#define BAOFONT_VERSION "2021c14-2328"
+#define BAOFONT_VERSION "2021c14-2337"
 
 /*** TODO
 
 */
 
 /*** INCLUDES */
+     #include <string.h> /* for strlen() */
+     #include "GL/baogl.h"
+     #include "bitty.h"
 /* INCLUDES end. */
 
 #ifdef __cplusplus
@@ -282,9 +285,32 @@ typedef char5x8_t font5x8_t[256]; /* 0-127 standard ascii + 128-255 custom chars
 /* GLOBALS end. */
 
 /*** FUNCTION DECLARATIONS */
+static __inline__ void drawChar5x8(char5x8_t c, vec2 pos, vec3 color, int8_t xOffset, int8_t yOffset);
+static __inline__ void write5x8(char* string, vec2 pos, font5x8_t font, vec3 color, int8_t xOffset, int8_t yOffset);
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+
+/* pos is the upper left corner of the char, drawing proceeds down and right form there */
+static __inline__ void drawChar5x8(char5x8_t c, vec2 pos, vec3 color, int8_t xOffset, int8_t yOffset){
+     uint8_t row;
+     uint8_t col;
+     for(col=0;col<5;col++){
+          for(row=0;row<8;row++){
+               if(getBit(c[4-col], 7-row)){
+                    drawPoint_(vec2make(uv(pos).x+(col)+(xOffset*6.), uv(pos).y+(row)+(yOffset*9.)), color);
+               }
+          }
+     }
+}
+
+static __inline__ void write5x8(char* string, vec2 pos, font5x8_t font, vec3 color, int8_t xOffset, int8_t yOffset){
+     uint16_t i;
+     for(i=0;i<strlen(string);i++){
+          drawChar5x8(font[(uint8_t)string[i]], pos, color, i+xOffset, yOffset);
+     }
+}
+
 /* FUNCTION DEFINITIONS end. */
 
 #ifdef __cplusplus

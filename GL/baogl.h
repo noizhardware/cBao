@@ -1,7 +1,7 @@
 #ifndef _BAOGL_H_
 #define _BAOGL_H_
 
-#define BAOGL_VERSION "2021c14-2328"
+#define BAOGL_VERSION "2021c15-0904"
 
 /*** TODO
 
@@ -12,6 +12,7 @@
      #include <stdio.h>
      #include <stdbool.h>
      #include <math.h>
+     #include "baoutil.h"
 /* INCLUDES end. */
 
 #ifdef __cplusplus
@@ -57,17 +58,32 @@
      
 /* DEFINES end. */
 
-/*** FUNCTION BLOCK DEFINES */     
+/*** FUNCTION BLOCK DEFINES */
+     #ifdef LOG_FPS
+          #define FPS_END \
+               ;end = SDL_GetPerformanceCounter();\
+               elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();\
+               SDL_Log("Current FPS: %.2f\n", (1.0f / elapsed));
+          #define FPS_START \
+                    start = SDL_GetPerformanceCounter();
+          #define FPS_DECL \
+               Uint64 start;                 \
+               Uint64 end;                   \
+               float elapsed
+     #else
+          #define FPS_END
+          #define FPS_START
+          #define FPS_DECL
+     #endif /* LOG_FPS */
+
      #define BAOGL_MAIN \
      int main(int argc, char* argv[]){  \
           bool quit;                    \
           SDL_Window* window;           \
-          SDL_Event event;              \
-          uint32_t tt;                  \
-          Uint64 start;                 \
-          Uint64 end;                   \
-          float elapsed
-          
+          SDL_Event event              \
+          FPS_DECL
+     
+     
      #define BAOGL_PRE_IMAGE  \
          (void)argc;\
          (void)argv;\
@@ -91,7 +107,7 @@
           rendererMain = SDL_CreateRenderer(window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) ;\
           quit = false;\
           while (!quit) {\
-               start = SDL_GetPerformanceCounter();\
+               FPS_START;\
                tt = SDL_GetTicks(); /* milliseconds */\
                while (SDL_PollEvent(&event)) {\
                     if (event.type == SDL_QUIT) {\
@@ -103,17 +119,14 @@
                
      #define BAOGL_END \
                SDL_RenderPresent(rendererMain);\
-               end = SDL_GetPerformanceCounter();\
-               elapsed = (end - start) / (float)SDL_GetPerformanceFrequency();\
-               SDL_Log("Current FPS: %.2f\n", (1.0f / elapsed));\
+               FPS_END; \
          }\
          SDL_DestroyWindow(window);\
          SDL_DestroyRenderer(rendererMain);\
          SDL_Quit();\
          return 0;\
      }\
-     __asm__("") /* just a dummy line to allow a semicolon after the function */
-
+     DUMMY
 /* FUNCTION BLOCK DEFINES end. */     
 
 /*** TYPEDEFS */
@@ -143,6 +156,7 @@
 /*** GLOBALS */
      SDL_Renderer* rendererMain;
      vec2 res = {SCREEN_WIDTH, SCREEN_HEIGHT};
+     uint32_t tt;
 /* GLOBALS end. */
 
 /*** FUNCTION DECLARATIONS */
@@ -159,8 +173,10 @@ static __inline__ void triangle3dInit(triangle3d_t* in, vec3 a, vec3 b, vec3 c);
 static __inline__ void triangle3dInitF(triangle3d_t* in, float aa, float ab, float ac, float ba, float bb, float bc, float ca, float cb, float cc);
 
 static __inline__ void setColor(vec3 col);
-static __inline__ void drawPoint(vec2 p, vec3 col);
-static __inline__ void drawLine(vec2 a, vec2 b, vec3 col);
+static __inline__ void drawPoint(vec2 p, vec3 col); /* [-1..1] coordinates */
+static __inline__ void drawPoint_(vec2 p, vec3 col); /* absolute coordinates */
+static __inline__ void drawLine(vec2 a, vec2 b, vec3 col); /* [-1..1] coordinates */
+static __inline__ void drawLine_(vec2 a, vec2 b, vec3 col); /* absolute coordinates */
 static __inline__ void _dla_changebrightness(vec3* colorIn, vec3* colorOut, float br);
 static __inline__ void _dla_plot(vec2 point, vec3* col, float br);
 static __inline__ void drawLineAA(vec2 a, vec2 b, vec3 color);
@@ -314,6 +330,10 @@ static __inline__ void drawPoint(vec2 p, vec3 col){
 }
 
 static __inline__ void drawLine(vec2 a, vec2 b, vec3 col){
+     setColor(col);
+     SDL_RenderDrawLine(rendererMain, uv(a).x, uv(a).y, uv(b).x, uv(b).y);
+}
+/*static __inline__ void drawLine(vec2 a, vec2 b, vec3 col){
      float lenX = fabs(b.x-a.x);
           int8_t dirX = a.x<b.x ? 1 : -1;
      float lenY = fabs(b.y-a.y);
@@ -328,6 +348,27 @@ static __inline__ void drawLine(vec2 a, vec2 b, vec3 col){
 
      for(;;){
           drawPoint(a1, col);
+          if (a1.x==b.x && a1.y==b.y) break;
+          e2 = err;
+          if (e2 > -lenX) { err -= lenY; a1.x += dirX; }
+          if (e2 < lenY) { err += lenX; a1.y += dirY; }
+     }
+}*/
+static __inline__ void drawLine_(vec2 a, vec2 b, vec3 col){
+     float lenX = fabs(b.x-a.x);
+          int8_t dirX = a.x<b.x ? 1 : -1;
+     float lenY = fabs(b.y-a.y);
+          int8_t dirY = a.y<b.y ? 1 : -1; 
+     float err = (lenX>lenY ? lenX : -lenY)/2.;
+     float e2;
+     vec2 a1;
+
+     vec2init(&a1, a.x, a.y);
+
+     setColor(col);
+
+     for(;;){
+          drawPoint_(a1, col);
           if (a1.x==b.x && a1.y==b.y) break;
           e2 = err;
           if (e2 > -lenX) { err -= lenY; a1.x += dirX; }

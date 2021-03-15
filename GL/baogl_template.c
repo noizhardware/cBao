@@ -4,6 +4,7 @@
 /*** DEFINES */
      #define SCREEN_QHD
      #define ASPECT_RATIO_CORRECTION
+     /*#define LOG_FPS*/
 /* DEFINES end. */
 
 /*** INCLUDES */
