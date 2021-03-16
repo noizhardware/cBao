@@ -1,7 +1,7 @@
 #ifndef _BAOGL_H_
 #define _BAOGL_H_
 
-#define BAOGL_VERSION "2021c15-0904"
+#define BAOGL_VERSION "2021c16-1901"
 
 /*** TODO
 
@@ -182,10 +182,11 @@ static __inline__ void _dla_plot(vec2 point, vec3* col, float br);
 static __inline__ void drawLineAA(vec2 a, vec2 b, vec3 color);
 static __inline__ void drawTri2d(triangle2d_t tri, vec3 col);
 static __inline__ void drawTri2dAA(triangle2d_t tri, vec3 col);
+static __inline__ void drawCircle(vec2 pos, float r, vec3 col);
 
 static __inline__ vec3 vec3translate(vec3 in, vec3 trans);
 
-static __inline__ vec2 uv(vec2 uv);
+static __inline__ vec2 uvToAbs(vec2 uv);
 static __inline__ triangle2d_t uvTri2d(triangle2d_t tri);
 
 
@@ -198,7 +199,7 @@ static __inline__ vec3 norm3d(vec3 in);
 
 /*** FUNCTION DEFINITIONS */
 
-static __inline__ vec2 uv(vec2 uv){ /* input uv[-1..+1], output actual coordinates */
+static __inline__ vec2 uvToAbs(vec2 uv){ /* input uv[-1..+1], output actual coordinates */
      return(
           vec2make(
                /*(uv.x/(res.x/res.y)+1)*.5*res.x,
@@ -220,9 +221,9 @@ static __inline__ vec2 uv(vec2 uv){ /* input uv[-1..+1], output actual coordinat
 static __inline__ triangle2d_t uvTri2d(triangle2d_t tri){
      return(
           triangle2dMake(
-               uv(tri.a),
-               uv(tri.b),
-               uv(tri.c)
+               uvToAbs(tri.a),
+               uvToAbs(tri.b),
+               uvToAbs(tri.c)
           )
      );
 }
@@ -326,12 +327,14 @@ static __inline__ void drawPoint_(vec2 p, vec3 col){
 }
 static __inline__ void drawPoint(vec2 p, vec3 col){
      setColor(col);
-     SDL_RenderDrawPoint(rendererMain, uv(p).x, uv(p).y);
+     SDL_RenderDrawPoint(rendererMain, uvToAbs(p).x, uvToAbs(p).y);
 }
 
 static __inline__ void drawLine(vec2 a, vec2 b, vec3 col){
+     vec2 aAbs = uvToAbs(a);
+     vec2 bAbs = uvToAbs(b);
      setColor(col);
-     SDL_RenderDrawLine(rendererMain, uv(a).x, uv(a).y, uv(b).x, uv(b).y);
+     SDL_RenderDrawLine(rendererMain, aAbs.x, aAbs.y, bAbs.x, bAbs.y);
 }
 /*static __inline__ void drawLine(vec2 a, vec2 b, vec3 col){
      float lenX = fabs(b.x-a.x);
@@ -384,6 +387,56 @@ static __inline__ void drawTri2dAA(triangle2d_t tri, vec3 col){
      drawLineAA(tri.a, tri.b, col);
      drawLineAA(tri.b, tri.c, col);
      drawLineAA(tri.c, tri.a, col);
+}
+
+static __inline__ void drawCircle(vec2 pos, float r, vec3 col){
+     const int32_t diameter = (r * res.x * 2);
+     int32_t x = (r * res.x - 1);
+     int32_t y = 0;
+     int32_t tx = 1;
+     int32_t ty = 1;
+     int32_t error = (tx - diameter);
+     vec2 posAbs = uvToAbs(pos);
+
+     setColor(col);
+     while (x >= y){
+          /*Each of the following renders an octant of the circle*/
+          SDL_RenderDrawPoint(rendererMain, posAbs.x + x, posAbs.y - y);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x + x, posAbs.y + y);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x - x, posAbs.y - y);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x - x, posAbs.y + y);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x + y, posAbs.y - x);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x + y, posAbs.y + x);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x - y, posAbs.y - x);
+          SDL_RenderDrawPoint(rendererMain, posAbs.x - y, posAbs.y + x);
+
+          if (error <= 0){
+               ++y;
+               error += ty;
+               ty += 2;
+          }
+          if (error > 0){
+               --x;
+               tx += 2;
+               error += (tx - diameter);
+          }
+     }
+}
+void drawCircleFill(vec2 pos, float r, vec3 col){
+     vec2 center = uvToAbs(pos);
+     int radius = r*res.x;
+     int w, h, dx, dy;
+     
+     setColor(col);
+     for (w = 0; w < radius * 2; w++){
+          for (h = 0; h < radius * 2; h++){
+               dx = radius - w; /* horizontal offset */
+               dy = radius - h; /* vertical offset */
+               if ((dx*dx + dy*dy) <= (radius * radius)){
+                    SDL_RenderDrawPoint(rendererMain, center.x + dx, center.y + dy);
+               }
+          }
+     }
 }
 
 /*** antialias line - from https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm#Algorithm */
