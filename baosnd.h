@@ -53,7 +53,7 @@ DEFAULT_MAIN;
 Ultrashort mode:
 ~~~~
 #include "baosnd.h"
-     snd(sine(432.));
+     snd(sn(432.));
 ~~~~
 
 Compile with:
