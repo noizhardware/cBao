@@ -31,6 +31,7 @@
      vec3 magenta = {1., .0, 1.};
      vec3 yellow = {1., 1., .0};
      
+     vec3 grun = {.2, .9, .4}; /* that's a naaaais green */
      vec3 safetyOrange = {1., .5, 0.};
 /* GLOBALS end. */
 
