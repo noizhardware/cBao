@@ -20,8 +20,8 @@ extern "C" {
      printf("| |   \\ \\_/ | |\\ \\| \\__/\\ \\_/ | |/ / _| |_\\ \\_/ /\n"); \
      printf("\\_|    \\___/\\_| \\_|\\____/\\___/|___/  \\___/ \\___/\n") \
 
-static __inline__ char* boolToString(bool in){
-  return in ? "true" : "false";}
+/*static __inline__ char* boolToString(bool in){
+  return in ? "true" : "false";}*/
 
 /* for 2D arrays*/
 /*#define ARRAYELEMS(arr) sizeof arr / sizeof arr[0]*/ /* how many elements in the array */

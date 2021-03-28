@@ -207,6 +207,9 @@ and kkSHIFT_ESC_REL things, still to complete
           #define kkSHIFT_ESC 16667
                /*#define kkSHIFT_ESC_REL 49435*/
                #define kkCTRL_ESC 8475
+               
+/* specials */               
+#define kkCTRLL_T 8276 /* left CTRL + T */
 
 #define kkSQUAREOPEN 1117
      #define kkSQUAREOPEN_REL 33885

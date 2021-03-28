@@ -1,6 +1,9 @@
 #ifndef _BAOARDU_H_
 #define _BAOARDU_H_
 
+
+#define __inline__ inline /* arduino IDE */
+
 void dw(uint8_t pin, bool val);
 
 
