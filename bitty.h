@@ -3,12 +3,12 @@
        * takes an 8-bit variable, and sets the (bitnumber)th bit (starting from Right = LSB), [0..7] to the bitvalue [true, false]
        * returns the changed 8-bit variable
        - BIT8 newvariable = setBit (8bitvariable, 2, false); // 11111111 -> 11111011
-       
+
      ## getBit (source, bitnumber)
        * takes an 8-bit variable, and returns the (bitnumber)th bit (starting from Right = LSB), [0..7]
        - returns a uint8_t value [true, false]
        - uint8_t mybit = getBit(8bitvariable, 2); // 11100101 -> true
-       
+
      ## printBits (source)
        * takes an 8-bit variable, and prints it to console in binary form
        * returns true if successful
@@ -18,9 +18,26 @@
 
 #ifndef _BITTY_H_
 #define _BITTY_H_
-/* 2021c14-2328 */
+/* 2021d04-1557 */
 
 #include <stdint.h>
+#include <stdbool.h>
+
+
+uint8_t getHiByte(uint16_t in){
+  return (in>>8) & 0xff;
+  /*
+    00001101 &
+    11111111
+    
+  */
+}
+uint8_t getLoByte(uint16_t in){
+  return in & 0xff;
+}
+uint16_t makeUint16(uint8_t hi, uint8_t lo){
+  return lo | (hi<<8);
+}
 
 #define B00000000 0
 #define B00000001 1
