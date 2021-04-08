@@ -24,12 +24,16 @@ extern "C" {
 static __inline__ float round_up(float num);
 static __inline__ float roundDec(float num, unsigned char prec);
 static __inline__ float roundDec_up(float num, unsigned char prec);
+static __inline__ float fract(float x);
 
 static __inline__ int minn(int a, int b);
 static __inline__ int maxx(int a, int b);
 static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high);
 /* prototypes END */
 
+static __inline__ float fract(float x){
+     return x - floor(x);}
+     
 
 static __inline__ float round_up(float num){
      return ((num - floor(num)) >= 0.5) ? ceil(num) : floor(num); }
