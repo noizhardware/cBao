@@ -1,7 +1,7 @@
 #ifndef _BITTY_H_
 #define _BITTY_H_
 
-#define BITTY_VERSION "2021d08-1146"
+#define BITTY_VERSION "2021d12-1619"
 /*
      ## setBit (source, bitnumber, bitvalue)
        * takes an 8-bit variable, and sets the (bitnumber)th bit (starting from Right = LSB), [0..7] to the bitvalue [true, false]
@@ -127,8 +127,8 @@ static __inline__ uint8_t onehot8Valid (const uint8_t source){
           (source==B00010000)|
           (source==B00100000)|
           (source==B01000000)|
-          (source==B10000000))
-          ? true : false;
+          (source==B10000000)
+     );
 }
 
 static __inline__ uint8_t onehot8Set (const uint8_t elem){ /* elem [0..7], (returns a 00000000 byte if "elem" is out of range (hint: it won't pass the "onehot8Valid" test)) */
