@@ -5,12 +5,13 @@ extern "C" {
 #ifndef _BAOSTRING_H_
 #define _BAOSTRING_H_
 
-/* 2021c06-1703 */
+/* 2021d18-1612 */
 
 /* C90 compliant <3 */
 
 /* TODO:
  * get rid of all malloc / calloc
+ - all non-malloc functions should be functionname(), while legacy malloc-burdened functions should be functionname_()
  * prepend to string
  * file to string: bool ftos(fileName, char* buf) >> fills the buffer, returns 1 if buffer space was enough to contain the file, 0 if not
 */
@@ -65,6 +66,16 @@ static __inline__ float str_toFloat(char* str);
 static __inline__ char* trim(char* in);
 
 /* prototypes END */
+
+static __inline__ char* charSwap(char* string, char match, char swap){
+     uint16_t i = 0;
+     char c;
+     while((c = string[i])){
+          string[i] = c==match ? swap : c;
+          i++;
+     }
+     return string; /* so I can concatenate functions */
+}
 
 static __inline__ char* trim(char* in){ /* cacca: ha un return, ma modifica anche ciò che gli entra >> vedi qui sotto "trimwhitespace" */
      unsigned int i = 0;
