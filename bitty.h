@@ -1,7 +1,7 @@
 #ifndef _BITTY_H_
 #define _BITTY_H_
 
-#define BITTY_VERSION "2021d12-1619"
+#define BITTY_VERSION "2021d25-1841"
 /*
      ## setBit (source, bitnumber, bitvalue)
        * takes an 8-bit variable, and sets the (bitnumber)th bit (starting from Right = LSB), [0..7] to the bitvalue [true, false]
@@ -65,11 +65,17 @@
      static __inline__ uint16_t makeUint16(const uint8_t hi, const uint8_t lo);
 
      static __inline__ uint8_t oneCount (const uint8_t source);
-     static __inline__ uint8_t printBits(const uint8_t c);
+     static __inline__ uint8_t printBits(const uint8_t c); /* without newline */
+     static __inline__ uint8_t printBitsn(const uint8_t c); /* with newline */
 
-     static __inline__ uint8_t getBit (const uint8_t source, const uint8_t bitno); /* bitno=[0..7] [LSB..MSB] */
-     static __inline__ uint8_t setBit (const uint8_t source, const uint8_t bitno, const uint8_t bittoset); /* bitno=[0..7] [LSB..MSB] */
-     static __inline__ uint8_t flipBit (const uint8_t source, const uint8_t bitno);
+     /* BIG ENDIAN and destructive: overwrite source and also return the result, to chain functions */
+     static __inline__ uint8_t setBit (uint8_t* source, const uint8_t bitno, const uint8_t bittoset); /* bitno=[0..7] [MSB..LSB] */
+     static __inline__ uint8_t getBit (const uint8_t source, const uint8_t bitno); /* bitno=[0..7] [MSB..LSB] */
+     
+     /* ACHTUNG: the functions ending with _ are little-endian, now semi-deprecated, use them in legacy code  */
+     static __inline__ uint8_t getBit_ (const uint8_t source, const uint8_t bitno); /* bitno=[0..7] [LSB..MSB] */
+     static __inline__ uint8_t setBit_ (const uint8_t source, const uint8_t bitno, const uint8_t bittoset); /* bitno=[0..7] [LSB..MSB] */
+     static __inline__ uint8_t flipBit_ (const uint8_t source, const uint8_t bitno);
 
      static __inline__ uint8_t onehot8Valid (const uint8_t source);
      static __inline__ uint8_t onehot8Set (const uint8_t elem);
@@ -104,17 +110,34 @@ static __inline__ uint8_t printBits(const uint8_t c){
      for (i = 7; i >= 0; i--){
           printf("%d", (c >> i) & 1 ? true : false);
      }
+     return true;
+}
+static __inline__ uint8_t printBitsn(const uint8_t c){
+     int i;
+     for (i = 7; i >= 0; i--){
+          printf("%d", (c >> i) & 1 ? true : false);
+     }
      printf("\n");
      return true;
 }
 
-static __inline__ uint8_t getBit (const uint8_t source, const uint8_t bitno){ /* bitno=[0..7] [LSB..MSB] */
+/* BIG ENDIAN */
+static __inline__ uint8_t setBit (uint8_t* source, const uint8_t bitno, const uint8_t bittoset){ /* bitno=[0..7] [MSB..LSB] */
+     *source = (bittoset) ? (*source | (B10000000 >> bitno)) : (*source & ~(B10000000 >> bitno));
+     return *source;
+}
+static __inline__ uint8_t getBit (const uint8_t source, const uint8_t bitno){ /* bitno=[0..7] [MSB..LSB] */
+     return ((source & (B10000000 >> bitno)) << bitno)!=0;
+}
+
+/* ACHTUNG: the functions ending with _ are little-endian, now semi-deprecated, use them in legacy code  */
+static __inline__ uint8_t getBit_ (const uint8_t source, const uint8_t bitno){ /* bitno=[0..7] [LSB..MSB] */
      return ((source & (1 << bitno)) >> bitno)!=0;
 }
-static __inline__ uint8_t setBit (const uint8_t source, const uint8_t bitno, const uint8_t bittoset){ /* bitno=[0..7] [LSB..MSB] */
+static __inline__ uint8_t setBit_ (const uint8_t source, const uint8_t bitno, const uint8_t bittoset){ /* bitno=[0..7] [LSB..MSB] */
      return (bittoset) ? (source | (1 << bitno)) : (source & ~(1 << bitno));
 }
-static __inline__ uint8_t flipBit (const uint8_t source, const uint8_t bitno){ /* bitno=[0..7] [LSB..MSB] */
+static __inline__ uint8_t flipBit_ (const uint8_t source, const uint8_t bitno){ /* bitno=[0..7] [LSB..MSB] */
      return source ^ (1 << bitno);
 }
 
