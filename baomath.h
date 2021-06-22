@@ -2,15 +2,18 @@
 #define __BAOMATH_H__
 
 /* 2020i17-1011 */
+/* 2021f21-2351 */
 
 /* ANSI C compliant <3 */
 
 #ifdef _WIN32
-#include <Math.h>
+     #include <Math.h>
 /********** non-win **********/
 #else
-#include <math.h>
+     #include <math.h>
 #endif /* OS switch */
+
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
