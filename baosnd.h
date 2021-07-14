@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2021a23-1830 */
+/* 2021g14-1154 */
 
 /***
 # ANSI C sound library
@@ -324,7 +324,7 @@ static __inline__ float sh_(float in, float trig, uint8_t sh_state_id){
      return global_cycles[sh_state_id];}
 
 static __inline__ float gate(float in, float th){
-     return in>=th;}
+     return in*(in>=th);}
 
 /**************************************/
 /************* GENERATORS *************/

@@ -5,7 +5,7 @@ extern "C" {
 #ifndef _BAOSTRING_H_
 #define _BAOSTRING_H_
 
-/* 2021d18-1612 */
+/* 2021g13-2021g13-2043 */
 
 /* C90 compliant <3 */
 
@@ -60,9 +60,11 @@ static __inline__ bool char_isNum(char c);
 static __inline__ bool string_isNum(char* s);
 static __inline__ bool string_isInt(char* s);
 static __inline__ uint16_t str_toUint16(char *str);
-static __inline__ uint16_t str_toUint8(char* str);
+static __inline__ uint8_t str_toUint8(char* str);
 static __inline__ float str_toFloat(char* str);
 
+static __inline__ char* rtrim(char* in);
+static __inline__ char* ltrim(char* in);
 static __inline__ char* trim(char* in);
 
 /* prototypes END */
@@ -77,19 +79,23 @@ static __inline__ char* charSwap(char* string, char match, char swap){
      return string; /* so I can concatenate functions */
 }
 
-static __inline__ char* trim(char* in){ /* cacca: ha un return, ma modifica anche ciò che gli entra >> vedi qui sotto "trimwhitespace" */
-     unsigned int i = 0;
-     char* out = in;
-     while(isspace(in[strlen(in)-i-1])){
-          /*printf("before: |%s| ", in);*/
-          memset((in+strlen(in)-i-1), '\0', 1);
-          /*printf("after: |%s|\n", in);*/
-          i++;}
-     i=0;
-     while(isspace(in[i])){
-          out = in+i+1;
-          i++;}
-     return out;
+static __inline__ char* ltrim(char *s)
+{
+    while(isspace(*s)) s++;
+    return s;
+}
+
+static __inline__ char* rtrim(char *s)
+{
+    char* back = s + strlen(s);
+    while(isspace(*--back));
+    *(back+1) = '\0';
+    return s;
+}
+
+static __inline__ char* trim(char *s)
+{
+    return rtrim(ltrim(s)); 
 }
 
 /* Stores the trimmed input string into the given output buffer, which must be
@@ -217,7 +223,7 @@ static __inline__ uint16_t str_toUint16(char* str){
 		num = num * 10 + char_toNum(str[i]);
     i++;}
 	return num;}
-static __inline__ uint16_t str_toUint8(char* str){
+static __inline__ uint8_t str_toUint8(char* str){
 	uint8_t i = 0;
   uint8_t num = 0;
 	while(str[i] && char_isNum(str[i])){
