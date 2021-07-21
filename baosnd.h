@@ -5,7 +5,7 @@
      #endif
 #define _BAOSND_H_
 
-/* 2021g14-1154 */
+/* 2021g14-1606 */
 
 /***
 # ANSI C sound library
@@ -195,19 +195,34 @@ Compile with:
      pOutput and pInput will be valid and you can move data from pInput into pOutput. Never process more than
      frameCount frames.*/
      /* "Samples" is just a (castless in this case) cast of the "pOutput" float pointer */ 
-#define WAVE_BEGIN(format, ch, sr) \
-          int32_t DEVICE_FORMAT = format; \
-          int32_t DEVICE_CHANNELS = ch; \
-          int32_t DEVICE_SAMPLE_RATE = sr; \
-          /* \
-          #define DEVICE_FORMAT F32 \
-          #define DEVICE_CHANNELS     MONO \
-          #define DEVICE_SAMPLE_RATE  48000 \
-          */     \
-     void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount){ \
-          /*static float clk = 0;*/ \
-          float* Samples = pOutput; \
-          ma_uint32 SampleIndex \
+#ifndef BAOSND_FORMAT /* sooooooooo the default format is F32 */
+     #define WAVE_BEGIN(ch, sr) \
+               int32_t DEVICE_FORMAT = F32; \
+               int32_t DEVICE_CHANNELS = ch; \
+               int32_t DEVICE_SAMPLE_RATE = sr; \
+          void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount){ \
+               float* Samples = pOutput; \
+               ma_uint32 SampleIndex
+#endif
+#ifdef BAOSND_FORMAT
+     #if BAOSND_FORMAT == U8
+          #define WAVE_BEGIN(ch, sr) \
+                    int32_t DEVICE_FORMAT = BAOSND_FORMAT; \
+                    int32_t DEVICE_CHANNELS = ch; \
+                    int32_t DEVICE_SAMPLE_RATE = sr; \
+               void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount){ \
+                    uint8_t* Samples = pOutput; \
+                    ma_uint32 SampleIndex
+     #elif BAOSND_FORMAT == F32
+          #define WAVE_BEGIN(ch, sr) \
+                    int32_t DEVICE_FORMAT = BAOSND_FORMAT; \
+                    int32_t DEVICE_CHANNELS = ch; \
+                    int32_t DEVICE_SAMPLE_RATE = sr; \
+               void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount){ \
+                    float* Samples = pOutput; \
+                    ma_uint32 SampleIndex
+     #endif
+#endif
 
 #define WAVE_PRE_SOUND \
      for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
@@ -232,7 +247,7 @@ Compile with:
      __asm__("")
 
 #define JUST_PRE_SOUND \
-     WAVE_BEGIN(F32, MONO, 48000); \
+     WAVE_BEGIN(MONO, 48000); \
      WAVE_PRE_SOUND;
 
 #define JUST_POST_SOUND \
