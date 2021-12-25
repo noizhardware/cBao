@@ -3,7 +3,7 @@
      extern "C" {
      #endif
 #define _BAOMUS_H_
-/* 2021b15-1445 */
+#define _BAOMUS_VERSION "2021w24-2217"
 
 /* TODO:
      - chords
@@ -19,9 +19,13 @@
 
 #define MAX_SCALE_SIZE 21 /* 3x a major scale in western tuning >> max 32 intervals per octave */
 
+
+typedef int8_t interval_t;
+typedef int8_t octave_t;
+
 typedef struct scale_t_{
      const uint8_t size;
-     const uint8_t scale[MAX_SCALE_SIZE];
+     const interval_t scale[MAX_SCALE_SIZE];
 } scale_t;
 
 typedef struct tuningSystem_t_{
@@ -36,10 +40,11 @@ void tuningInit(tuningSystem_t* ton, float rootFreq, float octMult, uint8_t inte
           ton->intervals = intervals;
 }
 
-typedef uint8_t interval_t;
-typedef int8_t octave_t;
 
 interval_t maj_all[MAX_SCALE_SIZE] = {0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28, 29, 31, 32, 34};
+
+scale_t chromatic = {12, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}};
+
 
 scale_t maj = {7, {0, 2, 4, 5, 7, 9, 11}};
      #define ionian maj
@@ -103,20 +108,35 @@ static __inline__ uint8_t majScaleSize(uint8_t intervals){ /* size of a major sc
 static __inline__ float tetX(uint8_t interval, float octMult, uint8_t intervals){ /* octaves are on (* octMult) and divided in "intervals" intervals */
      return pow(root(intervals, octMult), interval);} /* intervals'th root of octMult */
      
-static __inline__ uint8_t wrapz(uint8_t input, uint8_t wrapper){ /* modulus, including 0 in the loop */
-    return input%(wrapper+1);}
+static __inline__ uint8_t wrapz(uint8_t input, uint8_t wrapper){ /* modulus, including 0 in the loop (wrapzero) */
+     if(input==0){
+          return 0;
+     }
+     if((input%wrapper)==0){
+          return wrapper;
+     }else{
+          return input%wrapper;
+     }
+}
 static __inline__ uint8_t wrapzDone(uint8_t input, uint8_t wrapper){ /* how many times the wrapz did wrap */
      return (input - wrapz(input, wrapper))/(wrapper+1);}
 
-static __inline__ float freqMaker(tuningSystem_t tun, octave_t octShift, interval_t scale[MAX_SCALE_SIZE], interval_t interval_in){
+static __inline__ float freqMaker(tuningSystem_t tun, octave_t octShift, scale_t scale, interval_t interval_in){
+     if(interval_in==-127){ return 0; } /* pause */
+     if(interval_in<0){
+          octShift -= wrapzDone(-interval_in, scale.size)+1; /*jjj*/
+          /*octShift--;*/
+          interval_in = scale.size - wrapz(-interval_in, scale.size);
+          /*printf("%u %u\n", interval_in, wrapzDone(-interval_in, scale.size));*/
+     }
      return octX(
           octX(tun.rootFreq, octShift, tun.octMult) *
                tetX(
-                    scale[wrapz(interval_in, majScaleSize(tun.intervals))]
+                    scale.scale[wrapz(interval_in, scale.size)]
                     , tun.octMult
                     , tun.intervals)
-          , wrapzDone(interval_in, majScaleSize(tun.intervals))
-          , tun.octMult
+          , wrapzDone(interval_in, scale.size)  /* how many octaves to transpose */
+          , tun.octMult                                          /* octave multiplier */
      );
 }
 
