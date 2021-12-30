@@ -3,7 +3,7 @@
      extern "C" {
      #endif
 #define _BAOMUS_H_
-#define _BAOMUS_VERSION "2021w24-2217"
+#define _BAOMUS_VERSION "2021w27-1837"
 
 /* TODO:
      - chords
@@ -19,6 +19,48 @@
 
 #define MAX_SCALE_SIZE 21 /* 3x a major scale in western tuning >> max 32 intervals per octave */
 
+#ifdef DEFNOTES
+     #define LC -12
+     #define LDb -11
+     #define LD -10
+     #define LEb -9
+     #define LE -8
+     #define LF -7
+     #define LGb -6
+     #define LG -5
+     #define LAb -4
+     #define LA -3
+     #define LBb -2
+     #define LB -1
+     
+     #define C 0
+     #define Db 1
+     #define D 2
+     #define Eb 3
+     #define E 4
+     #define F 5
+     #define Gb 6
+     #define G 7
+     #define Ab 8
+     #define A 9
+     #define Bb 10
+     #define B 11
+     
+     #define HC 12
+     #define HDb 13
+     #define HD 14
+     #define HEb 15
+     #define HE 16
+     #define HF 17
+     #define HGb 18
+     #define HG 19
+     #define HAb 20
+     #define HA 21
+     #define HBb 22
+     #define HB 23
+     
+     #define X -127
+#endif /* DEFNOTES */
 
 typedef int8_t interval_t;
 typedef int8_t octave_t;
@@ -33,6 +75,11 @@ typedef struct tuningSystem_t_{
      float octMult; /* octave multiplier: you must multiply freq by this to obtain the same note in the next octave */
      uint8_t intervals; /* how many intervals an octave is divided in */
 } tuningSystem_t;
+
+typedef struct note_t_{
+     interval_t interval;
+     float len;
+} note_t;
 
 void tuningInit(tuningSystem_t* ton, float rootFreq, float octMult, uint8_t intervals){
           ton->rootFreq = rootFreq;
@@ -124,9 +171,15 @@ static __inline__ uint8_t wrapzDone(uint8_t input, uint8_t wrapper){ /* how many
 static __inline__ float freqMaker(tuningSystem_t tun, octave_t octShift, scale_t scale, interval_t interval_in){
      if(interval_in==-127){ return 0; } /* pause */
      if(interval_in<0){
-          octShift -= wrapzDone(-interval_in, scale.size)+1; /*jjj*/
+          octShift -= wrapzDone(-interval_in, scale.size)+1;
           /*octShift--;*/
           interval_in = scale.size - wrapz(-interval_in, scale.size);
+          /*printf("%u %u\n", interval_in, wrapzDone(-interval_in, scale.size));*/
+     }
+     if(interval_in>=scale.size){
+          octShift += wrapzDone(interval_in, scale.size)+1;
+          /*octShift--;*/
+          interval_in = scale.size + wrapz(interval_in, scale.size);
           /*printf("%u %u\n", interval_in, wrapzDone(-interval_in, scale.size));*/
      }
      return octX(

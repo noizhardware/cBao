@@ -4,8 +4,7 @@
      extern "C" {
      #endif
 #define _BAOSND_H_
-
-/* 2021g14-1606 */
+#define _BAOSND_VERSION "2021w28-1644"
 
 /***
 # ANSI C sound library
@@ -91,7 +90,6 @@ Compile with:
 
  #### TODO:
      * need to adjust these functions so they can maintain state and rely on phase instead of frequency:
-          - saw
           - sq
           - asr
      * exp envelope generator
@@ -137,7 +135,7 @@ Compile with:
 #define MINIAUDIO_IMPLEMENTATION
      #include "miniaudio.h"
 
-     static float clk = 0;
+     static uint32_t clk = 0;
      static float tt = 0;
      int32_t DEVICE_FORMAT;
      int32_t DEVICE_CHANNELS;
@@ -226,8 +224,8 @@ Compile with:
 
 #define WAVE_PRE_SOUND \
      for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
-          clk*=(clk<FLT_MAX); /* 0 to 1 continually rising, zeroes out when float is at its max value, to prevent float overflow - might cause a discontinuity after 227,730,624,142,661,179,698,216,735 years of continuous running at 48kHz. Needs fixing LoL. */ \
-          tt = clk/DEVICE_SAMPLE_RATE; /* same problem here LoL */
+          clk*=(clk<0xFFFFFFFF); /* continually rising, zeroes out when uint32 is at its max value, to prevent overflow - might cause a discontinuity after ~24 hours continuously running */ \
+          tt = ((float)clk)/DEVICE_SAMPLE_RATE; /* same problem here */
           
 #define WAVE_END \
           clk++; \
@@ -330,8 +328,8 @@ static __inline__ float tik(float interval, float len, float offset){
      return    (len<=0)*(fmod(tt-offset, interval)==0) +
                (len>0)*((fmod(tt-offset, interval)>=0)&&(fmod(tt-offset, interval)<=(len)));}
 static __inline__ float tikS(float interval, float len, float offset){ /* same, but in SAMPLES */
-     return    (len<=0)*(fmod(clk-offset, interval)==0) +
-               (len>0)*((fmod(clk-offset, interval)>=0)&&(fmod(clk-offset, interval)<=(len)));}
+     return    (len<=0)*(fmod(((float)clk)-offset, interval)==0) +
+               (len>0)*((fmod(((float)clk)-offset, interval)>=0)&&(fmod(((float)clk)-offset, interval)<=(len)));}
 
 #define sh(i, t) sh_(i, t, __COUNTER__) /* call the sh_() function with a preprocessor-generated unique ID - naaaasty */
 static __inline__ float sh_(float in, float trig, uint8_t sh_state_id){
@@ -346,11 +344,19 @@ static __inline__ float gate(float in, float th){
 /**************************************/
 #define RISE 1
 #define FALL 0
-static __inline__ float saw(float freq, bool rise){
+/*static __inline__ float saw(float freq, bool rise){*/
      /* (DEVICE_SAMPLE_RATE/freq) == wavelength, unit of measurement: samples 
      DEVICE_SAMPLE_RATE * wavelength(in seconds) == DEVICE_SAMPLE_RATE * (1/freq) */
-     return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2.-1.)) +
-     (!rise*((1.-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2.-1.));}
+     /*return (rise*(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)*2.-1.)) +
+     (!rise*((1.-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2.-1.));
+}*/
+
+#define saw(f, r) sawwave(f, r, __COUNTER__) /* call the saw() function with a preprocessor-generated unique ID - naaaasty */
+static __inline__ float sawwave(float freq, bool rise, uint8_t unique_id){
+     global_cycles[unique_id]++; /* incrementing the number of cycles on each sample. unit of measurement: cycles */
+     return (rise*(fmod(global_cycles[unique_id], ((float)DEVICE_SAMPLE_RATE/freq))/((float)DEVICE_SAMPLE_RATE/freq)*2.-1.)) +
+     (!rise*((1.-(fmod(global_cycles[unique_id], ((float)DEVICE_SAMPLE_RATE/freq))/((float)DEVICE_SAMPLE_RATE/freq)))*2.-1.));
+}
 
 static __inline__ float asr(float freq, float attack, float sustain, float release){
      /*
@@ -361,19 +367,19 @@ static __inline__ float asr(float freq, float attack, float sustain, float relea
           C = squarewave, ON for (attack+sustain+release)seconds, then 0 to delete the last part, until the next cycle
      */
      return 
-     clip((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)) * (1.f/attack)*(1.f/freq), 1.f) /* rising trapezoid */
+     clip((fmod(((float)clk), (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)) * (1.f/attack)*(1.f/freq), 1.f) /* rising trapezoid */
      * clip(
           (1.-(fmod(
-               clk
+               ((float)clk)
                     + ((DEVICE_SAMPLE_RATE/freq) - (DEVICE_SAMPLE_RATE*attack + DEVICE_SAMPLE_RATE*sustain + DEVICE_SAMPLE_RATE*release))
                , (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))) * (1.f/release)*(1.f/freq)
           , 1.f) /* falling trapezoid */
-     * (float)((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))
+     * (float)((fmod(((float)clk), (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))
           < ((DEVICE_SAMPLE_RATE*(attack+sustain+release))/(DEVICE_SAMPLE_RATE/freq)) ); /* squarewave that stays ON only in the a+s+r phase */
 }
      
 static __inline__ float sq(float freq, float duty){
-     return (float)((fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2.f-1.f;}
+     return (float)((fmod(((float)clk), (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2.f-1.f;}
 
 #define sn(f) sinewave(f, __COUNTER__) /* call the sine() function with a preprocessor-generated unique ID - naaaasty */
 static __inline__ float sinewave(float freq, uint8_t unique_id){
