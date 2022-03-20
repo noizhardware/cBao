@@ -14,10 +14,7 @@ extern "C" {
  - all non-malloc functions should be functionname(), while legacy malloc-burdened functions should be functionname_()
  * prepend to string
  * file to string: bool ftos(fileName, char* buf) >> fills the buffer, returns 1 if buffer space was enough to contain the file, 0 if not
- 
- 
- - nice ideas: https://wiki.xxiivv.com/site/defunct.html
- 
+  
 */
 
 #include <stdio.h>
@@ -33,24 +30,6 @@ extern "C" {
 #define str(x) # x
 #define xstr(x) str(x)
 /* DEFINES end. */
-
-/**** quick embeddable functions, no deps */
-	long int slen(char* s){
-		long int i = 0;
-		while(s[i]!='\0'){
-			i++;
-		}
-		return i;
-	}
-
-	void scpy(char* src, char* dest){
-		int i = 0;
-		while((dest[i] = src[i]) != '\0'){
-			i++;
-		}
-		return;
-	}
-/* quick embeddable functions END. */
 
 /* prototypes */
 static __inline__ char* toUpper(char* str);
