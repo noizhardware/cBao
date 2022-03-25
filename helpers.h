@@ -1,7 +1,7 @@
 #ifndef _HELPERS_H_
 #define _HELPERS_H_
 
-#define HELPERS_VERSION "2022c20-1851"
+#define HELPERS_VERSION "2022c22-1805"
 /**** quick embeddable functions, no deps */
 
 /*** TODO
@@ -9,6 +9,7 @@
 */
 
 /*** INCLUDES */
+#include <stdint.h>
 /* INCLUDES end. */
 
 #ifdef __cplusplus
@@ -17,25 +18,27 @@
 
 /*** DEFINES */
 	#define ERROR_BLOC printf("%c%c",219, 219)
+	#define OK_BLOC printf("%c%c",176, 176)
 /* DEFINES end. */
 
 /*** TYPEDEFS */
+	typedef uint8_t bool_t;
 /* TYPEDEFS end. */
 
 /*** GLOBALS */
 /* GLOBALS end. */
 
 /*** FUNCTION DECLARATIONS */
-	long int slen(char* s);
+	uint32_t slen(char* s);
 	char* scpy(char* dest, char* src);
-	char ctri(char c); /* char is trimmable */
+	bool_t ctri(char c); /* char is trimmable */
 	char* stri(char* s); /* string trim */
-	char sequ(char* a, char* b); /* string is equal */
+	bool_t sequ(char* a, char* b); /* string is equal */
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
-	long int slen(char* s){
-		long int i = 0;
+	uint32_t slen(char* s){
+		uint32_t i = 0;
 		while(s[i]!='\0'){
 			i++;
 		}
@@ -43,20 +46,20 @@
 	}
 
 	char* scpy(char* dest, char* src){
-		int i = 0;
+		uint32_t i = 0;
 		while((dest[i] = src[i]) != '\0'){
 			i++;
 		}
 		return dest;
 	}
 	
-	char ctri(char c){ /* char is trimmable */
+	bool_t ctri(char c){ /* char is trimmable */
 		return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 	}
 	
 	char* stri(char* s){ /* string trim */
 		char* end;
-		long int len = 0;
+		uint32_t len = 0;
 		char* temp = s;
 		int i = 0;
 
@@ -85,10 +88,10 @@
 		return s;
 	}
 	
-	char sequ(char* a, char* b){ /* string is equal */
-		long int i;
-		long int lena = 0;
-		long int lenb = 0;
+	bool_t sequ(char* a, char* b){ /* string is equal */
+		uint32_t i;
+		uint32_t lena = 0;
+		uint32_t lenb = 0;
 
 		while(a[lena]!='\0'){ /* slen() */
 			lena++;
