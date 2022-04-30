@@ -4,7 +4,7 @@
      extern "C" {
      #endif
 #define _BAOSND_H_
-#define _BAOSND_VERSION "2021w28-1644"
+#define _BAOSND_VERSION "2022d29-1340"
 
 /***
 # ANSI C sound library
@@ -16,10 +16,10 @@ Sample usage:
 ~~~~
 #include "baosnd.h"
      -- global variable and function definitions here
-WAVE_BEGIN(F32, MONO, 48000);
+WAVE_BEGIN(MONO, 48000);
      -- audio-callback variable definitions here
 WAVE_PRE_SOUND;
-     sndOut = sine(432.);
+     sndOut = sn(432.);
 WAVE_END;
 
 int main(){
@@ -133,13 +133,18 @@ Compile with:
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
 #define MINIAUDIO_IMPLEMENTATION
-     #include "miniaudio.h"
+	#include "miniaudio.h"
 
-     static uint32_t clk = 0;
-     static float tt = 0;
-     int32_t DEVICE_FORMAT;
-     int32_t DEVICE_CHANNELS;
-     int32_t DEVICE_SAMPLE_RATE;
+	static uint32_t clk = 0;
+	static float tt = 0.f;
+		typedef struct timelong_t_{
+			uint32_t inte;
+			float frac;
+		}timelong_t;
+		static timelong_t ttLong = {0, 0.f};
+	int32_t DEVICE_FORMAT;
+	int32_t DEVICE_CHANNELS;
+	int32_t DEVICE_SAMPLE_RATE;
 
 
 /* Formats: */
@@ -224,8 +229,11 @@ Compile with:
 
 #define WAVE_PRE_SOUND \
      for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
-          clk*=(clk<0xFFFFFFFF); /* continually rising, zeroes out when uint32 is at its max value, to prevent overflow - might cause a discontinuity after ~24 hours continuously running */ \
-          tt = ((float)clk)/DEVICE_SAMPLE_RATE; /* same problem here */
+          clk*=(clk<0xFFFFFFFF); /* continually rising, zeroes out when uint32 is at its max value, to prevent overflow - might cause a discontinuity after ~27 hours continuously running @ 44100Hz */ \
+		  ttLong.inte += ((clk % DEVICE_SAMPLE_RATE)==0);\
+		  ttLong.frac = ((float)(clk-(ttLong.inte-1)*DEVICE_SAMPLE_RATE))/((float)DEVICE_SAMPLE_RATE);\
+		  tt = ((float)(ttLong.inte-1)) + ttLong.frac;
+          /*tt = ((float)clk)/DEVICE_SAMPLE_RATE;*/ /* same problem here */
           
 #define WAVE_END \
           clk++; \
@@ -324,9 +332,26 @@ static __inline__ float mix(uint8_t qty, ...){
 static __inline__ float inv(float sig){
      return -sig;}
 
-static __inline__ float tik(float interval, float len, float offset){
+float tik(float interval, float len, float offset){
      return    (len<=0)*(fmod(tt-offset, interval)==0) +
                (len>0)*((fmod(tt-offset, interval)>=0)&&(fmod(tt-offset, interval)<=(len)));}
+
+float tikLong(timelong_t interval){/* kak not working properly in the frac part */
+	return ((ttLong.inte % interval.inte)==0) && (ttLong.frac==interval.frac);
+}
+float tikInt(uint32_t interval){
+	return ((ttLong.inte % interval)==0) && (ttLong.frac==0.f);
+}
+
+float AAtik_(float interval, float len, float offset, uint8_t unique_id);
+#define AAtik(interval, len, offset) tik_(interval, len, offset, __COUNTER__) /* call the tik_() function with a preprocessor-generated unique ID - naaaasty */
+float AAtik_(float interval, float len, float offset, uint8_t unique_id){ /* kak bhooooooooooo non funzia */
+	float out = (float)(global_cycles[unique_id] == 0.f);
+	(void)len;
+	(void)offset;
+	global_cycles[unique_id] = fmod(global_cycles[unique_id] + ((1.f/interval) / (float)(DEVICE_SAMPLE_RATE)), 1.f);
+	return out;
+ }
 static __inline__ float tikS(float interval, float len, float offset){ /* same, but in SAMPLES */
      return    (len<=0)*(fmod(((float)clk)-offset, interval)==0) +
                (len>0)*((fmod(((float)clk)-offset, interval)>=0)&&(fmod(((float)clk)-offset, interval)<=(len)));}
