@@ -1,7 +1,7 @@
 #ifndef _HELPERS_H_
 #define _HELPERS_H_
 
-#define HELPERS_VERSION "2022d08-1330"
+#define HELPERS_VERSION "2022e09-1502"
 /**** quick embeddable functions, no deps */
 
 /*** TODO
@@ -31,15 +31,33 @@
 /*** FUNCTION DECLARATIONS */
 	uint32_t slen(const char* s);
 	char* scpy(char* dest, const char* src);
+
 	bool_t ctri(const char c); /* char is trimmable */
 	char* stri(char* s); /* string trim */
 	bool_t sequ(const char* a, const char* b); /* string is equal */
+	bool_t ssta(const char* str, const char* with); /* string starts with */
+
 	bool_t sisi(const char* s); /* string is int */
 	bool_t ciui(const char c); /* char is uint */
 	uint16_t su16(const char* s); /* string to uint16 */
+	
+	int minn(int a, int b);
+	
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+	int minn(int a, int b){
+		return a*(a<b) + b*(b<a) + a*(a==b);
+	}
+
+	bool_t ssta(const char* str, const char* with){
+		uint32_t i;
+		size_t c = 0;
+		for(i=0; i<((uint32_t)minn(slen(with),slen(str))); i++){
+			c += str[i]==with[i];
+		}
+		return (c==slen(with))&&(slen(with)<=slen(str)); /* "with" must be smaller OR EQUAL to the string! if they are the same, we will return true */
+	}
 
 	bool_t sisi(const char* s){ /* string is int */
 		int ii = 0;
