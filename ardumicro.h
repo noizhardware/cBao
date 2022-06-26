@@ -6,6 +6,8 @@
 
      #define RX 0
      #define TX 1
+     #define SDA 2
+     #define SCL 3
 
      #define RXLED 17
      #define SS RXLED /* they're connected */
@@ -22,5 +24,8 @@
      #define A3 A3
      #define A4 A4
      #define A5 A5
+
+     #define 4 A6
+     #define 6 A7
 
 #endif /* _ARDUMICRO_H_ */

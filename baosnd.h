@@ -4,7 +4,7 @@
      extern "C" {
      #endif
 #define _BAOSND_H_
-#define _BAOSND_VERSION "2022d29-1340"
+#define _BAOSND_VERSION "2022f21-1654"
 
 /***
 # ANSI C sound library
@@ -317,7 +317,8 @@ static __inline__ float hwavn(float sig){
      return (sig*(sig<0));}
 
 static __inline__ float fwav(float sig){
-     return (sig*(sig>0))-(sig*(sig<0));}
+     /*return (sig*(sig>0))-(sig*(sig<0));}*/
+     return (float)fabs(sig);}
 
 static __inline__ float mix(uint8_t qty, ...){
      va_list ap;
