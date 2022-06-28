@@ -25,6 +25,21 @@
 #endif
 
 /*** DEFINES */
+	#ifdef __linux__
+		/* linux code goes here */
+	#elif _WIN32
+		/*  windows code goes here */
+		#define GETCH_ENTER 13
+		#define GETCH_BACKSPACE 8
+		#define GETCH_SPECIAL (-32)
+		#define GETCH_ARROW_LEFT 75
+		#define GETCH_ARROW_RIGHT 77
+		#define GETCH_ARROW_UP 72
+		#define GETCH_ARROW_DOWN 80
+
+	#else
+
+	#endif
 /* DEFINES end. */
 
 /*** TYPEDEFS */
