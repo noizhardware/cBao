@@ -63,7 +63,7 @@ Compile with:
 
 ### System variables:
      - `DEVICE_NAME` : string containing the name of the currently selected audio device
-     - `clk` : float, [0..FLT_MAX], constantly rising, +1 at each sample
+     - `clk` : uint32, [0..UINT32_MAX], constantly rising, +1 at each sample
      - `tt` : float, seconds from the start of the program
      
 ### Signal Generators: (output in range [-1..1])
