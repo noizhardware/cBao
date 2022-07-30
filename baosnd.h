@@ -4,7 +4,7 @@
      extern "C" {
      #endif
 #define _BAOSND_H_
-#define _BAOSND_VERSION "2022f21-1654"
+#define _BAOSND_VERSION "2022g30-1449"
 
 /***
 # ANSI C sound library
@@ -89,6 +89,8 @@ Compile with:
      * `asr(freq, attack, sustain, release)` : looping ASR envelope generator - range [0..1]
 
  #### TODO:
+ 	 - tidy the fuck up
+     * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
      * need to adjust these functions so they can maintain state and rely on phase instead of frequency:
           - sq
           - asr
@@ -97,7 +99,6 @@ Compile with:
      * linear interpolator
      * ttog : trigger to gate
      * flipflop (for triggers)
-     * **separate : _baosnd.h_ for OS backend and _baodsp.h_ for functions**
      * range(sig, x, y, z, w) : shift signal range from [x..y] to [z..w]
      * ntof(root) - fton(root)
      * linn(a, b, t) - linearly interpolate a to b in t time
@@ -124,7 +125,7 @@ Compile with:
 ***/
 
 #include <stdbool.h>
-#include <math.h>
+/* #include <math.h> not needed for now, I'm using fast_sin() */
 #include <float.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -377,6 +378,43 @@ static __inline__ float gate(float in, float th){
      (!rise*((1.-(fmod(clk, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq)))*2.-1.));
 }*/
 
+/* from https://gist.github.com/orlp/1501b5faa56b592683d5 */
+static __inline__ double fast_sin(double x) {
+    /* Polynomial constants generated with sollya.
+    fpminimax(sin(x), [|1,3,5,7|], [|D...|], [-pi/2;pi/2]);
+    Both relative and absolute error is 9.39e-7. */
+    const double magicround =  6755399441055744.0;
+    const double negpi      = -3.14159265358979323846264338327950288;
+    const double invpi      =  0.31830988618379067153776752674502872;
+    const double a          = -0.00018488140186756154724131984146140;
+    const double b          =  0.00831189979755905285208061883395203;
+    const double c          = -0.16665554092439083255783316417364403;
+    const double d          =  0.99999906089941981157664940838003531;
+    float x2, p;
+    union uType{
+    	double x;
+    	uint64_t i;
+    } u;
+    uint64_t odd_period;
+
+    /* Range-reduce to [-pi/2, pi/2] and store if period is odd. */
+    /*union { float x; uint64_t i; } u { invpi*x + magicround };*/
+    u.x = invpi*x + magicround;
+    odd_period = u.i << 63;
+    u.x = x + negpi*(int32_t)(u.i & 0xffffffff);
+
+    /* 7th degree odd polynomial followed by IEEE754 sign flip on odd periods. */
+    x2 = u.x*u.x;
+    p = d + x2*(c + x2*(b + x2*a));
+    u.i ^= odd_period;
+    return u.x * p;
+}
+
+static __inline__ float fast_cos(float x) {
+    const float pi_2 =  1.57079632679489661923132169163975144;
+    return fast_sin(x + pi_2);
+}
+
 #define saw(f, r) sawwave(f, r, __COUNTER__) /* call the saw() function with a preprocessor-generated unique ID - naaaasty */
 static __inline__ float sawwave(float freq, bool rise, uint8_t unique_id){
      global_cycles[unique_id]++; /* incrementing the number of cycles on each sample. unit of measurement: cycles */
@@ -430,7 +468,8 @@ static __inline__ float sinewave(float freq, uint8_t unique_id){
           phase = cycle*2*PI
           y(t) = sin(2 * PI * freq * time + phase_offset) -- TODO: user-exposed phase offset
       */
-     return (float)sin((double)(global_cycles[unique_id] * (float)MA_TAU));} /* multiplying cycles by MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
+     return (float)fast_sin((double)(global_cycles[unique_id] * (float)MA_TAU));} /* multiplying cycles by MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
+     /*return (float)sin((double)(global_cycles[unique_id] * (float)MA_TAU));}*/ /* multiplying cycles by MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
      
 static __inline__ float noiw(){ /* white noise - based on https://github.com/velipso/sndfilter/blob/master/src/reverb.c*/
 	static uint32_t seed = 123; /* doesn't matter */
