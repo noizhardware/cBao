@@ -10,7 +10,7 @@
      #define SCL 3
 
      #define RXLED 17
-     #define SS RXLED /* they're connected */
+     #define SS RXLED /* they're connected together */
      #define TXLED 30
      #define LED_BUILTIN 13 /* green LED */
 
@@ -25,7 +25,7 @@
      #define A4 A4
      #define A5 A5
 
-     #define 4 A6
-     #define 6 A7
+     #define A6 4
+     #define A7 6
 
 #endif /* _ARDUMICRO_H_ */
