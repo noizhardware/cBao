@@ -36,6 +36,8 @@
 	char* stri(char* s); /* string trim */
 	bool_t sequ(const char* a, const char* b); /* string is equal */
 	bool_t ssta(const char* str, const char* with); /* string starts with */
+		
+		uint16_t sunc(const char* src, char unti, char* dest); /* string until char */
 
 	bool_t sisi(const char* s); /* string is int */
 	bool_t ciui(const char c); /* char is uint */
@@ -46,6 +48,19 @@
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+	uint16_t sunc(const char* src, char unti, char* dest){ /* string until char */
+		uint16_t i = 0;
+		while(src[i]!='\0' && src[i]!=unti){
+			dest[i] = src[i];
+			i++;
+		}
+		dest[i] = '\0';
+		if(src[i]!='\0'){
+			i++;
+		}
+		return i;
+	}
+	
 	int minn(int a, int b){
 		return a*(a<b) + b*(b<a) + a*(a==b);
 	}
