@@ -4,7 +4,7 @@
      extern "C" {
      #endif
 #define _BAOSND_H_
-#define _BAOSND_VERSION "2022g30-1449"
+#define _BAOSND_VERSION "2022k20-1753"
 
 /***
 # ANSI C sound library
@@ -38,7 +38,7 @@ Short mode:
 ~~~~
 #include "baosnd.h"
      -- global variable and function definitions here
-WAVE_BEGIN(F32, MONO, 48000);
+WAVE_BEGIN(MONO, 48000);
      -- audio-callback variable definitions here
 WAVE_PRE_SOUND;
      sndOut = (
@@ -122,6 +122,8 @@ Compile with:
      - file output (.wav)(.mp3)
      - midi CC-notes input (http://www.cs.cmu.edu/~rbd/software/midi.htm)
      - OSC input
+
+     - http://eceweb1.rutgers.edu/~orfanidi/intro2sp/#cfunct nice DSP code snippets
 ***/
 
 #include <stdbool.h>
@@ -163,10 +165,11 @@ Compile with:
 
 #define MUTE 0.* /* use to quickly mute a part of a function */
 
-#define SND_INIT \
+#define SND_INIT_VARS \
      ma_device_config deviceConfig; \
      ma_device device; \
-      \
+
+#define SND_INIT_SETUP \
      /* audio output device configuration */ \
      deviceConfig = ma_device_config_init(ma_device_type_playback); /* initialize for playback (not capture) */ \
      deviceConfig.playback.format   = DEVICE_FORMAT; \
@@ -181,6 +184,10 @@ Compile with:
           printf("Failed to open playback device.\n"); \
           return -4;} \
      /**************************************/ \
+
+#define SND_INIT \
+	SND_INIT_VARS \
+	SND_INIT_SETUP \
      
 #define SND_START \
      /* this is the actual sound start */ \
@@ -228,13 +235,19 @@ Compile with:
      #endif
 #endif
 
-#define WAVE_PRE_SOUND \
-     for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){ \
+#define WAVE_PRE_SOUND_A \
+     for(SampleIndex = 0; SampleIndex < frameCount; SampleIndex++){
+
+#define WAVE_PRE_SOUND_B \
           clk*=(clk<0xFFFFFFFF); /* continually rising, zeroes out when uint32 is at its max value, to prevent overflow - might cause a discontinuity after ~27 hours continuously running @ 44100Hz */ \
 		  ttLong.inte += ((clk % DEVICE_SAMPLE_RATE)==0);\
 		  ttLong.frac = ((float)(clk-(ttLong.inte-1)*DEVICE_SAMPLE_RATE))/((float)DEVICE_SAMPLE_RATE);\
 		  tt = ((float)(ttLong.inte-1)) + ttLong.frac;
           /*tt = ((float)clk)/DEVICE_SAMPLE_RATE;*/ /* same problem here */
+
+#define WAVE_PRE_SOUND \
+		  WAVE_PRE_SOUND_A; \
+		  WAVE_PRE_SOUND_B;
           
 #define WAVE_END \
           clk++; \
@@ -415,11 +428,25 @@ static __inline__ float fast_cos(float x) {
     return fast_sin(x + pi_2);
 }
 
+/* from https://cboard.cprogramming.com/c-programming/105096-fmod.html */
+/* original: double mfmod(double x,double y) { double a; return ((a=x/y)-(int)a)*y; } */
+double fast_fmod(double x,double y){
+	double a = x/y;
+	return (a-((int)a))*y;
+}
+
+
 #define saw(f, r) sawwave(f, r, __COUNTER__) /* call the saw() function with a preprocessor-generated unique ID - naaaasty */
 static __inline__ float sawwave(float freq, bool rise, uint8_t unique_id){
      global_cycles[unique_id]++; /* incrementing the number of cycles on each sample. unit of measurement: cycles */
      return (rise*(fmod(global_cycles[unique_id], ((float)DEVICE_SAMPLE_RATE/freq))/((float)DEVICE_SAMPLE_RATE/freq)*2.-1.)) +
      (!rise*((1.-(fmod(global_cycles[unique_id], ((float)DEVICE_SAMPLE_RATE/freq))/((float)DEVICE_SAMPLE_RATE/freq)))*2.-1.));
+}
+/* with this one I can use my custom phase accumulator */
+float sawPhase(float freq, bool rise, float* phase){
+     *phase = *phase + 1.f; /* incrementing the number of cycles on each sample. unit of measurement: cycles */
+     return (rise*(fast_fmod(*phase, ((float)DEVICE_SAMPLE_RATE/freq))/((float)DEVICE_SAMPLE_RATE/freq)*2.-1.)) +
+     (!rise*((1.-(fast_fmod(*phase, ((float)DEVICE_SAMPLE_RATE/freq))/((float)DEVICE_SAMPLE_RATE/freq)))*2.-1.));
 }
 
 static __inline__ float asr(float freq, float attack, float sustain, float release){
@@ -470,6 +497,12 @@ static __inline__ float sinewave(float freq, uint8_t unique_id){
       */
      return (float)fast_sin((double)(global_cycles[unique_id] * (float)MA_TAU));} /* multiplying cycles by MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
      /*return (float)sin((double)(global_cycles[unique_id] * (float)MA_TAU));}*/ /* multiplying cycles by MA_TAU, doing the conversion (cycles)>>(radians) so I can finally plug the value in the sin() function */
+
+/* with this one I can use my custom phase accumulator */
+float sinPhase(float freq, float* phase){
+	*phase = fast_fmod(*phase + (freq / (float)(DEVICE_SAMPLE_RATE)), 1.f);
+	return (float)fast_sin((double)(*phase * (float)MA_TAU));
+}
      
 static __inline__ float noiw(){ /* white noise - based on https://github.com/velipso/sndfilter/blob/master/src/reverb.c*/
 	static uint32_t seed = 123; /* doesn't matter */

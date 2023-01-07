@@ -46,6 +46,8 @@
 		#define GETCH_ARROW_UP 72
 		#define GETCH_ARROW_DOWN 80
 
+		#define GETCH_F1 59
+
 		#define GETCH_1 49
 		#define GETCH_2 50
 		#define GETCH_3 51

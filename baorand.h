@@ -1,7 +1,7 @@
 #ifndef _BAORAND_H_
 #define _BAORAND_H_
 
-#define BAORAND_VERSION "2022i27-0839"
+#define BAORAND_VERSION "2022w12-1701"
 
 /*** TODO
 
@@ -53,6 +53,7 @@
 		uint64_t xorshift64(uint64_t* state);
 		uint16_t xorshift16(uint16_t* state);
 		static __inline__ void rand_xs32_init(uint32_t seed);
+		static __inline__ void rand_xs32_init_time(void);
 		static __inline__ uint32_t rand_xs32(uint32_t min, uint32_t max);
 		static __inline__ uint32_t rand_xs32_seed(uint32_t* seed, uint32_t min, uint32_t max);
 		static __inline__ void rand_xs16_init(uint16_t seed);
@@ -93,6 +94,12 @@
 
 		static __inline__ void rand_xs32_init(uint32_t seed){
 			baorand_seed32 = seed;
+			return;
+		}
+		static __inline__ void rand_xs32_init_time(void){
+			struct timeval usec;
+			gettimeofday(&usec, NULL);
+			baorand_seed32 = (uint32_t)usec.tv_usec;
 			return;
 		}
 		static __inline__ uint32_t rand_xs32(uint32_t min, uint32_t max){
@@ -142,6 +149,7 @@
 	#endif /* #ifndef BAORAND_8BIT */
 
 	/* from http://www.fractalforums.com/programming/8-bit-random-(unsigned)/ */
+	/* returns values from 1 to 255 inclusive, period is 255 */
 	/* The state must be initialized to non-zero */
 	uint8_t xorshift8(uint8_t* state){
 		uint8_t x = *state;

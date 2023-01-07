@@ -1,13 +1,47 @@
 #ifndef _BAOARDU_H_
 #define _BAOARDU_H_
 
+#define BAOARDU_H_VERSION "2022j22-1317"
 
-#define __inline__ inline /* arduino IDE */
+/*** TODO
 
-void dw(uint8_t pin, bool val);
+*/
+/*** DOCU
 
+*/
 
-/***************************/
+/*** INCLUDES */
+	#include <avr/interrupt.h>
+	#include <avr/sleep.h>
+/* INCLUDES end. */
+
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
+/*** DEFINES */
+	#define __inline__ inline /* arduino IDE */
+/* DEFINES end. */
+
+/*** TYPEDEFS */
+/* TYPEDEFS end. */
+
+/*** GLOBALS */
+/* GLOBALS end. */
+
+/*** FUNCTION DECLARATIONS */
+	void dw(uint8_t pin, bool val); /* slim digitalWrite */
+	void arduStop();
+	void arduReset(); /* Restarts program from beginning but does not reset the peripherals and registers */
+/* FUNCTION DECLARATIONS end. */
+
+/*** FUNCTION DEFINITIONS */
+void arduStop(){
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	cli();  // Disable interrupts
+	sleep_mode();
+	return;
+}
 
 void dw(uint8_t pin, bool val){ /* slim digitalWrite */
      uint8_t bit = digitalPinToBitMask(pin);
@@ -35,6 +69,7 @@ void dw(uint8_t pin, bool val){ /* slim digitalWrite */
 
      // cacca - anche questo
      // SREG = oldSREG;
+     return;
 }
 
 // // cacca: usually already defined in baothread.h
@@ -51,6 +86,11 @@ void dw(uint8_t pin, bool val){ /* slim digitalWrite */
 //      return cond;} /* retuns whether the (cycleLength) time has passed or not */
 
 void arduReset(){ /* Restarts program from beginning but does not reset the peripherals and registers */
-     asm volatile ("  jmp 0");}
+	asm volatile ("  jmp 0");
+}
+/* FUNCTION DEFINITIONS end. */
 
+#ifdef __cplusplus
+	}
+#endif
 #endif /* _BAOARDU_H_ */

@@ -292,7 +292,7 @@ and kkSHIFT_ESC_REL things, still to complete
 #define kkF12 364
      #define kkF12_REL 33132
 
-static __inline__ uint8_t kbdToChar(uint16_t kbd){ /* returns 0 if not typable */
+static __inline__ char kbdToChar(uint16_t kbd){ /* returns 0 if not typable */
      return
           'q'*(kbd==kkQ) +
                'Q'*(kbd==kkQ_CAP) +

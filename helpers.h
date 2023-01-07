@@ -5,7 +5,9 @@
 /**** quick embeddable functions, no deps */
 
 /*** TODO
-	- nice ideas: https://wiki.xxiivv.com/site/defunct.html
+	- nice ideas: 
+		- https://wiki.xxiivv.com/site/defunct.html
+		- https://git.sr.ht/~rostiger/logbook/tree/main/item/standard/standard.h
 */
 
 /*** INCLUDES */
