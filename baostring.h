@@ -68,6 +68,7 @@ static __inline__ char* rtrim(char* in);
 static __inline__ char* ltrim(char* in);
 static __inline__ char* trim(char* in);
 
+static __inline__ char* charSwap(char* string, char match, char swap);
 /* prototypes END */
 
 static __inline__ char* charSwap(char* string, char match, char swap){

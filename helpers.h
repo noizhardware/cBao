@@ -1,7 +1,7 @@
 #ifndef _HELPERS_H_
 #define _HELPERS_H_
 
-#define HELPERS_VERSION "2022j09-1802"
+#define HELPERS_VERSION "2023b24-1435"
 /**** quick embeddable functions, no deps */
 
 /*** TODO
@@ -12,6 +12,7 @@
 
 /*** INCLUDES */
 #include <stdint.h>
+#include "baomath.h"
 /* INCLUDES end. */
 
 #ifdef __cplusplus
@@ -50,7 +51,7 @@
 	uint32_t strHexToUint32(char* s);
 	bool_t strIsHex(char* s);
 	
-	static __inline__ int minn(int a, int b);
+	/*static __inline__ int minn(int a, int b);*/ /* TODO 2023a23-0948 moved to baomath.h */
 	
 /* FUNCTION DECLARATIONS end. */
 
@@ -66,10 +67,6 @@
 			i++;
 		}
 		return i;
-	}
-	
-	static __inline__ int minn(int a, int b){
-		return a*(a<b) + b*(b<a) + a*(a==b);
 	}
 
 	bool_t strStartWith(const char* str, const char* with){

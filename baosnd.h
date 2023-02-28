@@ -4,7 +4,7 @@
      extern "C" {
      #endif
 #define _BAOSND_H_
-#define _BAOSND_VERSION "2022k20-1753"
+#define _BAOSND_VERSION "2023b11-1541"
 
 /***
 # ANSI C sound library
@@ -94,6 +94,7 @@ Compile with:
      * need to adjust these functions so they can maintain state and rely on phase instead of frequency:
           - sq
           - asr
+     * triggered(non-looping) ASR envelope
      * exp envelope generator
      * soft gate
      * linear interpolator
@@ -311,6 +312,12 @@ static float global_cycles[255] = {0.f}; /* to maintain state of phase, unit of 
 /*************************************/
 /************* UTILITIES *************/
 /*************************************/
+
+static __inline__ float* phaseOffset(float* phase, float offset){
+	*phase = *phase + (DEVICE_SAMPLE_RATE * offset);
+	return phase;
+}
+
 static __inline__ float sigNorm(float x){
      return ((x/2)+.5);}
 
@@ -392,6 +399,7 @@ static __inline__ float gate(float in, float th){
 }*/
 
 /* from https://gist.github.com/orlp/1501b5faa56b592683d5 */
+/* see also https://github.com/jamesbowman/sincos , especially for 16bit integer sin/cos */     
 static __inline__ double fast_sin(double x) {
     /* Polynomial constants generated with sollya.
     fpminimax(sin(x), [|1,3,5,7|], [|D...|], [-pi/2;pi/2]);
@@ -471,6 +479,14 @@ static __inline__ float asr(float freq, float attack, float sustain, float relea
      
 static __inline__ float sq(float freq, float duty){
      return (float)((fmod(((float)clk), (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2.f-1.f;}
+
+static __inline__ float sqPhase(float freq, float duty, float* phase){
+	*phase = *phase + 1.f; /* incrementing the number of cycles on each sample. unit of measurement: cycles */
+    return (float)((fmod(*phase, (DEVICE_SAMPLE_RATE/freq))/(DEVICE_SAMPLE_RATE/freq))<duty)*2.f-1.f;
+}
+
+
+
 
 #define sn(f) sinewave(f, __COUNTER__) /* call the sine() function with a preprocessor-generated unique ID - naaaasty */
 static __inline__ float sinewave(float freq, uint8_t unique_id){

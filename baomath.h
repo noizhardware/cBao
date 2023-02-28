@@ -1,12 +1,12 @@
 #ifndef __BAOMATH_H__
 #define __BAOMATH_H__
 
-/* 2022w20-2219 */
+/* 2023a10-2048 */
 
 /* ANSI C compliant <3 */
 
 #include <math.h>
-#include <stdbool.h>
+/*#include <stdbool.h>*/
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -23,9 +23,10 @@ static __inline__ float roundDec(float num, unsigned char prec);
 static __inline__ float roundDec_up(float num, unsigned char prec);
 static __inline__ float fract(float x);
 
-/*static __inline__ int minn(int a, int b);*/
+static __inline__ int minn(int a, int b);
 static __inline__ int maxx(int a, int b);
-static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high);
+/*static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high);*/
+static __inline__ unsigned char inRange(unsigned char x, unsigned char low, unsigned char high);
 /* prototypes END */
 
 static __inline__ float fract(float x){
@@ -41,14 +42,16 @@ static __inline__ float roundDec(float num, unsigned char prec){
 static __inline__ float roundDec_up(float num, unsigned char prec){
      return floor(round_up(pow(10, prec) * num)) / pow(10, prec); }
 
-/* TODO commented out minn() so it doesn't conflict with helpers.h 2022w12-1509 */
-/*static __inline__ int minn(int a, int b){
-     return a*(a<b) + b*(b<a) + a*(a==b);}*/
+static __inline__ int minn(int a, int b){
+     return a*(a<b) + b*(b<a) + a*(a==b);}
 static __inline__ int maxx(int a, int b){
      return a*(a>b) + b*(b>a) + a*(a==b);}
 
-static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high) { 
-     return  ((x-low) <= (high-low));}
+/*static __inline__ bool inRange(unsigned char x, unsigned char low, unsigned char high) { 
+     return  ((x-low) <= (high-low));}*/
+static __inline__ unsigned char inRange(unsigned char x, unsigned char low, unsigned char high){ 
+	return ((x-low) <= (high-low));
+}
 
 
 /* from: https://github.com/FHowington/CPUEngine/blob/d1c6f4abeff330ba4ab6b4a6098ae460e7bb4ffc/src/rasterize.cpp#L19 */
