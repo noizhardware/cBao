@@ -8,6 +8,8 @@
 	- nice ideas: 
 		- https://wiki.xxiivv.com/site/defunct.html
 		- https://git.sr.ht/~rostiger/logbook/tree/main/item/standard/standard.h
+
+	- differentiable smoothfloor function: f(x) = x - sin(2πx)/(2π)
 */
 
 /*** INCLUDES */
@@ -46,6 +48,7 @@
 	bool_t charIsUint(const char c); /* char is uint */
 	bool_t strIsFloat(const char* s);
 	float strToFloat(char* s);
+	uint8_t strToUint8(const char* s); /* string to uint8 */
 	uint16_t strToUint16(const char* s); /* string to uint16 */
 	uint32_t strToUint32(char* s);
 	uint32_t strHexToUint32(char* s);
@@ -113,6 +116,15 @@
 		return (c >= '0' && c <= '9');
 	}
 	
+	/* TODO : none of those have any form of clipping/signflip prevention */
+	uint8_t strToUint8(const char* s){ /* string to uint8 */
+		uint8_t n = 0, ii = 0;
+		char c;
+		while((c = s[ii++])){
+			n = n * 10 + (c - '0');
+		}
+		return n;
+	}	
 	uint16_t strToUint16(const char* s){ /* string to uint16 */
 		uint16_t n = 0, ii = 0;
 		char c;
@@ -121,7 +133,6 @@
 		}
 		return n;
 	}
-
 	uint32_t strToUint32(char* s){
 		uint32_t n = 0, ii = 0;
 		char c;
