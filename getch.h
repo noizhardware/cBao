@@ -1,7 +1,7 @@
 #ifndef _GETCH_H_
 #define _GETCH_H_
 
-#define GETCH_H_VERSION "2022i24-1753"
+#define GETCH_H_VERSION "202d07-1039"
 
 /*** TODO
 	- define all keys names/codes, cross-platform
@@ -15,7 +15,10 @@
 
 			#include <sys/select.h>
 			#include <stropts.h>
-	#elif _WIN32
+
+			#include <stdbool.h>
+			#include <sys/ioctl.h>
+		#elif _WIN32
 	    /*  windows code goes here */
 		#include <conio.h>
 	#else
@@ -35,11 +38,19 @@
 	#else
 
 	#endif
-	/* common defines */
-		#define GETCH_ENTER 13
+	/* common defines */	
+	#ifdef __linux__
+		#define GETCH_ENTER 10
+	#elif _WIN32
+		f#define GETCH_ENTER 13
+	#endif
 		#define GETCH_SPACE 32
 		#define GETCH_ESC 27
+	#ifdef __linux__
+		#define GETCH_BACKSPACE 127
+	#elif _WIN32
 		#define GETCH_BACKSPACE 8
+	#endif
 		#define GETCH_SPECIAL (-32)
 		#define GETCH_ARROW_LEFT 75
 		#define GETCH_ARROW_RIGHT 77
@@ -116,7 +127,7 @@
 		
 	#ifdef __linux__
 		/* linux code goes here */
-		char getch();
+		int getch();
 	#elif _WIN32
 		/*  windows code goes here */
 	#else
@@ -127,8 +138,8 @@
 /*** FUNCTION DEFINITIONS */
 #ifdef __linux__
 /* linux code goes here */
-	char getch(){
-		char buf = 0;
+	int getch(){
+		int buf = 0;
 		struct termios old = {0};
 		fflush(stdout);
 		if(tcgetattr(0, &old) < 0){
@@ -149,7 +160,7 @@
 		if(tcsetattr(0, TCSADRAIN, &old) < 0){
 			perror("tcsetattr ~ICANON");
 		}
-		/*printf("%c\n", buf);*/
+		/*printf("%d\n", buf);*/
 		return buf;
 	}
 
@@ -161,10 +172,11 @@
 	int kbhit(){
 	    static const int STDIN = 0;
 	    static bool initialized = false;
+	    int bytesWaiting;
 
 	    if (! initialized) {
-	        // Use termios to turn off line buffering
-	        termios term;
+	        /* Use termios to turn off line buffering */
+	        struct termios term;
 	        tcgetattr(STDIN, &term);
 	        term.c_lflag &= ~ICANON;
 	        tcsetattr(STDIN, TCSANOW, &term);
@@ -172,7 +184,6 @@
 	        initialized = true;
 	    }
 
-	    int bytesWaiting;
 	    ioctl(STDIN, FIONREAD, &bytesWaiting);
 	    return bytesWaiting;
 	}

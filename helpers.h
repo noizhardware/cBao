@@ -42,7 +42,7 @@
 	bool_t strEqu(const char* a, const char* b); /* string is equal */
 	bool_t strStartWith(const char* str, const char* with); /* string starts with */
 		
-		uint16_t strUntilChar(const char* src, char unti, char* dest); /* cuts a string BEFORE the provided char, so it won't be included in the output string. returns len of output string */
+	uint16_t strUntilChar(const char* src, char unti, char* dest); /* cuts a string BEFORE the provided char, so it won't be included in the output string. returns len of output string */
 
 	bool_t strIsInt(const char* s); /* string is int */
 	bool_t charIsUint(const char c); /* char is uint */
