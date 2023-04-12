@@ -1,7 +1,7 @@
 #ifndef _HELPERS_H_
 #define _HELPERS_H_
 
-#define HELPERS_VERSION "2023b24-1435"
+#define HELPERS_VERSION "2023d12-2035"
 /**** quick embeddable functions, no deps */
 
 /*** TODO
@@ -15,6 +15,20 @@
 /*** INCLUDES */
 #include <stdint.h>
 #include "baomath.h"
+
+
+	#ifdef __linux__
+	    /* linux code goes here */
+			/*#include <time.h>*/
+		    #include <bits/types/struct_timespec.h>
+			/*#include "miniaudio.h"*/ /* contains some struct timespec definition, maybe */
+			int nanosleep(const struct timespec* req, struct timespec* rem);
+	#elif _WIN32
+	    /*  windows code goes here */
+	#else
+
+	#endif
+
 /* INCLUDES end. */
 
 #ifdef __cplusplus
@@ -53,12 +67,30 @@
 	uint32_t strToUint32(char* s);
 	uint32_t strHexToUint32(char* s);
 	bool_t strIsHex(char* s);
+
+	void sleepMs(uint16_t ms);
 	
 	/*static __inline__ int minn(int a, int b);*/ /* TODO 2023a23-0948 moved to baomath.h */
 	
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+	#ifdef __linux__
+		void sleepMs(uint16_t ms){
+			struct timespec sleepTime = {0, 0};
+			sleepTime.tv_nsec = ms * 100;
+			nanosleep(&sleepTime, NULL);
+			return;
+		}
+	#elif _WIN32
+		void sleepMs(uint16_t ms){
+			Sleep(ms);
+			return;
+		}
+	#else
+
+	#endif
+
 	uint16_t strUntilChar(const char* src, char unti, char* dest){ /* string until char */
 		uint16_t i = 0;
 		while(src[i]!='\0' && src[i]!=unti){
