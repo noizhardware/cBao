@@ -1,7 +1,7 @@
 #ifndef _GETCH_H_
 #define _GETCH_H_
 
-#define GETCH_H_VERSION "202d07-1039"
+#define GETCH_H_VERSION "2023d14-2159"
 
 /*** TODO
 	- define all keys names/codes, cross-platform
@@ -32,25 +32,21 @@
 
 /*** DEFINES */
 	#ifdef __linux__
-		/* linux code goes here */
-	#elif _WIN32
-		/*  windows code goes here */
-	#else
-
-	#endif
-	/* common defines */	
-	#ifdef __linux__
+	/* linux code goes here */
 		#define GETCH_ENTER 10
-	#elif _WIN32
-		f#define GETCH_ENTER 13
-	#endif
-		#define GETCH_SPACE 32
-		#define GETCH_ESC 27
-	#ifdef __linux__
 		#define GETCH_BACKSPACE 127
 	#elif _WIN32
+	/*  windows code goes here */
+		#define GETCH_ENTER 13
 		#define GETCH_BACKSPACE 8
+	#else
 	#endif
+
+	/* common defines */	
+		#define GETCH_SPACE 32
+		#define GETCH_ESC 27
+
+
 		#define GETCH_SPECIAL (-32)
 		#define GETCH_ARROW_LEFT 75
 		#define GETCH_ARROW_RIGHT 77

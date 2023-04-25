@@ -1,7 +1,7 @@
 #ifndef _HELPERS_H_
 #define _HELPERS_H_
 
-#define HELPERS_VERSION "2023d12-2035"
+#define HELPERS_VERSION "2023d14-2158"
 /**** quick embeddable functions, no deps */
 
 /*** TODO
@@ -25,6 +25,7 @@
 			int nanosleep(const struct timespec* req, struct timespec* rem);
 	#elif _WIN32
 	    /*  windows code goes here */
+		#include <windows.h>
 	#else
 
 	#endif
