@@ -432,8 +432,8 @@ static __inline__ double fast_sin(double x) {
 }
 
 static __inline__ float fast_cos(float x) {
-    const float pi_2 =  1.57079632679489661923132169163975144;
-    return fast_sin(x + pi_2);
+    const float pi_halved =  1.57079632679489661923132169163975144;
+    return fast_sin(x + pi_halved);
 }
 
 /* from https://cboard.cprogramming.com/c-programming/105096-fmod.html */

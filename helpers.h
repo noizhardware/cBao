@@ -222,7 +222,7 @@
 		return n;
 	}
 
-	uint32_t strLen(const char* s){
+	uint32_t strLen(const char* s){ /* length of string, NOT counting the terminating '\0' */
 		uint32_t i = 0;
 		while(s[i]!='\0'){
 			i++;
