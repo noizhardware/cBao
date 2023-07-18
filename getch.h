@@ -14,7 +14,9 @@
 			#include <termios.h>
 
 			#include <sys/select.h>
-			#include <stropts.h>
+
+			/* should be useless */
+			/* #include <stropts.h>*/
 
 			#include <stdbool.h>
 			#include <sys/ioctl.h>
