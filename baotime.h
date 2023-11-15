@@ -1,7 +1,7 @@
 #ifndef _BAOTIME_H_
 #define _BAOTIME_H_
 
-#define BAOTIME_VERSION "2021d15-1635"
+#define BAOTIME_VERSION "2023k15-2138"
 
 /*** TODO
  * need to use -Wno-long-long >> define BAOTIME_LONGLONG_ENABLED if you do so
@@ -117,6 +117,7 @@ bool __BAOTIME_H__running = false;
 #endif
 
 #ifdef BAOTIME_LONGLONG_ENABLED
+     struct timezone;
 int gettimeofday(struct timeval* tp, struct timezone* tzp){
     /* Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
      * This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
