@@ -5,6 +5,12 @@
 
 /*** TODO
  * need to use -Wno-long-long >> define BAOTIME_LONGLONG_ENABLED if you do so
+ * you can use
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wlong-long"
+		your code here
+	#pragma GCC diagnostic pop
+
 */
 
 
@@ -258,6 +264,19 @@ static __inline__ uint16_t getDay(){
      time_t t = time(NULL);
      struct tm tm = *localtime(&t);
      return (uint16_t)(tm.tm_mday);}
+
+static __inline__ uint16_t getHour(){
+     time_t t = time(NULL);
+     struct tm tm = *localtime(&t);
+     return (uint16_t)(tm.tm_hour);}
+static __inline__ uint16_t getMin(){
+     time_t t = time(NULL);
+     struct tm tm = *localtime(&t);
+     return (uint16_t)(tm.tm_min);}
+static __inline__ uint16_t getSec(){
+     time_t t = time(NULL);
+     struct tm tm = *localtime(&t);
+     return (uint16_t)(tm.tm_sec);}
 
 /*static __inline__ void getFloowDate(char* storage){
      char* out;
