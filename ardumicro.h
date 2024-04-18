@@ -28,4 +28,7 @@
      #define A6 4
      #define A7 6
 
+     #define D4 4
+     #define D6 6
+
 #endif /* _ARDUMICRO_H_ */
