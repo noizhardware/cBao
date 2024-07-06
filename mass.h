@@ -1,7 +1,7 @@
 #ifndef _MASS_H_
 #define _MASS_H_
 
-#define MASS_H_VERSION "2023a24-1334"
+#define MASS_H_VERSION "2024e20-1631"
 
 /*
 POWERSHELL:
@@ -15,6 +15,7 @@ POWERSHELL:
 - in generale, un migliore sanitizing dei .MASS con errori
 
 - ereditarietà dei types dai PNAM (forse da mettere in grain.h)
+	- soprattutto di `forw`
 
 - clean preprocessor directives
 - le funzioni che hanno a che fare con TOTT e quelle robe li, dovrebbero andare in grain.h
@@ -84,7 +85,7 @@ extern "C" {
 #define MAX_VALUE_LEN 64 /* TODO questo deve essere modificabile dal .mass stesso */
 #define MAX_ELEMS_IN_BLOCK 16 /* TODO questo deve essere modificabile dal .mass stesso */
 
-#define MAX_BLOCKS_IN_ARCHIVE 3000
+#define MAX_BLOCKS_IN_ARCHIVE 16000
 #define MAX_LINE_LEN 64
 
 #define MASS_INLINE_COMMENT "--"
