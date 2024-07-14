@@ -1,7 +1,8 @@
 #ifndef _BITTY_H_
 #define _BITTY_H_
 
-#define BITTY_VERSION "2021e09-1307"
+#define BITTY_LAST "2021e09-1307"
+#define BITTY_VERSION "2024g14-1250"
 /*
      ## setBit (source, bitnumber, bitvalue)
        * takes an 8-bit variable, and sets the (bitnumber)th bit (starting from Right = LSB), [0..7] to the bitvalue [true, false]
@@ -68,6 +69,7 @@
      static __inline__ uint8_t oneCount16 (const uint16_t source);
      
      static __inline__ uint8_t printBits(const uint8_t c); /* without newline */
+	 static __inline__ uint8_t printBits16(const uint16_t c); /* 16bit */
      static __inline__ uint8_t printBitsn(const uint8_t c); /* with newline */
 
      /* BIG ENDIAN and destructive: overwrite source and also return the result, to chain functions */
@@ -121,6 +123,13 @@ static __inline__ uint8_t oneCount16 (const uint16_t source){ /* counts the numb
 static __inline__ uint8_t printBits(const uint8_t c){
      int i;
      for (i = 7; i >= 0; i--){
+          printf("%d", (c >> i) & 1 ? true : false);
+     }
+     return true;
+}
+static __inline__ uint8_t printBits16(const uint16_t c){
+     int i;
+     for (i = 15; i >= 0; i--){
           printf("%d", (c >> i) & 1 ? true : false);
      }
      return true;
