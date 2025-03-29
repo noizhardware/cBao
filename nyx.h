@@ -6,7 +6,8 @@
 
 #include "ardumicro.h"
 
-#define BUZZER A5 /* pin where the piezo buzzer is connected */
+// #define BUZZER A5 /* pin where the piezo buzzer is connected */
+#define BUZZER 9 /* 2025a31-1455 */
 #define VIBRO A4 /* pin where the vibro is connected */
 
 /* pins where the PS/2 keyboard is connected */
@@ -57,7 +58,7 @@ uint16_t DBL(uint16_t x, unsigned char t){
 #define WRYTE_STARTUP_SOUND \
      tone(BUZZER, MORSE_FREQ*4, DOT);
      
-#define WRYTE_FREQ MORSE_FREQ*8
+#define WRYTE_FREQ MORSE_FREQ*2
 
 #define BEEP_WRYTE_EEPROM_ONE \
      tone(BUZZER, WRYTE_FREQ, DOT);
@@ -84,7 +85,7 @@ uint16_t DBL(uint16_t x, unsigned char t){
                     delay(DOT + PAUSE_BETWEEN_SIGNS);\
                     tone(BUZZER, WRYTE_FREQ, DOT);
      #define BEEP_WRYTE_EEPROM_FULL \
-          tone(BUZZER, WRYTE_FREQ*2, DASH*4);
+          tone(BUZZER, WRYTE_FREQ*3, DASH*4);
      
 #define ERROR_SOUND \
      tone(BUZZER, MORSE_FREQ*10, DASH); \

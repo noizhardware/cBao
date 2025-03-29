@@ -132,7 +132,7 @@ static __inline__ float octX(float freq, octave_t oct, float octMult){ /* octave
 /* usage: rootFreq * tet(interval) */
 static __inline__ float tet(uint8_t interval){
      return pow(1.0594630943592953, interval);} /* twelfth root of 2 - https://www.mathwarehouse.com/arithmetic/principal-nth-root-calculator.php */
-     /* it's the root of "2" becouse octaves repeat od doubling(* 2) the frequency */
+     /* it's the root of "2" because octaves repeat on doubling(* 2) the frequency */
 static __inline__ float tet19(uint8_t interval){
      return pow(1.0371550444461919, interval);} /* 19th root of 2 */
 static __inline__ float tet7(uint8_t interval){

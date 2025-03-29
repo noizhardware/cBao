@@ -1,7 +1,8 @@
 #ifndef _BAOKBD_H_
 #define _BAOKBD_H_
 
-#define BAOKBD_VERSION "2021c27-2052"
+#define BAOKBD_VERSION "2025a31-1910"
+#define BAOKBD_VERSION_ "2021c27-2052"
 
 /*** TODO
 
@@ -70,6 +71,8 @@
 
      #define MAX_COMMAND_LEN 80
      
+     #define BAOKBD_LOCK kkF5
+     #define BAOKBD_UNLOCK kkF6
 /* DEFINES end. */
 
 /*** function DEFINES */
@@ -161,14 +164,14 @@ static __inline__ void keyboard_thread(void(*consoleCallback)(char* consoleComma
           if( (c > 0) ){ /* see if keyboard buffer is not empty and is not the mysterious 170 or 250 that appears at startup */
                
                /* keylock */
-               if(c==kkHOME){
+               if(c==BAOKBD_LOCK){
                     keyboardOn = false;
                     keyboardLed_set(KLED_A, ON);
                     #ifdef DEBUG
                          Serial.println("keyboard is LOCKED");
                          #endif
                }
-               else if(c==kkMAIL){
+               else if(c==BAOKBD_UNLOCK){
                     keyboardOn = true;
                     keyboardLed_set(KLED_A, OFF);
                     #ifdef DEBUG
