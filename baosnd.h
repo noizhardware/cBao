@@ -124,7 +124,7 @@ Compile with:
      - midi CC-notes input (http://www.cs.cmu.edu/~rbd/software/midi.htm)
      - OSC input
 
-     - http://eceweb1.rutgers.edu/~orfanidi/intro2sp/#cfunct nice DSP code snippets
+     - http://eceweb1.rutgers.edu/~orfanidi/intro2sp/#cfunct nice DSP code snippets - Sophocles Orphanidis, deceased 2024 :((
 ***/
 
 #include <stdbool.h>
