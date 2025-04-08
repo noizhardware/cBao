@@ -86,7 +86,7 @@ Compile with:
      * `tikS(interval, length, offset)` : jumps to 1 every "interval" SAMPLES, and stays up for "length" SAMPLES. if "length" is 0, it stays up for a single sample(digital trigger)
      * `sh(input, trigger)` : sample and hold, triggers whenever trigger>=1.
      * `gate(input, threshold)` : sound is passing thru only when trigger>=threshold
-     * `asr(freq, attack, sustain, release)` : looping ASR envelope generator - range [0..1]
+     * `asr(freq, attack, sustain, release)` : looping ASR envelope generator - A,S,R in seconds, output range [0..1]
 
  #### TODO:
  	 - tidy the fuck up
