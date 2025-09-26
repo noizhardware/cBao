@@ -1,7 +1,8 @@
 #ifndef _MASS_H_
 #define _MASS_H_
 
-#define MASS_H_VERSION "2024e20-1631"
+#define MASS_H_LAST "2024e20-1631"
+#define MASS_H_VERSION "2025i26-1320"
 
 /*
 POWERSHELL:
@@ -70,8 +71,25 @@ e poi malloc la struct: https://stackoverflow.com/questions/14768230/malloc-for-
 
 /*** INCLUDES */
 #include <wchar.h>
+#include <math.h>
+#include <stdlib.h>
 #include "baostring.h"
-#include "baotime.h"
+
+
+	#ifdef __linux__
+		int max ( int a, int b ) { return a > b ? a : b; }
+	#endif
+
+
+/*#include "baotime.h"*/
+static __inline__ float sec_to_hm(unsigned long int sec){
+     return floor(((float)sec / 3600)) + ((((float)sec / 3600) - floor(((float)sec / 3600))) * 0.6);}
+static __inline__ unsigned long int hm_to_sec(float hm){
+     return (unsigned long int)(floor(hm)*3600) + (unsigned long int)(fmod(hm, 1.0)*6000.f);}
+static __inline__ float hm_add(float a, float b){
+     return sec_to_hm(hm_to_sec(a)+hm_to_sec(b));}
+
+
 #include "helpers.h"
 /* INCLUDES end. */
 

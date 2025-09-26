@@ -1,9 +1,14 @@
 #ifndef _BAOTIME_H_
 #define _BAOTIME_H_
 
-#define BAOTIME_VERSION "2023k15-2138"
+#define BAOTIME_LAST "2023k15-2138"
+#define BAOTIME_VERSION "2025g08-2224"
 
 /*** TODO
+ * 
+ * 2025h24-2201 very fukedup, to rewrite/chack
+ * 
+ * 
  * need to use -Wno-long-long >> define BAOTIME_LONGLONG_ENABLED if you do so
  * you can use
 	#pragma GCC diagnostic push
@@ -14,10 +19,13 @@
 */
 
 
+          #include <time.h> /* for nanosleep */
+          #include <unistd.h> /* for usleep */
+
 /*** INCLUDES */
-#ifndef _POSIX_C_SOURCE
-     #define _POSIX_C_SOURCE 199309L
-#endif
+     #ifndef _POSIX_C_SOURCE
+          #define _POSIX_C_SOURCE 199309L
+     #endif
 
      #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
           #include <time.h>
@@ -30,9 +38,11 @@
 
      #ifdef WIN32
      #elif _POSIX_C_SOURCE >= 199309L
-     #include <time.h> /* for nanosleep */
+          #define _BSD_SOURCE
+          #include <time.h> /* for nanosleep */
+          #include <unistd.h> /* for usleep */
      #else
-     #include <unistd.h> /* for usleep */
+          #include <unistd.h> /* for usleep */
      #endif /* OS switch */
      /**********************************/
 
@@ -42,18 +52,18 @@
 
      /* gettimeofday for WINDOWS */
      #ifdef WIN32
-     #include <stdint.h>
-     /* already defined in c:\mingw\include\sys\time.h:55:8 */
-     /*typedef struct timeval{*/
-     /*     time_t     tv_sec;*/    /* seconds */
-     /*     useconds_t tv_usec;*/   /* microseconds */
-     /*} timeval;*/
+          #include <stdint.h>
+          /* already defined in c:\mingw\include\sys\time.h:55:8 */
+          /*typedef struct timeval{*/
+          /*     time_t     tv_sec;*/    /* seconds */
+          /*     useconds_t tv_usec;*/   /* microseconds */
+          /*} timeval;*/
 
-     /* already defined in c:\mingw\include\time.h:382:22 */
-     /*typedef struct timezone{*/
-          /*int tz_minuteswest; */    /* minutes west of Greenwich */
-          /*int tz_dsttime;  */       /* type of DST correction */
-     /*} timezone;*/
+          /* already defined in c:\mingw\include\time.h:382:22 */
+          /*typedef struct timezone{*/
+               /*int tz_minuteswest; */    /* minutes west of Greenwich */
+               /*int tz_dsttime;  */       /* type of DST correction */
+          /*} timezone;*/
      
 /* INCLUDES end. */
 
@@ -101,25 +111,28 @@ bool __BAOTIME_H__running = false;
      static __inline__ struct timeval elapsed();
      static __inline__ struct timeval getSplit();
      static __inline__ float hm_add(float a, float b);
+     static __inline__ float hm_sub(float a, float b);
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
 
 #ifndef BAOTIME_LONGLONG_ENABLED
-     static __inline__ void startTimer(){
-          clock_gettime(CLOCK_REALTIME, &baotime_start);
-     }
-     static __inline__ double getTimerNs(){
-          clock_gettime(CLOCK_REALTIME, &baotime_end);
-          return ((baotime_end.tv_sec - baotime_start.tv_sec) * 1000000000) +
-                         (baotime_end.tv_nsec - baotime_start.tv_nsec); /* in nanoseconds */
-     }
-     static __inline__ double getTimerMs(){
-          clock_gettime(CLOCK_REALTIME, &baotime_end);
-          return
-               ((baotime_end.tv_sec - baotime_start.tv_sec) * 1000) +
-               ((baotime_end.tv_nsec - baotime_start.tv_nsec) / 1000000); /* in milliseconds */
-     }
+     #ifndef BAOTIME_FUKIT_LINUX
+          static __inline__ void startTimer(){
+               clock_gettime(CLOCK_REALTIME, &baotime_start);
+          }
+          static __inline__ double getTimerNs(){
+               clock_gettime(CLOCK_REALTIME, &baotime_end);
+               return ((baotime_end.tv_sec - baotime_start.tv_sec) * 1000000000) +
+                              (baotime_end.tv_nsec - baotime_start.tv_nsec); /* in nanoseconds */
+          }
+          static __inline__ double getTimerMs(){
+               clock_gettime(CLOCK_REALTIME, &baotime_end);
+               return
+                    ((baotime_end.tv_sec - baotime_start.tv_sec) * 1000) +
+                    ((baotime_end.tv_nsec - baotime_start.tv_nsec) / 1000000); /* in milliseconds */
+          }
+     #endif
 #endif
 
 #ifdef BAOTIME_LONGLONG_ENABLED
@@ -155,6 +168,8 @@ int gettimeofday(struct timeval* tp, struct timezone* tzp){
 
 static __inline__ float hm_add(float a, float b){
      return sec_to_hm(hm_to_sec(a)+hm_to_sec(b));}
+static __inline__ float hm_sub(float a, float b){
+     return sec_to_hm(hm_to_sec(a)-hm_to_sec(b));}
 
 static __inline__ void sleep_ms(int milliseconds){ /* cross-platform sleep function */
      #ifdef WIN32

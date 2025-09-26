@@ -2,7 +2,7 @@
 #define _KONFIG_H_
 
 #define KONFIG_CREATED "2025b21-1332"
-#define KONFIG_VERSION "2025c01-2058s"
+#define KONFIG_VERSION "2025c01-2058"
 
 /*** TODO
 
