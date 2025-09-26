@@ -2,7 +2,7 @@
 #define _MASS_H_
 
 #define MASS_H_LAST "2024e20-1631"
-#define MASS_H_VERSION "2025i26-1320"
+#define MASS_H_VERSION "2025i26-1350"
 
 /*
 POWERSHELL:
@@ -411,7 +411,7 @@ void getFile(char* fileName, massArchive_t* archive, uint8_t verbose){
 						#endif
 					}
 					else{
-						printf("\n::== NAME array too small [%d>>%d] for: \"%s\"\n", (strlen(nameTemp)+1), MAX_NAME_LEN, nameTemp);
+						printf("\n::== NAME array too small [%ld>>%d] for: \"%s\"\n", (strlen(nameTemp)+1), MAX_NAME_LEN, nameTemp);
 						name_arr_full++;
 						strcpy(archive->block[massArchive_index].elem[massElem_index].name, "");
 					}
@@ -426,7 +426,7 @@ void getFile(char* fileName, massArchive_t* archive, uint8_t verbose){
 						#endif
 					}
 					else{
-						printf("::== VALUE array too small [%d>>%d] for: \"%s\"\n", (strlen(token)+1), MAX_VALUE_LEN, token);
+						printf("::== VALUE array too small [%ld>>%d] for: \"%s\"\n", (strlen(token)+1), MAX_VALUE_LEN, token);
 						value_arr_full++;
 						strcpy(archive->block[massArchive_index].elem[massElem_index].value, "");
 					}
@@ -470,7 +470,7 @@ void getFile(char* fileName, massArchive_t* archive, uint8_t verbose){
 									strcpy(archive->block[massArchive_index].elem[massElem_index].name, nameTemp);
 								}
 								else{
-									printf("\n::== NAME array too small [%d>>%d] for: \"%s\"\n", (strlen(nameTemp)+1), MAX_NAME_LEN, nameTemp);
+									printf("\n::== NAME array too small [%ld>>%d] for: \"%s\"\n", (strlen(nameTemp)+1), MAX_NAME_LEN, nameTemp);
 									name_arr_full++;
 									strcpy(archive->block[massArchive_index].elem[massElem_index].name, "");
 								}
@@ -479,7 +479,7 @@ void getFile(char* fileName, massArchive_t* archive, uint8_t verbose){
 									strcpy(archive->block[massArchive_index].elem[massElem_index].value, token);
 								}
 								else{
-									printf("::== VALUE array too small [%d>>%d] for: \"%s\"\n", (strlen(token)+1), MAX_VALUE_LEN, token);
+									printf("::== VALUE array too small [%ld>>%d] for: \"%s\"\n", (strlen(token)+1), MAX_VALUE_LEN, token);
 									value_arr_full++;
 									strcpy(archive->block[massArchive_index].elem[massElem_index].value, "");
 								}
