@@ -2,7 +2,7 @@
 #define _KONFIG_H_
 
 #define KONFIG_CREATED "2025b21-1332"
-#define KONFIG_VERSION "2025c01-2058"
+#define KONFIG_VERSION "2025w14-1502"
 
 /*** TODO
 
@@ -10,7 +10,10 @@
 /*** DOCU
 	- usage:
 		kfgVal_t myValue;
-		kfgGet("myFileName.kfg", "myKey", myValue);
+		kfgGet("myFileName.kfg", "myKey", myValue); ignoring return value
+		or
+		if(strcmp(kfgGet("myFileName.kfg", "myKey", myValue), stringToCompare)){ do something }; to concatenate
+		if(strcmp(kfgGet("myFileName.kfg", "date", myDate), "2025j31-0101")){ printf("date match!"); }; to concatenate
 */
 
 /*** INCLUDES */
@@ -35,11 +38,11 @@
 /* GLOBALS end. */
 
 /*** FUNCTION DECLARATIONS */
-	void kfgGet(char* konfigFileName, char* key, kfgVal_t value); /* will fill `value` string, NULL if not found */
+	kfgVal_t kfgGet(char* konfigFileName, char* key, kfgVal_t value); /* will fill `value` string, NULL if not found */
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
-	void kfgGet(char* konfigFileName, char* key, kfgVal_t value){
+	kfgVal_t kfgGet(char* konfigFileName, char* key, kfgVal_t value){
 		FILE* konfigFile;
 		char line[KFG_MAX_LINE_LEN];
 		char temp[KFG_MAX_LINE_LEN];
@@ -53,14 +56,14 @@
 					strUntilChar(line, KFG_SEPARATOR, temp);
 					if(strEqu(temp+1, key)){
 						strCopy(value, line+strLen(temp)+1);
-						return;
+						return value;
 					}
 				}
 			}
 		}
 		fclose(konfigFile);
 		value = NULL; /* key not found */
-		return;
+		return value;
 	}
 /* FUNCTION DEFINITIONS end. */
 

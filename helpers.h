@@ -1,7 +1,8 @@
 #ifndef _HELPERS_H_
 #define _HELPERS_H_
 
-#define HELPERS_VERSION "2023d14-2158"
+#define HELPERS_LAST "2023d14-2158"
+#define HELPERS_VERSION "2026b27-1054"
 /**** quick embeddable functions, no deps */
 
 /*** TODO
@@ -72,10 +73,92 @@
 	void sleepMs(uint16_t ms);
 	
 	/*static __inline__ int minn(int a, int b);*/ /* TODO 2023a23-0948 moved to baomath.h */
+
+	int32_t fileNumGet(const char* fileName); /* read number from file */
+	int8_t fileNumSet(const char* fileName, uint16_t num, uint8_t len); /* write number to file */
+
 	
 /* FUNCTION DECLARATIONS end. */
 
 /*** FUNCTION DEFINITIONS */
+	#include <stdio.h>
+	#include <stdint.h>
+	int8_t fileNumSet(const char* fileName, uint16_t num, uint8_t len) {
+		/* Check if the requested length can hold the number */
+		uint16_t max_value = 1;
+		uint8_t i;
+		FILE* file;
+		int written;
+		for (i = 0; i < len; i++) {
+			max_value *= 10;
+		}
+		if (num >= max_value) {
+			return -1; /* Number too big for specified length */
+		}
+
+		file = fopen(fileName, "w"); /* open in write mode, wipes file */
+		if (!file) {
+			return -1; /* Could not open file */
+		}
+
+		/* Write number with zero-padding */
+		written = fprintf(file, "%0*u\n", len, num);
+		if (written != len) {
+			fclose(file);
+			return -1; /* Failed to write expected number of digits */
+		}
+
+		if (fclose(file) != 0) {
+			return -1; /* Error closing file */
+		}
+
+		return 1; /* Success */
+	}
+
+	#include <stdio.h>
+	#include <stdint.h>
+	#include <ctype.h>
+	#include <stdlib.h>
+	int32_t fileNumGet(const char* fileName) {
+		FILE* file = fopen(fileName, "r");
+		char buffer[32]; /* Enough for 16-bit numbers and newline */
+		int c;
+		char* p;
+		unsigned long value;
+		if (!file) {
+			return -1; /* Could not open file */
+		}
+
+		if (!fgets(buffer, sizeof(buffer), file)) {
+			fclose(file);
+			return -1; /* Could not read line */
+		}
+
+		/* Check there are no extra lines */
+		c = fgetc(file);
+		if (c != EOF) {
+			fclose(file);
+			return -1; /* File has more than one line */
+		}
+		fclose(file);
+
+		/* Validate that the line contains only digits and optional newline */
+		for (p = buffer; *p != '\0'; ++p) {
+			if (*p == '\n' || *p == '\r') continue; /* skip line endings */
+			if (!isdigit((unsigned char)*p)) {
+				return -1; /* Invalid character found */
+			}
+		}
+
+		/* Convert string to number */
+		value = strtoul(buffer, NULL, 10);
+		if (value > 0xFFFF) {
+			return -1; /* Overflow for uint16_t */
+		}
+
+		return (uint16_t)value;
+	}
+
 	#ifdef __linux__
 		void sleepMs(uint16_t ms){
 			struct timespec sleepTime = {0, 0};

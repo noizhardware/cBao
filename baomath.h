@@ -2,6 +2,7 @@
 #define __BAOMATH_H__
 
 /* 2023a10-2048 */
+/* 2026c18-2351 */
 
 /* ANSI C compliant <3 */
 
@@ -16,6 +17,13 @@ extern "C" {
 /* defines */
 #define PHI ((1.+sqrt(5.))/2.)
 #define MA_PHI 1.618033988749894848204586834
+
+#ifndef M_PI
+# define M_PI 3.1415926535897932384626433832795028841971
+#endif
+#ifndef M_PHI
+# define M_PHI 1.6180339887498948482045868343656381177203
+#endif
 
 /* prototypes: */
 static __inline__ float round_up(float num);

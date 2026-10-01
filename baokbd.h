@@ -1,8 +1,8 @@
 #ifndef _BAOKBD_H_
 #define _BAOKBD_H_
 
-#define BAOKBD_VERSION "2025a31-1910"
-#define BAOKBD_VERSION_ "2021c27-2052"
+#define BAOKBD_LAST "2021c27-2052"
+#define BAOKBD_VERSION "2025k04-1021"
 
 /*** TODO
 
@@ -50,15 +50,15 @@
 */
 
 /*** INCLUDES */
-     #include "R:/s/c/i/baothread.h"
-     #include "R:/s/c/i/baostring.h"
+     #include "/media/nff/RED/s/c/i/baothread.h"
+     #include "/media/nff/RED/s/c/i/baostring.h"
 
-     #include "R:/s/c/i/PS2KeyAdvanced/PS2KeyAdvanced.h"
+     #include "/media/nff/RED/s/c/i/PS2KeyAdvanced/PS2KeyAdvanced.h"
      
      #include <Keyboard.h>
 
-     #include "R:/s/c/i/baoArdu.h"
-     #include "R:/s/c/i/baoutil.h"
+     #include "/media/nff/RED/s/c/i/baoardu.h"
+     #include "/media/nff/RED/s/c/i/baoutil.h"
 /* INCLUDES end. */
 
 #ifdef __cplusplus
