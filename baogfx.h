@@ -1,8 +1,8 @@
 #ifndef _BAOGFX_H_
 #define _BAOGFX_H_
 
-#define FILENAME_H_CREATED "2026i24-1501"
-#define FILENAME_H_VERSION "2026i30-2146"
+#define BAOGFX_H_CREATED "2026i24-1501"
+#define BAOGFX_H_VERSION "2026j04-2327"
 
 /*** TODO
 
@@ -14,7 +14,16 @@
 */
 
 /*** DEFINES */
-	#define BAOGFX_FRAMELEN_NOLOOP 1000 /* for static renders */
+	#define BAOGFX_FRAMELEN_STATIC 200 /* for static renders */
+	
+	#ifdef BAOGFX_FULLSCREEN
+		#define BAOGFX_CREATEWIN \
+			win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, displayX, displayY, 0);\
+			SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN_DESKTOP)
+	#else
+		#define BAOGFX_CREATEWIN \
+			win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GC_WINX_SIZE, GC_WINY_SIZE, 0)
+	#endif
 
 	#define BAOGFX_FAST_PRE \
 		SDL_Window* win;\
@@ -23,19 +32,16 @@
 		int running;\
 		SDL_Init(SDL_INIT_VIDEO);\
 		SDL_ShowCursor(SDL_DISABLE);/*hide mouse cursor/pointer*/\
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");/*forces nearest-neighbor so you get sharp blocks instead of a blurred upscale*/\
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");/*forces nearest-neighbor to get sharp blocks instead of a blurred upscale*/\
 		SDL_DisplayMode desktopMode;\
 		SDL_GetDesktopDisplayMode(0, &desktopMode);\
 		int displayX = desktopMode.w;\
 		int displayY = desktopMode.h;\
-		int resX = desktopMode.w/GC_RESDOWNSCALE;\
-		int resY = desktopMode.h/GC_RESDOWNSCALE;\
+		int resX = desktopMode.w/BAOGFX_RESDOWNSCALE;\
+		int resY = desktopMode.h/BAOGFX_RESDOWNSCALE;\
 		SDL_Log("display size(xy); %d x %d\n", displayX, displayY);\
-		SDL_Log("resize[x%d] -> %d x %d\n", GC_RESDOWNSCALE, resX, resY);\
-		if(BAOGFX_FULLSCREEN){\
-			win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, displayX, displayY, 0);\
-			SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN_DESKTOP);}\
-			else{win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GC_WINX_SIZE, GC_WINY_SIZE, 0);}\
+		SDL_Log("resize[/%d] -> %d x %d\n", BAOGFX_RESDOWNSCALE, resX, resY);\
+		BAOGFX_CREATEWIN;\
 		ren = SDL_CreateRenderer(win, -1, 0);\
 		SDL_RenderSetLogicalSize(ren, resX, resY);\
 		SDL_RenderSetIntegerScale(ren, SDL_TRUE);\
@@ -53,7 +59,7 @@
 		SDL_DestroyWindow(win);\
 		SDL_Quit()
 
-	#define BAOGFX_NOLOOP_PRE \
+	#define BAOGFX_STATIC_PRE \
 		SDL_Window* win;\
 		SDL_Renderer* ren;\
 		SDL_Event ev;\
@@ -65,26 +71,27 @@
 		SDL_GetDesktopDisplayMode(0, &desktopMode);\
 		int displayX = desktopMode.w;\
 		int displayY = desktopMode.h;\
-		int resX = desktopMode.w/GC_RESDOWNSCALE;\
-		int resY = desktopMode.h/GC_RESDOWNSCALE;\
+		int resX = desktopMode.w/BAOGFX_RESDOWNSCALE;\
+		int resY = desktopMode.h/BAOGFX_RESDOWNSCALE;\
 		SDL_Log("display size(xy); %d x %d\n", displayX, displayY);\
-		SDL_Log("resize[x%d] -> %d x %d\n", GC_RESDOWNSCALE, resX, resY);\
-		if(BAOGFX_FULLSCREEN){\
-			win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, displayX, displayY, 0);\
-			SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN_DESKTOP);}\
-			else{win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GC_WINX_SIZE, GC_WINY_SIZE, 0);}\
+		SDL_Log("resize[/%d] -> %d x %d\n", BAOGFX_RESDOWNSCALE, resX, resY);\
+		BAOGFX_CREATEWIN;\
 		ren = SDL_CreateRenderer(win, -1, 0);\
 		SDL_RenderSetLogicalSize(ren, resX, resY);\
 		SDL_RenderSetIntegerScale(ren, SDL_TRUE)
 
-	#define BAOGFX_NOLOOP_POST \
+	#define BAOGFX_STATIC_POST \
 		SDL_RenderPresent(ren);\
 		running = 1;\
 		while (running) {\
 		while (SDL_PollEvent(&ev)) {\
-		if (ev.type == SDL_QUIT) {\
-		running = 0;}}\
-		SDL_Delay(BAOGFX_FRAMELEN_NOLOOP);\
+		if (ev.type == SDL_QUIT) {running = 0;}\
+		if(ev.type==SDL_KEYDOWN && !ev.key.repeat){\
+			SDL_Keycode k = ev.key.keysym.sym;\
+			if(k==SDLK_ESCAPE) { running=0; }\
+		}\
+		}\
+		SDL_Delay(BAOGFX_FRAMELEN_STATIC);\
 		}\
 		SDL_DestroyRenderer(ren);\
 		SDL_DestroyWindow(win);\
