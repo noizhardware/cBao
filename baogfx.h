@@ -2,7 +2,7 @@
 #define _BAOGFX_H_
 
 #define BAOGFX_H_CREATED "2026i24-1501"
-#define BAOGFX_H_VERSION "2026j04-2327"
+#define BAOGFX_H_VERSION "2026j12-1150"
 
 /*** TODO
 
@@ -15,6 +15,7 @@
 
 /*** DEFINES */
 	#define BAOGFX_FRAMELEN_STATIC 200 /* for static renders */
+	#define BAOGFX_ZOOM_DEFAULT 1
 	
 	#ifdef BAOGFX_FULLSCREEN
 		#define BAOGFX_CREATEWIN \
@@ -24,6 +25,8 @@
 		#define BAOGFX_CREATEWIN \
 			win = SDL_CreateWindow(GC_WINNAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GC_WINX_SIZE, GC_WINY_SIZE, 0)
 	#endif
+
+	extern uint32_t G_BAOGFX_zoom;
 
 	#define BAOGFX_FAST_PRE \
 		SDL_Window* win;\
@@ -37,10 +40,10 @@
 		SDL_GetDesktopDisplayMode(0, &desktopMode);\
 		int displayX = desktopMode.w;\
 		int displayY = desktopMode.h;\
-		int resX = desktopMode.w/BAOGFX_RESDOWNSCALE;\
-		int resY = desktopMode.h/BAOGFX_RESDOWNSCALE;\
+		int resX = desktopMode.w/G_BAOGFX_zoom;\
+		int resY = desktopMode.h/G_BAOGFX_zoom;\
 		SDL_Log("display size(xy); %d x %d\n", displayX, displayY);\
-		SDL_Log("resize[/%d] -> %d x %d\n", BAOGFX_RESDOWNSCALE, resX, resY);\
+		SDL_Log("resize[/%d] -> %d x %d\n", G_BAOGFX_zoom, resX, resY);\
 		BAOGFX_CREATEWIN;\
 		ren = SDL_CreateRenderer(win, -1, 0);\
 		SDL_RenderSetLogicalSize(ren, resX, resY);\
@@ -71,10 +74,10 @@
 		SDL_GetDesktopDisplayMode(0, &desktopMode);\
 		int displayX = desktopMode.w;\
 		int displayY = desktopMode.h;\
-		int resX = desktopMode.w/BAOGFX_RESDOWNSCALE;\
-		int resY = desktopMode.h/BAOGFX_RESDOWNSCALE;\
+		int resX = desktopMode.w/G_BAOGFX_zoom;\
+		int resY = desktopMode.h/G_BAOGFX_zoom;\
 		SDL_Log("display size(xy); %d x %d\n", displayX, displayY);\
-		SDL_Log("resize[/%d] -> %d x %d\n", BAOGFX_RESDOWNSCALE, resX, resY);\
+		SDL_Log("resize[/%d] -> %d x %d\n", G_BAOGFX_zoom, resX, resY);\
 		BAOGFX_CREATEWIN;\
 		ren = SDL_CreateRenderer(win, -1, 0);\
 		SDL_RenderSetLogicalSize(ren, resX, resY);\
